@@ -15,10 +15,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth/login">
-              <Button variant="ghost" className="font-semibold">Iniciar Sesión</Button>
-            </Link>
-            <Link href="/auth/login">
-              <Button className="bg-primary font-bold px-6">Comenzar</Button>
+              <Button className="bg-primary font-bold px-6">Comienza a Aprender</Button>
             </Link>
           </div>
         </div>
