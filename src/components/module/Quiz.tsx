@@ -55,18 +55,18 @@ export function Quiz({ questions, onComplete }: QuizProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-headline font-bold text-primary">Assessment Complete!</h2>
-            <p className="text-muted-foreground text-lg">You've finished this section's checkpoint.</p>
+            <h2 className="text-3xl font-headline font-bold text-primary">¡Evaluación Completada!</h2>
+            <p className="text-muted-foreground text-lg">Has terminado el punto de control de esta sección.</p>
           </div>
           <div className="py-8">
             <div className="text-6xl font-black text-accent">{finalScore}%</div>
-            <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground mt-2">Accuracy Score</p>
+            <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground mt-2">Puntaje de Precisión</p>
           </div>
           <Button 
             className="w-full h-12 text-lg bg-primary hover:bg-primary/90"
             onClick={() => onComplete(finalScore)}
           >
-            Continue to Next Section
+            Continuar a la Siguiente Sección
           </Button>
         </CardContent>
       </Card>
@@ -78,7 +78,7 @@ export function Quiz({ questions, onComplete }: QuizProps) {
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-center mb-4">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Pregunta {currentQuestionIndex + 1} de {questions.length}
           </span>
           <div className="h-1 w-24 bg-muted rounded-full overflow-hidden">
             <div 
@@ -94,7 +94,7 @@ export function Quiz({ questions, onComplete }: QuizProps) {
       <CardContent className="space-y-6">
         <RadioGroup
           value={selectedAnswer?.toString()}
-          onValueChange={(v) => !showFeedback && setSelectedAnswer(parseInt(v))}
+          onValueChange={(v: string) => !showFeedback && setSelectedAnswer(parseInt(v))}
           className="space-y-3"
         >
           {currentQuestion.options.map((option, idx) => {
@@ -132,22 +132,22 @@ export function Quiz({ questions, onComplete }: QuizProps) {
                 <>
                   <CheckCircle2 className="h-5 w-5 mt-0.5" />
                   <div>
-                    <p className="font-bold">Correct!</p>
-                    <p className="text-sm">Great job understanding this concept.</p>
+                    <p className="font-bold">¡Correcto!</p>
+                    <p className="text-sm">Gran trabajo entendiendo este concepto.</p>
                   </div>
                 </>
               ) : (
                 <>
                   <XCircle className="h-5 w-5 mt-0.5" />
                   <div>
-                    <p className="font-bold">Not quite.</p>
-                    <p className="text-sm">The correct answer was: {currentQuestion.options[currentQuestion.correctAnswer]}</p>
+                    <p className="font-bold">No exactamente.</p>
+                    <p className="text-sm">La respuesta correcta era: {currentQuestion.options[currentQuestion.correctAnswer]}</p>
                   </div>
                 </>
               )}
             </div>
             <Button onClick={handleContinue} className="w-full bg-primary h-12 text-lg">
-              {currentQuestionIndex + 1 < questions.length ? 'Next Question' : 'Finish Quiz'}
+              {currentQuestionIndex + 1 < questions.length ? 'Siguiente Pregunta' : 'Finalizar Cuestionario'}
             </Button>
           </div>
         ) : (
@@ -156,7 +156,7 @@ export function Quiz({ questions, onComplete }: QuizProps) {
             onClick={handleNext} 
             className="w-full bg-primary h-12 text-lg"
           >
-            Submit Answer
+            Enviar Respuesta
           </Button>
         )}
       </CardContent>

@@ -34,8 +34,8 @@ export function FeedbackSurvey({ onComplete }: FeedbackSurveyProps) {
               <Send className="h-12 w-12 text-emerald-600 animate-pulse" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-headline font-bold text-emerald-900">Thank You!</CardTitle>
-          <p className="text-emerald-700 text-lg">Your feedback helps us make DiaCero better for everyone.</p>
+          <CardTitle className="text-3xl font-headline font-bold text-emerald-900">¡Gracias!</CardTitle>
+          <p className="text-emerald-700 text-lg">Tus comentarios nos ayudan a mejorar DiaCero para todos.</p>
         </CardContent>
       </Card>
     );
@@ -49,13 +49,13 @@ export function FeedbackSurvey({ onComplete }: FeedbackSurveyProps) {
             <MessageSquare className="h-10 w-10 text-primary" />
           </div>
         </div>
-        <CardTitle className="text-2xl font-headline font-bold">Your Opinion Matters</CardTitle>
-        <CardDescription className="text-lg">How was your learning experience today?</CardDescription>
+        <CardTitle className="text-2xl font-headline font-bold">Tu Opinión Importa</CardTitle>
+        <CardDescription className="text-lg">¿Cómo fue tu experiencia de aprendizaje hoy?</CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-4 text-center">
-            <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Overall Rating</Label>
+            <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Calificación General</Label>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -77,19 +77,19 @@ export function FeedbackSurvey({ onComplete }: FeedbackSurveyProps) {
               ))}
             </div>
             <p className="text-sm text-muted-foreground font-medium italic">
-              {rating === 1 && "Could be much better"}
-              {rating === 2 && "Needs improvement"}
-              {rating === 3 && "It was okay"}
-              {rating === 4 && "Great experience!"}
-              {rating === 5 && "Exceeded my expectations!"}
+              {rating === 1 && "Podría ser mucho mejor"}
+              {rating === 2 && "Necesita mejorar"}
+              {rating === 3 && "Estuvo bien"}
+              {rating === 4 && "¡Gran experiencia!"}
+              {rating === 5 && "¡Superó mis expectativas!"}
             </p>
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="comments" className="text-sm font-semibold">Any additional thoughts?</Label>
+            <Label htmlFor="comments" className="text-sm font-semibold">¿Algún pensamiento adicional?</Label>
             <Textarea
               id="comments"
-              placeholder="What did you like? What could we improve?"
+              placeholder="¿Qué te gustó? ¿Qué podríamos mejorar?"
               className="min-h-[150px] resize-none border-primary/10 focus-visible:ring-primary"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
@@ -101,7 +101,7 @@ export function FeedbackSurvey({ onComplete }: FeedbackSurveyProps) {
             disabled={!rating} 
             className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
           >
-            Submit Feedback
+            Enviar Comentarios
           </Button>
         </form>
       </CardContent>

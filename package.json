@@ -55,6 +55,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.161",
+    "@types/mysql": "^2.15.27",
     "@types/node": "^20",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",

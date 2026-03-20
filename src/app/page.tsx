@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { BookOpen, Shield, TrendingUp, Sparkles, ArrowRight } from "lucide-react";
 import Image from 'next/image';
+import { Logo } from "@/components/ui/logo";
 
 export default function Home() {
   return (
@@ -9,18 +10,15 @@ export default function Home() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary p-2 rounded-xl">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-headline font-black tracking-tighter text-primary">DiaCero</span>
+          <div className="flex items-center gap-2 mt-1">
+            <Logo className="h-8 w-auto" />
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth/login">
-              <Button variant="ghost" className="font-semibold">Sign In</Button>
+              <Button variant="ghost" className="font-semibold">Iniciar Sesión</Button>
             </Link>
             <Link href="/auth/login">
-              <Button className="bg-primary font-bold px-6">Get Started</Button>
+              <Button className="bg-primary font-bold px-6">Comenzar</Button>
             </Link>
           </div>
         </div>
@@ -32,24 +30,24 @@ export default function Home() {
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest">
               <TrendingUp className="h-3 w-3" />
-              Pilot Program Access
+              Acceso al Programa Piloto
             </div>
             <h1 className="text-6xl md:text-7xl font-headline font-black leading-[1.05] tracking-tight text-foreground">
-              Master Clarity.<br />
-              <span className="text-primary">Unlock Potential.</span>
+              Domina la Claridad.<br />
+              <span className="text-primary">Desbloquea tu Potencial.</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
-              DiaCero provides structured, AI-enhanced learning modules designed to build high-performance cognitive habits for the modern professional.
+              DiaCero proporciona módulos de aprendizaje estructurados y mejorados por IA, diseñados para desarrollar hábitos cognitivos de alto rendimiento en el profesional moderno.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/auth/login">
                 <Button size="lg" className="h-14 px-8 text-lg font-bold bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform group">
-                  Begin Your Module
+                  Inicia tu Módulo
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold border-2">
-                Learn More
+                Saber Más
               </Button>
             </div>
           </div>
@@ -76,22 +74,22 @@ export default function Home() {
               <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center">
                 <BookOpen className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-headline font-bold">Structured Learning</h3>
-              <p className="text-muted-foreground">Interactive modules broken into digestible segments to prevent cognitive overload.</p>
+              <h3 className="text-xl font-headline font-bold">Aprendizaje Estructurado</h3>
+              <p className="text-muted-foreground">Módulos interactivos divididos en segmentos asimilables para prevenir la sobrecarga cognitiva.</p>
             </div>
             <div className="space-y-4">
               <div className="bg-accent/10 w-12 h-12 rounded-2xl flex items-center justify-center">
                 <TrendingUp className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="text-xl font-headline font-bold">Progress Tracking</h3>
-              <p className="text-muted-foreground">Automatically track your completion status and assessment scores as you learn.</p>
+              <h3 className="text-xl font-headline font-bold">Seguimiento de Progreso</h3>
+              <p className="text-muted-foreground">Rastrea automáticamente tu estado de finalización y puntajes de evaluación mientras aprendes.</p>
             </div>
             <div className="space-y-4">
               <div className="bg-emerald-100 w-12 h-12 rounded-2xl flex items-center justify-center">
                 <Shield className="h-6 w-6 text-emerald-600" />
               </div>
-              <h3 className="text-xl font-headline font-bold">Secure Access</h3>
-              <p className="text-muted-foreground">Personalized accounts ensuring your learning journey remains private and secure.</p>
+              <h3 className="text-xl font-headline font-bold">Acceso Seguro</h3>
+              <p className="text-muted-foreground">Cuentas personalizadas que garantizan que tu viaje de aprendizaje se mantenga privado y seguro.</p>
             </div>
           </div>
         </div>
@@ -101,14 +99,13 @@ export default function Home() {
       <footer className="py-12 bg-background border-t">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="font-headline font-black text-primary">DiaCero</span>
+            <Logo className="h-6 w-auto opacity-70 grayscale" />
           </div>
-          <p className="text-muted-foreground text-sm">© 2024 DiaCero Learning Systems. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© 2024 DiaCero Learning Systems. Todos los derechos reservados.</p>
           <div className="flex gap-6 text-sm font-medium text-muted-foreground">
-            <Link href="#" className="hover:text-primary transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Support</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Términos</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Privacidad</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Soporte</Link>
           </div>
         </div>
       </footer>

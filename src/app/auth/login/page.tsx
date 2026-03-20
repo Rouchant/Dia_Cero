@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Loader2, Lock } from "lucide-react";
 import Link from 'next/link';
+import { Logo } from "@/components/ui/logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,11 +28,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-      <Link href="/" className="mb-8 flex items-center gap-2">
-        <div className="bg-primary p-2 rounded-xl">
-          <Sparkles className="h-6 w-6 text-white" />
-        </div>
-        <span className="text-2xl font-headline font-black tracking-tighter text-primary">DiaCero</span>
+      <Link href="/" className="mb-8">
+        <Logo className="h-10 w-auto" />
       </Link>
 
       <Card className="w-full max-w-md shadow-2xl border-primary/5">
@@ -41,17 +39,17 @@ export default function LoginPage() {
               <Lock className="h-6 w-6 text-muted-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-headline font-bold">Pilot Access</CardTitle>
-          <CardDescription>Enter your credentials to access the learning module</CardDescription>
+          <CardTitle className="text-2xl font-headline font-bold">Acceso Piloto</CardTitle>
+          <CardDescription>Ingresa tus credenciales para acceder al módulo</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo Electrónico</Label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="pilot@diacero.com" 
+                placeholder="piloto@diacero.com" 
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -60,8 +58,8 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label htmlFor="password">Password</Label>
-                <button type="button" className="text-xs text-primary font-medium hover:underline">Forgot password?</button>
+                <Label htmlFor="password">Contraseña</Label>
+                <button type="button" className="text-xs text-primary font-medium hover:underline">¿Olvidaste tu contraseña?</button>
               </div>
               <Input 
                 id="password" 
@@ -77,19 +75,19 @@ export default function LoginPage() {
               className="w-full h-12 text-lg font-bold bg-primary hover:bg-primary/90 mt-4" 
               disabled={loading}
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Iniciar Sesión"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col text-center border-t py-6 bg-muted/30">
           <p className="text-sm text-muted-foreground">
-            Don't have an account? <Link href="#" className="text-primary font-bold hover:underline">Apply for pilot access</Link>
+            ¿No tienes cuenta? <Link href="#" className="text-primary font-bold hover:underline">Solicita acceso piloto</Link>
           </p>
         </CardFooter>
       </Card>
       
       <p className="mt-8 text-xs text-muted-foreground/60 max-w-xs text-center">
-        This is a controlled pilot release. For technical assistance, please contact help@diacero.com
+        Esta es una versión piloto controlada. Para asistencia técnica, contacta a help@diacero.com
       </p>
     </div>
   );

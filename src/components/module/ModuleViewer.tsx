@@ -77,12 +77,12 @@ export function ModuleViewer() {
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar Navigation */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-[85vw] sm:w-[400px] lg:w-[450px] shrink-0 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="p-6 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-headline font-bold text-primary">Module Sections</h2>
+            <h2 className="text-xl font-headline font-bold text-primary">Secciones del Módulo</h2>
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -101,16 +101,18 @@ export function ModuleViewer() {
                       if (window.innerWidth < 1024) setSidebarOpen(false);
                     }}
                     className={cn(
-                      "w-full flex items-center gap-3 p-3 rounded-lg text-left text-sm transition-all group",
+                      "w-full flex items-start gap-4 p-4 rounded-xl text-left text-sm transition-all group",
                       isActive ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-primary/5 text-foreground/70"
                     )}
                   >
-                    {isCompleted ? (
-                      <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-emerald-500")} />
-                    ) : (
-                      <Circle className={cn("h-4 w-4 opacity-30", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
-                    )}
-                    <span className="flex-1 font-medium truncate">{section.title}</span>
+                    <div className="pt-0.5 shrink-0">
+                      {isCompleted ? (
+                        <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-emerald-500")} />
+                      ) : (
+                        <Circle className={cn("h-4 w-4 opacity-30", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
+                      )}
+                    </div>
+                    <span className="flex-1 font-medium leading-relaxed">{section.title}</span>
                   </button>
                 );
               })}
@@ -118,7 +120,7 @@ export function ModuleViewer() {
           </ScrollArea>
           <div className="pt-6 border-t mt-6">
             <div className="flex justify-between items-center text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
-              <span>Overall Progress</span>
+              <span>Progreso General</span>
               <span>{progress}%</span>
             </div>
             <Progress value={progress} className="h-2 bg-primary/10" />
@@ -146,75 +148,87 @@ export function ModuleViewer() {
         </header>
 
         {/* Section Content */}
-        <ScrollArea className="flex-1 bg-background/50">
-          <div className="max-w-4xl mx-auto p-6 md:p-12 space-y-8 animate-in fade-in duration-500">
+        <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100vh-4rem)] relative flex flex-col [&>div>div]:!block">
+          <div className="max-w-6xl mx-auto px-4 md:px-12 py-6 min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in duration-500">
             {currentSection.type === 'content' && (
-              <div className="space-y-8">
-                {currentSection.imageUrl && (
-                  <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5">
-                    <Image 
-                      src={currentSection.imageUrl} 
-                      alt={currentSection.title}
-                      fill
-                      className="object-cover"
-                      priority
-                      data-ai-hint={currentSection.imageHint}
-                    />
+              <div className="flex flex-col flex-1 h-full">
+                <div className="flex-1 flex flex-col gap-6 md:gap-8 items-center justify-start min-h-0 h-full overflow-y-auto py-4 px-2">
+                  
+                  {/* Top: Media */}
+                  <div className="w-full max-w-md md:max-w-lg lg:max-w-xl flex flex-col justify-center items-center shrink-0 mx-auto">
+                    {currentSection.imageUrl && (
+                      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
+                        <Image 
+                          src={currentSection.imageUrl} 
+                          alt={currentSection.title}
+                          fill
+                          className="object-cover"
+                          priority
+                          data-ai-hint={currentSection.imageHint}
+                        />
+                      </div>
+                    )}
+                    
+                    {currentSection.videoUrl && (
+                      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl bg-black">
+                        <iframe 
+                          src={currentSection.videoUrl} 
+                          className="absolute inset-0 w-full h-full"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                {currentSection.videoUrl && (
-                  <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                    <iframe 
-                      src={currentSection.videoUrl} 
-                      className="absolute inset-0 w-full h-full"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
 
-                <div className="prose prose-lg max-w-none text-foreground/80 leading-relaxed font-body">
-                  <p className="whitespace-pre-wrap text-lg md:text-xl">
-                    {currentSection.content}
-                  </p>
+                  {/* Bottom: Text & AI */}
+                  <div className="w-full max-w-3xl space-y-6 flex flex-col pb-6 mx-auto">
+                    <div className="prose prose-lg max-w-none text-foreground/80 leading-relaxed font-body">
+                      <p className="whitespace-pre-wrap text-base md:text-lg">
+                        {currentSection.content}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-border/50 shrink-0">
+                      <AIHelper 
+                        sectionContent={currentSection.content || ""} 
+                        sectionTitle={currentSection.title} 
+                      />
+                    </div>
+                  </div>
+
                 </div>
 
-                <div className="pt-8 border-t">
-                  <AIHelper 
-                    sectionContent={currentSection.content || ""} 
-                    sectionTitle={currentSection.title} 
-                  />
+                {/* Navigation Buttons Pinned to Bottom */}
+                <div className="flex items-center justify-between pt-6 mt-8 border-t border-border/50 shrink-0">
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePrev} 
+                    disabled={currentSectionIndex === 0}
+                    className="h-12 px-6"
+                  >
+                    <ChevronLeft className="h-5 w-5 mr-2" />
+                    Anterior
+                  </Button>
+                  <Button 
+                    onClick={handleNext} 
+                    className="h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                  >
+                    Siguiente Sección
+                    <ChevronRight className="h-5 w-5 ml-2" />
+                  </Button>
                 </div>
               </div>
             )}
 
             {currentSection.type === 'quiz' && (
-              <Quiz questions={currentSection.questions || []} onComplete={handleQuizComplete} />
+              <div className="flex-1 flex flex-col items-center justify-center py-8 h-full">
+                <Quiz questions={currentSection.questions || []} onComplete={handleQuizComplete} />
+              </div>
             )}
 
             {currentSection.type === 'feedback' && (
-              <FeedbackSurvey onComplete={handleFeedbackComplete} />
-            )}
-
-            {/* Navigation Buttons */}
-            {currentSection.type === 'content' && (
-              <div className="flex items-center justify-between pt-12">
-                <Button 
-                  variant="outline" 
-                  onClick={handlePrev} 
-                  disabled={currentSectionIndex === 0}
-                  className="h-12 px-6"
-                >
-                  <ChevronLeft className="h-5 w-5 mr-2" />
-                  Previous
-                </Button>
-                <Button 
-                  onClick={handleNext} 
-                  className="h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
-                >
-                  Next Section
-                  <ChevronRight className="h-5 w-5 ml-2" />
-                </Button>
+              <div className="flex-1 flex flex-col items-center justify-center py-8 h-full">
+                <FeedbackSurvey onComplete={handleFeedbackComplete} />
               </div>
             )}
           </div>

@@ -66,7 +66,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           className="border-accent/30 text-accent hover:bg-accent/5"
         >
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-          Quick Summary
+          Resumen Rápido
         </Button>
         <Button 
           variant="outline" 
@@ -76,7 +76,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           className="border-primary/30 text-primary hover:bg-primary/5"
         >
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
-          Explain Simply
+          Explicar de Forma Sencilla
         </Button>
       </div>
 
@@ -86,7 +86,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
                 {summary ? <BookOpen className="h-4 w-4 text-accent" /> : <Brain className="h-4 w-4 text-primary" />}
-                {summary ? 'Key Takeaway' : 'Adaptive Explanation'}
+                {summary ? 'Punto Clave' : 'Explicación Adaptativa'}
               </CardTitle>
               {explanation?.level && (
                 <Badge variant="secondary" className="capitalize text-[10px] py-0">{explanation.level}</Badge>
@@ -99,7 +99,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
             </p>
             {explanation?.analogy && (
               <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-                <p className="text-[11px] font-bold uppercase text-primary mb-1">Analogy Used</p>
+                <p className="text-[11px] font-bold uppercase text-primary mb-1">Analogía Utilizada</p>
                 <p className="text-xs text-primary/80 font-medium">{explanation.analogy}</p>
               </div>
             )}
@@ -109,7 +109,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
               className="p-0 h-auto text-[10px] text-muted-foreground hover:bg-transparent"
               onClick={() => { setSummary(null); setExplanation(null); }}
             >
-              Clear AI insights
+              Borrar información de IA
             </Button>
           </CardContent>
         </Card>
