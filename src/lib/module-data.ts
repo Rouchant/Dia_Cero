@@ -24,77 +24,77 @@ export interface LearningModule {
 }
 
 export const DIA_CERO_MODULE: LearningModule = {
-  id: 'dia-cero-intro',
-  title: 'DiaCero: Fundamentos del Crecimiento Intelectual',
-  description: 'Domina los principios centrales de claridad, enfoque y aprendizaje continuo en un entorno moderno.',
+  id: 'seguridad-laboral-chile',
+  title: 'Módulo Piloto: Seguridad Laboral (Ley 16.744)',
+  description: 'Conoce los fundamentos de la prevención de riesgos en Chile, el seguro social obligatorio y el Derecho a Saber (ODI).',
   sections: [
     {
-      id: 'welcome',
-      title: 'Bienvenido a DiaCero',
+      id: 'ley-16744',
+      title: '1. ¿Qué es la Ley 16.744?',
       type: 'content',
-      content: 'DiaCero está diseñado para llevarte de una línea base de cero a un estado altamente productivo de claridad y propósito. En esta sección introductoria, exploramos por qué el enfoque es la máxima ventaja competitiva en el siglo XXI. El crecimiento intelectual no se trata solo de recopilar información; se trata de sintetizarla en sabiduría procesable.',
-      imageUrl: 'https://picsum.photos/seed/learn1/1200/600',
-      imageHint: 'online learning'
+      content: 'En Chile, la Ley 16.744 establece un seguro social obligatorio contra riesgos de accidentes del trabajo y enfermedades profesionales. Este seguro protege a todos los trabajadores dependientes e independientes, brindando cobertura médica, económica y preventiva frente a cualquier eventualidad que ocurra a causa o con ocasión del trabajo.',
+      imageUrl: 'https://picsum.photos/seed/safety1/1200/600',
+      imageHint: 'construction safety'
     },
     {
-      id: 'core-concepts',
-      title: 'Conceptos Centrales del Enfoque',
+      id: 'derecho-a-saber',
+      title: '2. El Derecho a Saber (ODI)',
       type: 'content',
-      content: 'El enfoque es un recurso finito. Para gestionarlo eficazmente, debes comprender la filosofía del "Trabajo Profundo". El trabajo profundo es la capacidad de concentrarse sin distracciones en una tarea cognitivamente exigente. Es una habilidad que te permite dominar rápidamente información complicada y producir mejores resultados en menos tiempo. Contrasta esto con el trabajo superficial: tareas de estilo logístico, no exigentes cognitivamente, a menudo realizadas mientras estás distraído.',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+      content: 'El "Derecho a Saber" u Obligación de Informar (ODI) es un mandato legal para todo empleador en Chile. Consiste en la obligación de informar oportuna y convenientemente a todos sus trabajadores acerca de los riesgos que entrañan sus labores, las medidas preventivas y los métodos de trabajo correctos para evitar accidentes o enfermedades profesionales antes de iniciar sus actividades.',
+      videoUrl: 'https://www.youtube.com/embed/aTodIVUqh2s'
     },
     {
       id: 'quiz-1',
-      title: 'Punto de Control de Enfoque',
+      title: 'Punto de Control: Conceptos Base',
       type: 'quiz',
       questions: [
         {
           id: 'q1',
-          question: '¿Cuál es la característica principal del "Trabajo Profundo"?',
+          question: '¿A quiénes protege principalmente la Ley 16.744?',
           options: [
-            'Multitarea eficiente',
-            'Enfocarse sin distracciones en tareas cognitivamente exigentes',
-            'Responder correos electrónicos a medida que llegan',
-            'Trabajar más horas que los compañeros'
+            'Solo a los empleadores',
+            'A todos los trabajadores dependientes e independientes',
+            'Únicamente a los trabajadores del rubro de la construcción',
+            'A personas que no tienen trabajo'
           ],
           correctAnswer: 1
         },
         {
           id: 'q2',
-          question: '¿Por qué el enfoque se considera un "recurso finito"?',
+          question: '¿Qué significan las siglas ODI en el contexto de prevención chileno?',
           options: [
-            'Se puede cambiar por dinero',
-            'Disminuye con la edad',
-            'Requiere energía fisiológica y se agota con el uso',
-            'Solo existe por la mañana'
+            'Organización de Desarrollo Interno',
+            'Obligación de Informar',
+            'Orden de Despido Inmediato',
+            'Oficina de Inspección'
           ],
-          correctAnswer: 2
+          correctAnswer: 1
         }
       ]
     },
     {
-      id: 'knowledge-synthesis',
-      title: 'Sintetizando Conocimiento',
+      id: 'epp',
+      title: '3. Elementos de Protección Personal (EPP)',
       type: 'content',
-      content: 'Una vez que tienes enfoque, el siguiente paso es la síntesis. La síntesis es el proceso de combinar ideas diversas en algo nuevo. En esta etapa, te mueves más allá de la memorización mecánica hacia el ámbito del verdadero entendimiento. Aprendes a ver patrones donde otros ven caos.',
-      imageUrl: 'https://picsum.photos/seed/brain/800/400',
-      imageHint: 'brain knowledge'
+      content: 'Los Elementos de Protección Personal (EPP) son dispositivos, accesorios y vestimentas diseñados para proteger al trabajador de posibles lesiones. En Chile, el empleador debe proporcionar estos elementos de forma gratuita, y el trabajador está obligado legalmente a usarlos y cuidarlos. Los EPP no eliminan el riesgo, sino que minimizan las consecuencias de un accidente.',
+      imageUrl: 'https://picsum.photos/seed/epp/800/400',
+      imageHint: 'personal protective equipment'
     },
     {
       id: 'final-assessment',
-      title: 'Cuestionario Final de Dominio',
+      title: 'Cuestionario Evaluativo',
       type: 'quiz',
       questions: [
         {
           id: 'q3',
-          question: '¿Qué proceso implica combinar ideas diversas para crear un nuevo entendimiento?',
+          question: 'Sobre los EPP (Elementos de Protección Personal), ¿cuál afirmación es correcta?',
           options: [
-            'Memorización',
-            'Síntesis',
-            'Clasificación',
-            'Archivo'
+            'El trabajador debe comprarlos con su propio dinero',
+            'Eliminan completamente la probabilidad de que ocurra el accidente',
+            'El empleador debe entregarlos gratuitamente y el trabajador debe usarlos',
+            'Su uso es completamente opcional según la comodidad del trabajador'
           ],
-          correctAnswer: 1
+          correctAnswer: 2
         }
       ]
     },

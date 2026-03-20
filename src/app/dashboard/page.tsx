@@ -106,7 +106,7 @@ export default function Dashboard() {
             </div>
 
             <Card className="overflow-hidden border-primary/10 shadow-xl group hover:shadow-2xl transition-all">
-              <div className="relative h-48 sm:h-64">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
                 <Image 
                   src="https://picsum.photos/seed/learn1/1200/600" 
                   alt="Module Hero"
