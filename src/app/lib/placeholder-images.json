@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-learning",
+      "description": "A person learning online with a laptop",
+      "imageUrl": "https://picsum.photos/seed/learn1/1200/600",
+      "imageHint": "online learning"
+    },
+    {
+      "id": "brain-concept",
+      "description": "A stylized brain representing knowledge",
+      "imageUrl": "https://picsum.photos/seed/brain/800/400",
+      "imageHint": "brain knowledge"
+    },
+    {
+      "id": "team-collaboration",
+      "description": "A team collaborating on a project",
+      "imageUrl": "https://picsum.photos/seed/team1/800/400",
+      "imageHint": "team collaboration"
+    }
+  ]
+}
