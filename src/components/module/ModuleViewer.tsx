@@ -12,8 +12,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { createClient } from '@/utils/supabase/client';
 import { Logo } from "@/components/ui/logo";
+import { useRouter } from 'next/navigation';
 
-export function ModuleViewer() {
+export function ModuleViewer({ moduleId }: { moduleId: string }) {
+  const router = useRouter();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [completedSections, setCompletedSections] = useState<string[]>([]);
   const [quizScores, setQuizScores] = useState<Record<string, number>>({});
@@ -40,7 +42,7 @@ export function ModuleViewer() {
           .from('user_progress')
           .select('*')
           .eq('user_id', currentUserId)
-          .eq('module_id', 'seguridad-laboral-chile')
+          .eq('module_id', moduleId)
           .maybeSingle();
           
         if (progress) {
@@ -60,7 +62,7 @@ export function ModuleViewer() {
             quiz_questions(*)
           )
         `)
-        .eq('id', 'seguridad-laboral-chile')
+        .eq('id', moduleId)
         .single();
         
       if (modData) {
@@ -80,7 +82,7 @@ export function ModuleViewer() {
       async function saveProgress() {
         await supabase.from('user_progress').upsert({
           user_id: userId,
-          module_id: 'seguridad-laboral-chile',
+          module_id: moduleId,
           completed_sections: completedSections,
           quiz_scores: quizScores,
           current_section_index: currentSectionIndex,
@@ -110,6 +112,8 @@ export function ModuleViewer() {
     if (currentSectionIndex < moduleData.module_sections.length - 1) {
       setCurrentSectionIndex(currentSectionIndex + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      router.push('/certificate/' + moduleId);
     }
   };
 
@@ -129,6 +133,23 @@ export function ModuleViewer() {
     console.log('Feedback submitted:', data);
     setCompletedSections([...completedSections, currentSection.id]);
     // Potentially redirect to a "Course Completed" page
+  };
+
+  // Helper function to convert raw YouTube links into Embed iframes dynamically
+  const parseVideoUrl = (url: string) => {
+    if (!url) return '';
+    try {
+      if (url.includes('youtu.be/')) {
+        const id = url.split('youtu.be/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      if (url.includes('youtube.com/watch')) {
+        const urlObj = new URL(url);
+        const id = urlObj.searchParams.get('v');
+        if (id) return `https://www.youtube.com/embed/${id}`;
+      }
+    } catch(e) {}
+    return url;
   };
 
   // Map database fields to components expected fields format
@@ -238,7 +259,7 @@ export function ModuleViewer() {
                     {currentSection.video_url && (
                       <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl bg-black">
                         <iframe 
-                          src={currentSection.video_url} 
+                          src={parseVideoUrl(currentSection.video_url)} 
                           className="absolute inset-0 w-full h-full"
                           allowFullScreen
                         />

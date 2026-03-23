@@ -66,7 +66,7 @@ export function Quiz({ questions, onComplete }: QuizProps) {
             className="w-full h-12 text-lg bg-primary hover:bg-primary/90"
             onClick={() => onComplete(finalScore)}
           >
-            Continuar a la Siguiente Sección
+            Obtener Certificado de Aprobación
           </Button>
         </CardContent>
       </Card>
