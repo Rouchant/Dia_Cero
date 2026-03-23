@@ -1,61 +1,143 @@
-# DiaCero - Plataforma de Aprendizaje Estructurado
+# DiaCero — Plataforma de Entrenamiento Normativo
 
-Plataforma educativa moderna impulsada por un enfoque en maximizar el rendimiento cognitivo de los estudiantes a través de módulos interactivos de "Línea Base de Enfoque".
+> **Cero papeleo. 100% digital.** Plataforma educativa moderna para la capacitación en normativas de seguridad ocupacional chilena, diseñada para maximizar la retención y minimizar el tiempo fuera de faena.
 
 ---
 
 ## 🌟 Características Principales
 
-* 🚀 **Sistema de Módulos (Module Viewer)**: Interfaz estructurada verticalmente con seguimiento de lectura, secciones de contenido interactivas, integración multimedia (videos/imágenes 16:9), y asistente inteligente (IA) nativo en contexto.
-* 🎓 **Panel del Estudiante**: Panel individual (Dashboard) donde los alumnos pueden apreciar de un pantazo sus estadísticas de aprendizaje, tiempo de concentración, progreso porcentual y puntajes evaluativos.
-* 🛡️ **Panel de Administración**: Centro de monitoreo general del piloto para visualizar en tiempo real el progreso de los usuarios afiliados, puntajes de finalización y estado de los perfiles (Activos/Inactivos/Completados), construido con KPIs e indicadores de semáforo.
-* 📝 **Evaluaciones y Feedback**: Sistema de cuestionarios (Quizzes) adaptativos y encuestas de retroalimentación totalmente integrados para medir el pulso final al culminar el material de estudio.
-* 🎨 **Diseño Responsivo Total**: Una capa visual de alta jerarquía diseñada con Tailwind y animaciones `framer-motion`/shadcn para una inmersión "premium". Además, incluye inyección de Logos Vectorizados (Componentes híbridos SVG/PNG) altamente escalables.
+| Feature | Descripción |
+|---|---|
+| 🔐 **Autenticación Real** | Login / registro unificado con **Supabase Auth** (email + contraseña). Auto-registro en el primer acceso. |
+| 📚 **Módulos de Aprendizaje** | Visor estructurado verticalmente con secciones de contenido interactivas, integración multimedia (YouTube 16:9) y seguimiento de lectura por sección. |
+| 🎓 **Dashboard del Estudiante** | Resumen de módulos asignados, barra de progreso por módulo, y acceso directo al certificado al completar. |
+| 🛡️ **Panel de Administración** | Centro de monitoreo en tiempo real: progreso de cohorte, KPIs, indicadores semáforo (Activo / Inactivo / Completado) y puntajes de evaluación. |
+| 📝 **Quizzes Integrados** | Sistema de cuestionarios adaptativos al final de cada módulo para validar el aprendizaje. |
+| 🏅 **Certificados PDF** | Emisión automática de certificados firmados en formato A4 al completar un módulo. |
+| 🎨 **Diseño Premium Responsivo** | UI ligera en modo claro con glassmorphism, paleta de marca corporativa, animaciones suaves y logo vectorial dinámico. |
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-* [Next.js 14+](https://nextjs.org/) (App Router)
-* [React](https://reactjs.org/)
-* [Tailwind CSS](https://tailwindcss.com/)
-* Componentes de Interfaz: Accesorios basados en la especificación [Shadcn UI](https://ui.shadcn.com/)
-* Iconografía visual: [Lucide React](https://lucide.dev/)
-* *Node Engine, Pre-empaquetado Firebase Studio Exports y Genkit Analytics.*
+| Capa | Tecnología |
+|---|---|
+| **Framework** | [Next.js 15](https://nextjs.org/) (App Router + Turbopack) |
+| **Frontend** | [React 19](https://react.dev/) |
+| **Estilos** | [Tailwind CSS 3](https://tailwindcss.com/) |
+| **Componentes UI** | [Shadcn UI](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) |
+| **Base de Datos & Auth** | [Supabase](https://supabase.com/) (PostgreSQL + Auth) |
+| **Iconografía** | [Lucide React](https://lucide.dev/) |
+| **Gráficos** | [Recharts](https://recharts.org/) |
+| **IA (Opcional)** | [Genkit](https://firebase.google.com/docs/genkit) + Google GenAI |
+| **Lenguaje** | TypeScript 5 |
+
+---
+
+## 🗄️ Arquitectura de Base de Datos (Supabase)
+
+La plataforma usa **Supabase PostgreSQL** como fuente de verdad. Las tablas principales son:
+
+```
+modules          → Catálogo de módulos de curso (título, descripción, orden)
+module_sections  → Secciones individuales de cada módulo (contenido, videos, tipo)
+user_progress    → Progreso por usuario/módulo (secciones completadas, puntajes)
+profiles         → Metadatos extendidos del usuario (rol: student | admin)
+```
+
+> **Row Level Security (RLS)** habilitado. Los usuarios solo pueden leer/escribir su propio progreso.
 
 ---
 
 ## 🧭 Mapa de Rutas
 
-* **`/`** — Página de aterrizaje (Landing page) de impacto para atraer la atención.
-* **`/auth/login`** — Formulario de autenticación del módulo piloto.
-* **`/dashboard`** — Centro de usuario y punto de acceso al aprendizaje.
-* **`/admin/dashboard`** — Panel de supervisor / facilitador con la cuadrícula de análisis.
-* **`/module/[id]`** — Visor central y responsivo del módulo de curso.
+| Ruta | Descripción |
+|---|---|
+| `/` | Landing page + formulario de acceso unificado (login / registro) |
+| `/dashboard` | Portal individual del estudiante con módulos asignados y progreso |
+| `/module/[id]` | Visor central del módulo de curso |
+| `/admin/dashboard` | Panel del administrador / facilitador (roles via `user_metadata.role`) |
+| `/certificate/[id]` | Generación y descarga del certificado de finalización |
 
 ---
 
-## 🚀 Desarrollo Local (Modo Piloto)
+## ⚙️ Variables de Entorno
 
-1. **Instalar el núcleo de dependencias** e inyectar de manera segura las definiciones complementarias ocultas que exige la arquitectura analítica (por ej. `aws-lambda`, `mysql`):
-   ```bash
-   npm install
-   npm install -D @types/aws-lambda @types/mysql
-   ```
+Crea un archivo `.env.local` en la raíz del proyecto con las siguientes claves (obtenidas desde tu proyecto en [supabase.com](https://supabase.com/dashboard)):
 
-2. **Levantar el servidor local** en modo desarrollo:
-   ```bash
-   npm run dev
-   ```
-
-3. **Interactuar** accediendo mediante el navegador a `http://localhost:9002` (o el puerto emitido por la consola).
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
+```
 
 ---
 
-## ⚙️ Gestión de Datos y Contenido
+## 🚀 Desarrollo Local
 
-Al estar configurado como Programa Piloto sin requerimiento estricto de base de datos todavía (uso de estados estáticos y caché temporal en entorno de pruebas), se proveen estos módulos:
+```bash
+# 1. Instalar dependencias
+npm install
 
-* **Contenidos Educativos**: El plan de estudio actual *"DiaCero: Fundamentos del Crecimiento Intelectual"*, junto con sus quizzes y enlaces lógicos de recursos audiovisuales se estructuran libremente desde `src/lib/module-data.ts`.
-* **Métricas Mockeables**: La lista de alumnos evaluables por el gestor de la cohorte en el panel administrativo es editable desde `src/lib/mock-users.ts`.
-* **Logotipos Flexibles**: El logo del encabezado está programado mediante una subrutina propia en `components/ui/logo.tsx`. Puedes proveer un archivo nativo llamado `logo.png` directamente en tu carpeta de assets global `public/` y la aplicación forzará su visualización dinámica. De lo contrario, mantendrá un excelente renderizado digital predefinido en vectores.
+# 2. Configurar variables de entorno (ver sección anterior)
+cp .env.local.example .env.local   # o créalo manualmente
+
+# 3. Iniciar servidor de desarrollo (Turbopack, puerto 9002)
+npm run dev
+```
+
+Accede a `http://localhost:9002` en tu navegador.
+
+### Otros comandos útiles
+
+```bash
+npm run build       # Build de producción
+npm run lint        # Linting con ESLint
+npm run typecheck   # Verificación de tipos TypeScript
+```
+
+---
+
+## 👤 Roles de Usuario
+
+| Rol | Acceso | Configuración |
+|---|---|---|
+| **Estudiante** | Dashboard + módulos asignados | Por defecto al registrarse |
+| **Administrador** | Todo lo anterior + `/admin/dashboard` | Requiere `user_metadata.role = 'admin'` en Supabase Auth |
+
+Para promover un usuario a administrador, actualiza su metadata desde el panel de Supabase:
+```json
+{ "role": "admin" }
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── app/                  # Rutas de Next.js (App Router)
+│   ├── page.tsx          # Landing / Login
+│   ├── dashboard/        # Portal del estudiante
+│   ├── module/[id]/      # Visor de módulos
+│   ├── admin/dashboard/  # Panel administrativo
+│   └── certificate/[id]/ # Generación de certificados
+├── components/
+│   ├── ui/               # Shadcn UI + componentes base (logo.tsx, etc.)
+│   └── module/           # Componentes del visor (Quiz, secciones, etc.)
+├── lib/                  # Utilidades y datos estáticos de respaldo
+└── utils/supabase/       # Cliente Supabase (client.ts / server.ts)
+```
+
+---
+
+## 🔄 Gestión de Contenido
+
+- **Módulos y Secciones**: administrados directamente desde las tablas `modules` y `module_sections` en Supabase.
+- **Logo**: coloca `logo.png` en `/public/` para sobrescribir el logo SVG predeterminado (detectado automáticamente por `components/ui/logo.tsx`).
+- **Fallback estático**: si no hay conexión a Supabase, `src/lib/module-data.ts` sirve como respaldo local de contenido.
+
+---
+
+## 📄 Licencia
+
+Proyecto privado — © DiaCero. Todos los derechos reservados.
