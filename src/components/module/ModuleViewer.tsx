@@ -194,7 +194,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                   >
                     <div className="pt-0.5 shrink-0">
                       {isCompleted ? (
-                        <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-emerald-500")} />
+                        <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-brand-pink")} />
                       ) : (
                         <Circle className={cn("h-4 w-4 opacity-30", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
                       )}

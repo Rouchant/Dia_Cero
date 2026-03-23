@@ -33,7 +33,6 @@ export default function Dashboard() {
 
       if (!currentUserId) return;
 
-      // 1. Fetch user progress for current user
       const { data: upData } = await supabase
         .from('user_progress')
         .select('*')
@@ -44,7 +43,6 @@ export default function Dashboard() {
         return;
       }
 
-      // 2. Fetch module records for those module_ids
       const modIds = upData.map(p => p.module_id);
       const { data: modsData } = await supabase
         .from('modules')
@@ -77,23 +75,23 @@ export default function Dashboard() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header Panel */}
-      <header className="bg-primary text-primary-foreground px-6 py-4 shadow-md bg-opacity-95 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      {/* Header Panel Light Theme */}
+      <header className="bg-white/90 text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Logo variant="white" className="h-8 w-auto" />
-            <span className="font-headline font-black text-lg tracking-tight hidden sm:inline">Portal Piloto</span>
+            <Logo className="h-8 w-auto" />
+            <span className="font-headline font-black text-lg tracking-tight hidden sm:inline mt-2.5 leading-none border-l border-brand-blue/20 pl-3">Portal Piloto</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full">
+            <Button variant="ghost" size="icon" className="text-brand-blue hover:bg-brand-lightblue/20 rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-full border border-white/10">
-              <div className="bg-primary-foreground text-primary rounded-full p-1 border-2 border-primary-foreground/20">
+            <div className="flex items-center gap-2 bg-brand-lightblue/10 px-3 py-1.5 rounded-full border border-brand-blue/10 shadow-sm">
+              <div className="bg-white text-brand-blue rounded-full p-1 border border-brand-blue/20">
                 <User className="h-4 w-4" />
               </div>
-              <span className="text-sm font-medium mr-1 hidden sm:inline">{userEmail}</span>
+              <span className="text-sm font-bold mr-1 hidden sm:inline">{userEmail}</span>
             </div>
           </div>
         </div>
@@ -104,65 +102,65 @@ export default function Dashboard() {
         
         {/* Welcome Section */}
         <section className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-headline font-bold text-slate-800 tracking-tight">
-            Hola, <span className="text-primary pr-1">Estudiante</span> 👋
+          <h1 className="text-3xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
+            Hola, <span className="text-brand-pink pr-1">Estudiante</span> 👋
           </h1>
-          <p className="text-slate-500 mt-2 text-lg">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
         </section>
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Main Course Feed */}
           <div className="flex-1 space-y-6">
-            <h2 className="text-xl font-bold font-headline mb-4 flex items-center gap-2">
-              <BookOpen className="text-primary h-5 w-5" /> Tus Módulos Activos
+            <h2 className="text-xl font-bold font-headline mb-4 flex items-center gap-2 text-brand-blue">
+              <BookOpen className="text-brand-lightblue h-5 w-5 fill-brand-lightblue/20" /> Tus Módulos Activos
             </h2>
             
             {loading ? (
-              <div className="text-center py-16 animate-pulse opacity-50 bg-slate-100 rounded-xl border border-slate-200">
-                <BookOpen className="h-8 w-8 mx-auto mb-3 text-slate-400" />
+              <div className="text-center py-16 animate-pulse opacity-50 bg-white rounded-3xl border border-brand-blue/10 shadow-sm">
+                <BookOpen className="h-8 w-8 mx-auto mb-3 text-brand-lightblue" />
                 <p className="font-medium text-slate-500">Cargando material académico desde la nube...</p>
               </div>
             ) : assignedModules.length === 0 ? (
-              <Card className="border-dashed shadow-sm text-center py-16 border-slate-300">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Star className="text-slate-400 h-8 w-8" />
+              <Card className="border-dashed shadow-sm text-center py-16 border-brand-blue/20 bg-white/50 backdrop-blur-sm rounded-3xl">
+                <div className="w-16 h-16 bg-brand-lightblue/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-blue/10">
+                  <Star className="text-brand-gold h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-700">Sin Módulos Asignados</h3>
-                <p className="text-muted-foreground max-w-sm mx-auto mt-2">Tu administrador aún no te ha matriculado en ningún currículum dinámico. ¡Vuelve pronto!</p>
+                <h3 className="text-lg font-bold text-brand-blue font-headline">Sin Módulos Asignados</h3>
+                <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">Tu administrador aún no te ha matriculado en ningún currículum dinámico. ¡Vuelve pronto!</p>
               </Card>
             ) : (
                 assignedModules.map((mod, index) => (
-                  <Card key={mod.id} className="shadow-lg border-primary/10 hover:border-primary/30 transition-all duration-300 hover:shadow-xl group overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-10 group-hover:bg-primary/10 transition-colors"></div>
-                    <CardHeader className="bg-white pb-4 relative z-0">
+                  <Card key={mod.id} className="shadow-lg border-brand-blue/10 hover:border-brand-blue/30 transition-all duration-300 hover:shadow-xl group overflow-hidden relative rounded-3xl bg-white/90 backdrop-blur-sm">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-lightblue/10 rounded-bl-full -z-10 group-hover:bg-brand-lightblue/20 transition-colors"></div>
+                    <CardHeader className="bg-transparent pb-4 relative z-0">
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="inline-block px-3 py-1 mb-3 text-xs font-black tracking-widest rounded-full bg-primary/10 text-primary uppercase">
+                          <div className="inline-block px-3 py-1 mb-3 text-xs font-black tracking-widest rounded-full bg-brand-lightblue/20 text-brand-blue uppercase border border-brand-blue/5">
                             CÁPSULA ACADÉMICA {index + 1}
                           </div>
-                          <CardTitle className="text-2xl font-headline font-black text-slate-800 leading-tight">{mod.title}</CardTitle>
-                          <CardDescription className="text-slate-600 mt-2 text-base leading-relaxed">{mod.description}</CardDescription>
+                          <CardTitle className="text-2xl font-headline font-black text-brand-blue leading-tight">{mod.title}</CardTitle>
+                          <CardDescription className="text-slate-500 mt-2 text-base leading-relaxed font-medium">{mod.description}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="pt-2 bg-slate-50/50">
+                    <CardContent className="pt-2">
                       {/* Progress Metrics */}
-                      <div className="flex justify-between text-sm mb-2 font-medium">
-                        <span className="text-slate-600 flex items-center gap-1.5"><Trophy className="h-4 w-4 text-amber-500"/> Avance General</span>
-                        <span className="font-bold flex items-center gap-1.5 text-slate-700">{mod.progress_percentage}%<span className="text-slate-400 font-normal text-xs">/ 100%</span></span>
+                      <div className="flex justify-between text-sm mb-2 font-bold">
+                        <span className="text-brand-blue flex items-center gap-1.5"><Trophy className="h-4 w-4 text-brand-gold"/> Avance General</span>
+                        <span className="font-black flex items-center gap-1.5 text-brand-blue">{mod.progress_percentage}%<span className="text-slate-400 font-medium text-xs">/ 100%</span></span>
                       </div>
-                      <Progress value={mod.progress_percentage || 0} className="h-3 mb-6 bg-slate-200" />
+                      <Progress value={mod.progress_percentage || 0} className="h-3 mb-6 bg-slate-100" />
                       
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Link href={`/module/${mod.id}`} className={mod.progress_percentage >= 100 ? "flex-1" : "w-full"}>
-                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all ${mod.progress_percentage >= 100 ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200" : ""}`} variant={mod.progress_percentage >= 100 ? "outline" : "default"} size="lg">
+                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all ${mod.progress_percentage >= 100 ? "bg-white text-brand-blue border border-brand-blue/20 hover:bg-slate-50" : "bg-brand-blue hover:bg-opacity-90 text-white"}`} variant={mod.progress_percentage >= 100 ? "outline" : "default"} size="lg">
                             {mod.progress_percentage > 0 && mod.progress_percentage < 100 ? "Continuar Entrenando" : 
                              mod.progress_percentage >= 100 ? "Repasar Módulo" : "Comenzar Ahora"}
                           </Button>
                         </Link>
                         {mod.progress_percentage >= 100 && (
                           <Link href={`/certificate/${mod.id}`} className="flex-1">
-                            <Button className="w-full h-12 text-base font-bold shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all bg-indigo-600 hover:bg-indigo-700 text-white" size="lg">
+                            <Button className="w-full h-12 text-base font-bold shadow-lg shadow-brand-pink/20 hover:shadow-brand-pink/40 transition-all bg-brand-pink hover:bg-[#c9788d] text-white" size="lg">
                               <Award className="mr-2 h-5 w-5"/> Ir al Certificado
                             </Button>
                           </Link>
@@ -176,44 +174,44 @@ export default function Dashboard() {
 
           {/* Sidebar Area */}
           <div className="w-full md:w-80 space-y-6">
-            <Card className="shadow-md border-slate-200">
-              <CardHeader className="pb-3 bg-slate-50 border-b border-slate-100">
-                <CardTitle className="text-lg font-headline font-bold flex items-center gap-2 text-slate-800">
-                  <User className="h-5 w-5 text-primary" /> Atajos de Cuenta
+            <Card className="shadow-lg border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
+              <CardHeader className="pb-3 bg-brand-lightblue/10 border-b border-brand-blue/5">
+                <CardTitle className="text-lg font-headline font-bold flex items-center gap-2 text-brand-blue">
+                  <User className="h-5 w-5 text-brand-blue" /> Atajos de Cuenta
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-2">
                 <Link href="/settings" className="block">
-                  <Button variant="ghost" className="w-full justify-start h-12 font-medium text-slate-600 hover:text-primary hover:bg-primary/5">
+                  <Button variant="ghost" className="w-full justify-start h-12 font-bold text-slate-600 hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-xl">
                     <Settings className="h-5 w-5 mr-3" /> Preferencias 
                   </Button>
                 </Link>
                 
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
-                    <Button variant="outline" className="w-full justify-start h-12 font-bold border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors">
+                    <Button variant="outline" className="w-full justify-start h-12 font-bold border-brand-gold/30 bg-brand-yellow/10 text-brand-gold hover:bg-brand-yellow/30 transition-colors rounded-xl shadow-sm">
                       <Award className="h-5 w-5 mr-3" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50"/>
                     </Button>
                   </Link>
                 )}
                 
-                <div className="h-px bg-slate-100 my-2 w-full"></div>
+                <div className="h-px bg-brand-blue/5 my-2 w-full"></div>
                 
                 <Link href="/auth/login" className="block">
-                  <Button variant="ghost" className="w-full justify-start h-12 font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors">
+                  <Button variant="ghost" className="w-full justify-start h-12 font-bold text-red-500 hover:text-white hover:bg-red-500 transition-colors rounded-xl">
                     <LogOut className="h-5 w-5 mr-3" /> Cerrar Sesión
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20 shadow-inner">
-               <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="h-12 w-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
-                    <Clock className="h-6 w-6 text-primary" />
+            <Card className="bg-gradient-to-br from-brand-lightblue/20 to-brand-yellow/20 border-brand-blue/10 shadow-inner rounded-3xl">
+               <CardContent className="p-6 flex flex-col items-center text-center">
+                  <div className="h-14 w-14 bg-white rounded-full shadow-md flex items-center justify-center mb-4 border border-brand-blue/5">
+                    <Clock className="h-7 w-7 text-brand-gold" />
                   </div>
-                  <h4 className="font-bold text-slate-800 mb-1">Ritmo de Aprendizaje</h4>
-                  <p className="text-xs text-slate-600 font-medium">Mantén una racha constante para absorber las normativas más eficientemente.</p>
+                  <h4 className="font-headline font-black text-brand-blue mb-2 text-lg">Ritmo de Aprendizaje</h4>
+                  <p className="text-sm text-brand-blue/80 font-medium">Mantén una racha constante para absorber las normativas más eficientemente.</p>
                </CardContent>
             </Card>
           </div>

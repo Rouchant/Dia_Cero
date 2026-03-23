@@ -429,37 +429,37 @@ export default function AdminDashboard() {
   const averageProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* Admin Header */}
-      <header className="bg-slate-950 text-white px-6 py-4 shadow-xl">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="bg-white/90 backdrop-blur-md text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 sticky top-0 z-10 w-full">
+        <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
           <div className="flex items-center gap-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-                <ArrowLeft className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="text-brand-blue hover:bg-brand-lightblue/20 border border-brand-blue/10 rounded-full shadow-sm">
+                <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <Logo className="h-8 w-auto" variant="white" />
-              <span className="text-emerald-400 font-bold px-2 border-l border-white/20 ml-2 hidden sm:inline">ADMIN L.M.S</span>
+              <Logo className="h-8 w-auto hidden sm:block" />
+              <span className="text-brand-pink font-black px-3 border-l border-brand-blue/20 ml-2 hidden sm:inline mt-2.5 leading-none uppercase tracking-wide">Admin Escolar</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold">Administrador Supervisor</p>
-              <p className="text-xs text-white/70">Master Control</p>
+              <p className="text-sm font-bold text-brand-blue">Director de Currículum</p>
+              <p className="text-xs text-slate-500 font-medium">Panel de Supervisión</p>
             </div>
-            <div className="h-10 w-10 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center">
-              <Users className="h-5 w-5 text-emerald-400" />
+            <div className="h-11 w-11 rounded-full bg-brand-lightblue/30 border border-brand-blue/20 flex items-center justify-center shadow-sm">
+              <Users className="h-5 w-5 text-brand-blue fill-brand-blue/20" />
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-6 md:p-12 space-y-8 animate-in fade-in duration-500">
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12 space-y-8 animate-in fade-in duration-500">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-headline font-black text-foreground">Plataforma Dinámica de Control</h1>
-          <p className="text-muted-foreground text-lg mt-2">Gestiona estudiantes, diseña módulos y vigila la analítica en un solo lugar.</p>
+          <h1 className="text-3xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">Centro Táctico DiaCero</h1>
+          <p className="text-slate-500 font-medium text-base sm:text-lg mt-2">Gestiona estudiantes, diseña módulos y vigila la analítica en un solo lugar.</p>
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
@@ -497,15 +497,15 @@ export default function AdminDashboard() {
                   <Progress value={averageProgress} className="h-2 mt-3 bg-accent/20" />
                 </CardContent>
               </Card>
-              <Card className="shadow-md border-emerald-50 hover:border-emerald-200 transition-colors">
+              <Card className="shadow-lg shadow-brand-blue/5 border-brand-pink/20 hover:border-brand-pink/50 transition-colors bg-white/90 backdrop-blur-sm rounded-2xl">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-base font-bold text-muted-foreground">Completados Perfectos</CardTitle>
-                  <div className="p-2 bg-emerald-100 rounded-full">
-                    <Award className="h-5 w-5 text-emerald-600" />
+                  <CardTitle className="text-base font-bold text-slate-500">Completados Perfectos</CardTitle>
+                  <div className="p-2.5 bg-brand-pink/10 rounded-xl border border-brand-pink/20">
+                    <Award className="h-5 w-5 text-brand-pink" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-4xl font-black text-emerald-700">{completedStudents}</p>
+                  <p className="text-4xl font-black text-brand-blue">{completedStudents}</p>
                 </CardContent>
               </Card>
             </div>
@@ -560,7 +560,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-2">
                                 <div>
                                   <p className="font-bold text-foreground text-sm uppercase group-hover:text-primary transition-colors">
-                                    {user.name} {user.role === 'admin' && <span className="ml-2 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] tracking-widest border border-amber-300">ADMIN</span>}
+                                    {user.name} {user.role === 'admin' && <span className="ml-2 px-1.5 py-0.5 rounded bg-brand-yellow/30 text-brand-gold font-black text-[10px] tracking-widest border border-brand-gold/30">ADMIN</span>}
                                   </p>
                                   <p className="text-xs text-muted-foreground">{user.email}</p>
                                 </div>
@@ -604,13 +604,13 @@ export default function AdminDashboard() {
                 <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
                   {selectedUserStats?.moduleBreakdown && selectedUserStats.moduleBreakdown.length > 0 ? (
                      selectedUserStats.moduleBreakdown.map((mb: any, idx: number) => (
-                        <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-primary/40 transition-colors shadow-sm relative overflow-hidden">
-                          {mb.percentage >= 100 && <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-[100px] pointer-events-none"></div>}
+                        <div key={idx} className="bg-white p-4 rounded-xl border border-brand-blue/10 hover:border-brand-blue/30 transition-colors shadow-sm relative overflow-hidden">
+                          {mb.percentage >= 100 && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-pink/10 rounded-bl-[100px] pointer-events-none"></div>}
                           <div className="flex justify-between items-start mb-3 gap-4">
-                             <span className="font-bold text-slate-800 text-sm leading-tight">{mb.title}</span>
-                             <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-emerald-100 text-emerald-700' : 'text-primary'}`}>{mb.percentage}%</span>
+                             <span className="font-bold text-brand-blue text-sm leading-tight">{mb.title}</span>
+                             <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-brand-pink/10 text-brand-pink' : 'text-brand-blue bg-brand-lightblue/20'}`}>{mb.percentage}%</span>
                           </div>
-                          <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-emerald-500 bg-emerald-100' : 'bg-slate-200'}`} />
+                          <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-brand-pink bg-brand-pink/20' : 'bg-slate-100'}`} />
                         </div>
                      ))
                   ) : (
@@ -693,9 +693,9 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Form: Asignar Modulo */}
-              <Card className="border-indigo-100 shadow-lg h-full border-t-[5px] border-t-indigo-500">
-                <CardHeader className="bg-slate-50 border-b">
-                  <CardTitle className="flex items-center gap-2 text-xl font-headline"><LinkIcon className="h-5 w-5 text-indigo-500" /> Matricular Alumno a Módulo</CardTitle>
+              <Card className="border-brand-blue/10 shadow-lg h-full border-t-[5px] border-t-brand-gold bg-white/90 backdrop-blur-sm rounded-2xl">
+                <CardHeader className="bg-white/50 border-b border-brand-blue/5">
+                  <CardTitle className="flex items-center gap-2 text-xl font-headline text-brand-blue"><LinkIcon className="h-5 w-5 text-brand-gold" /> Matricular Alumno a Módulo</CardTitle>
                   <CardDescription>
                     Otorga acceso visual al curso para que el estudiante pueda interactuar con el módulo y someterse a evaluación.
                   </CardDescription>
@@ -726,8 +726,8 @@ export default function AdminDashboard() {
                         {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
                       </select>
                     </div>
-                    <div className="pt-4 border-t border-slate-100">
-                       <Button type="submit" disabled={isAssigning || dbModules.length === 0} className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-indigo-500/30 font-bold font-headline tracking-wide">
+                    <div className="pt-4 border-t border-brand-blue/5">
+                       <Button type="submit" disabled={isAssigning || dbModules.length === 0} className="w-full h-12 bg-brand-gold hover:bg-[#c2933d] text-white shadow-lg shadow-brand-gold/30 font-bold font-headline tracking-wide rounded-xl">
                         {isAssigning ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Empalmando en Tiempo Real...</> : "Dictar Mandato de Asignación Exclusiva"}
                       </Button>
                     </div>
@@ -738,18 +738,18 @@ export default function AdminDashboard() {
             </div>
 
             {/* ---> Form: Constructor de Contenido Teórico <--- */}
-            <Card className="mt-8 border-sky-100 shadow-lg border-t-[5px] border-t-sky-500 overflow-hidden">
-               <CardHeader className="bg-slate-50 border-b">
+            <Card className="mt-8 border-brand-blue/10 shadow-lg border-t-[5px] border-t-brand-lightblue overflow-hidden bg-white/80 backdrop-blur-md rounded-2xl">
+               <CardHeader className="bg-white/60 border-b border-brand-blue/5">
                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-headline">
-                      <Edit3 className="h-5 w-5 text-sky-600" /> Constructor de Contenido Teórico
+                    <CardTitle className="flex items-center gap-2 text-xl font-headline text-brand-blue">
+                      <Edit3 className="h-5 w-5 text-brand-lightblue" /> Constructor de Contenido Teórico
                     </CardTitle>
-                    <CardDescription>Modifica los textos, imágenes e incrusta videos en las "Diapositivas" de los módulos en tiempo real.</CardDescription>
+                    <CardDescription className="text-slate-500 font-medium pt-1">Modifica los textos, imágenes e incrusta videos en las "Diapositivas" de los módulos en tiempo real.</CardDescription>
                   </div>
                   <div className="min-w-64">
                     <select 
-                      className="w-full h-11 px-3 border border-sky-200 shadow-sm rounded-md bg-sky-50/50 text-sm font-bold text-sky-900 focus:ring-sky-500 focus:border-sky-500"
+                      className="w-full h-11 px-3 border border-brand-blue/20 shadow-sm rounded-xl bg-white text-sm font-bold text-brand-blue focus:ring-brand-blue focus:border-brand-blue"
                       value={editContentModuleId}
                       onChange={e => setEditContentModuleId(e.target.value)}
                     >

@@ -47,15 +47,15 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   }, [moduleId]);
 
   if (loading) return (
-     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4 text-slate-500">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-        <p className="font-bold font-headline animate-pulse">Forjando certificado en papel virtual...</p>
+     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 text-brand-blue/70">
+        <Loader2 className="h-8 w-8 animate-spin text-brand-pink" />
+        <p className="font-bold font-headline animate-pulse">Generando certificado en papel virtual...</p>
      </div>
   );
 
   if (!data) return (
-     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
-        <h2 className="text-xl font-bold text-slate-800">No hay registros de aprobación.</h2>
+     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4">
+        <h2 className="text-xl font-bold text-brand-blue">No hay registros de aprobación.</h2>
         <p className="text-slate-500 max-w-sm text-center">No pudimos verificar que poseas los requisitos en este módulo en este momento.</p>
         <Button onClick={()=>router.push('/dashboard')} className="mt-4"><ArrowLeft className="mr-2 h-4 w-4" /> Volver a Seguridad</Button>
      </div>
@@ -63,7 +63,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
   // Layout specifically engineered for Strict US LETTER PORTRAIT length
   return (
-    <div className="min-h-screen bg-slate-100 py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
       
       {/* Forzar tamaño Carta (Letter) Vertical en la impresora física + Prevenir Salto de Página */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -99,47 +99,47 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
       {/* Action Bar - Hidden in Print */}
       <div className="w-full max-w-[8.5in] flex flex-col sm:flex-row justify-between items-center mb-8 px-4 gap-4 print:hidden">
-        <Button variant="outline" onClick={() => router.push('/dashboard')} className="bg-white hover:bg-slate-50 border-slate-300 font-bold shadow-sm">
+        <Button variant="outline" onClick={() => router.push('/dashboard')} className="bg-white hover:bg-slate-50 border-brand-blue/20 text-brand-blue font-bold shadow-sm">
            <ArrowLeft className="mr-2 h-4 w-4"/> Volver al Panel
         </Button>
-        <Button onClick={() => window.print()} className="bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-lg shadow-indigo-200">
+        <Button onClick={() => window.print()} className="bg-brand-blue hover:bg-brand-blue/90 text-white font-black shadow-lg shadow-brand-blue/20 border border-brand-blue">
            <Printer className="mr-2 h-5 w-5"/> Imprimir Diploma Oficial
         </Button>
       </div>
 
       {/* Actual Certificate Document Wrapper (Strict US Letter Format: 8.5 x 11 inches) */}
-      <div className="certificate-paper w-full max-w-[8.5in] aspect-[8.5/11] bg-white text-slate-900 relative overflow-hidden shadow-2xl mx-auto flex flex-col items-center">
+      <div className="certificate-paper w-full max-w-[8.5in] aspect-[8.5/11] bg-white text-brand-blue relative overflow-hidden shadow-2xl mx-auto flex flex-col items-center">
          
          {/* Internal Borders and Graphics */}
-         <div className="absolute inset-4 sm:inset-6 md:inset-8 border-[6px] border-double border-indigo-200/60 flex flex-col items-center p-6 sm:p-8 md:p-12 text-center bg-white z-10 before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] before:from-indigo-50/20 before:to-transparent before:-z-10 print:inset-6 print:p-8">
+         <div className="absolute inset-4 sm:inset-6 md:inset-8 border-[6px] border-double border-brand-blue/30 flex flex-col items-center p-6 sm:p-8 md:p-12 text-center bg-white z-10 before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] before:from-brand-lightblue/10 before:to-transparent before:-z-10 print:inset-6 print:p-8">
             
             {/* Header: Auth Badges & Logo */}
             <div className="w-full flex justify-between items-start mb-6 md:mb-12 print:mb-14">
-               <div className="flex items-center gap-2 md:gap-3 bg-slate-50/80 px-4 py-2 rounded-lg border border-slate-100 shadow-sm print:shadow-none print:border-none print:bg-transparent print:px-0">
-                 <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-emerald-500" />
+               <div className="flex items-center gap-2 md:gap-3 bg-brand-lightblue/10 px-4 py-2 rounded-lg border border-brand-blue/10 shadow-sm print:shadow-none print:border-none print:bg-transparent print:px-0">
+                 <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-brand-gold" />
                  <div className="text-left leading-tight">
-                   <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Validación Oficial</p>
-                   <p className="text-[10px] md:text-sm font-black text-emerald-600 font-mono tracking-wider">ID-{certId}</p>
+                   <p className="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">Validación Oficial</p>
+                   <p className="text-[10px] md:text-sm font-black text-brand-blue font-mono tracking-wider">ID-{certId}</p>
                  </div>
                </div>
-               <Logo className="h-10 md:h-12 w-auto grayscale opacity-80 mix-blend-multiply" />
+               <Logo className="h-10 md:h-12 w-auto opacity-90" />
             </div>
 
-            <Award className="h-16 w-16 md:h-24 md:w-24 text-indigo-500/10 mb-6 md:mb-8 print:mb-10" />
+            <Award className="h-16 w-16 md:h-24 md:w-24 text-brand-blue/5 mb-6 md:mb-8 print:mb-10 block pointer-events-none" />
 
             {/* Core Typography Block */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-slate-800 mb-1 uppercase print:text-5xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-brand-blue mb-1 uppercase print:text-5xl">
                Certificado
             </h1>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-slate-500 tracking-widest mb-8 md:mb-12 uppercase print:text-3xl print:mb-16">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-pink tracking-widest mb-8 md:mb-12 uppercase print:text-3xl print:mb-16">
                de Aprobación
             </h2>
             
-            <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 md:mb-6 font-medium print:text-[11px]">
+            <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-[0.2em] mb-4 md:mb-6 font-medium print:text-[11px]">
                El presente documento formativo reconoce formalmente a
             </p>
 
-            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-indigo-700 font-headline mb-8 md:mb-12 border-b-[3px] border-indigo-100 pb-2 md:pb-4 inline-block px-4 md:px-12 uppercase tracking-wide print:text-4xl print:mb-16">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-brand-blue font-headline mb-8 md:mb-12 border-b-[3px] border-brand-lightblue/40 pb-2 md:pb-4 inline-block px-4 md:px-12 uppercase tracking-wide print:text-4xl print:mb-16">
                {data.userName}
             </h3>
 
@@ -147,7 +147,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
               Por haber participado, asimilado y completado exitosamente con nivel de suficiencia, la examinación integral del programa de instrucción técnica:
             </p>
             
-            <h4 className="text-base md:text-lg lg:text-xl font-black text-slate-800 max-w-xl mx-auto uppercase py-4 leading-snug print:text-lg">
+            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-pink max-w-xl mx-auto uppercase py-4 leading-snug print:text-lg">
               "{data.moduleTitle}"
             </h4>
 
@@ -157,21 +157,21 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
             {/* Footer Signatures (Stacked or spaced differently for Vertical) */}
             <div className="w-full flex justify-between items-end mt-12 md:mt-24 px-2 md:px-8 pb-4 print:mt-16">
                <div className="text-center w-1/3">
-                 <div className="h-px w-20 md:w-32 bg-slate-300 mx-auto mb-3 print:bg-slate-400"></div>
-                 <p className="text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-wider print:text-[10px]">Comité Evaluador</p>
+                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
+                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Comité Evaluador</p>
                  <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Plataforma Diacero</p>
                </div>
                
                <div className="flex flex-col items-center justify-end w-1/3">
-                 <div className="bg-amber-50 text-amber-600 border-[3px] border-amber-200 rounded-full h-16 w-16 md:h-24 md:w-24 flex flex-col items-center justify-center shadow-lg relative -top-6 md:-top-8 print:shadow-none print:bg-white print:border-amber-300">
+                 <div className="bg-brand-yellow/10 text-brand-gold border-[3px] border-brand-gold/30 rounded-full h-16 w-16 md:h-24 md:w-24 flex flex-col items-center justify-center shadow-lg relative -top-6 md:-top-8 print:shadow-none print:bg-white print:border-brand-gold">
                     <span className="text-[6px] md:text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5 print:text-[8px]">Rendimiento</span>
                     <span className="text-xl md:text-3xl font-black tracking-tighter print:text-3xl">{data.score}%</span>
                  </div>
                </div>
 
                <div className="text-center w-1/3">
-                 <div className="h-px w-20 md:w-32 bg-slate-300 mx-auto mb-3 print:bg-slate-400"></div>
-                 <p className="text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-wider print:text-[10px]">Otorgado el {data.date}</p>
+                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
+                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Otorgado el {data.date}</p>
                  <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal</p>
                </div>
             </div>
