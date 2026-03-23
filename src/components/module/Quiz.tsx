@@ -6,7 +6,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Award } from "lucide-react";
-import { QuizQuestion } from '@/lib/module-data';
+
+interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+}
 
 interface QuizProps {
   questions: QuizQuestion[];
