@@ -134,7 +134,6 @@ src/
 
 - **Módulos y Secciones**: administrados directamente desde las tablas `modules` y `module_sections` en Supabase.
 - **Logo**: coloca `logo.png` en `/public/` para sobrescribir el logo SVG predeterminado (detectado automáticamente por `components/ui/logo.tsx`).
-- **Fallback estático**: si no hay conexión a Supabase, `src/lib/module-data.ts` sirve como respaldo local de contenido.
 
 ---
 
