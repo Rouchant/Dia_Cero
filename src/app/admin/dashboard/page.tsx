@@ -1,25 +1,88 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { MOCK_USERS } from "@/lib/mock-users";
 import { Users, TrendingUp, Award, ArrowLeft, Search } from "lucide-react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
+import { createClient } from '@/utils/supabase/client';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  const filteredUsers = MOCK_USERS.filter(user => 
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    async function fetchUsers() {
+      // Secure the route
+      const { data: authData } = await supabase.auth.getUser();
+      if (!authData.user) {
+        router.push('/auth/login');
+        return;
+      }
+
+      // Check role straight from the users table metadata (without doing a secondary table query!)
+      const userRole = authData.user.user_metadata?.role;
+
+      if (userRole !== 'admin') {
+        router.push('/dashboard');
+        return;
+      }
+
+      // Fetch profiles
+      const { data: profiles } = await supabase.from('profiles').select('*');
+      
+      // Fetch user progress for module
+      const { data: progressData } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('module_id', 'seguridad-laboral-chile');
+        
+      // Fetch module to know the total sections
+      const { data: modData } = await supabase
+        .from('modules')
+        .select('*, module_sections(*)')
+        .eq('id', 'seguridad-laboral-chile')
+        .single();
+        
+      const totalSections = modData?.module_sections?.length || 1;
+
+      if (profiles) {
+        // Map progress into profiles
+        const enhancedUsers = profiles.map(profile => {
+          const userProg = progressData?.find(p => p.user_id === profile.id);
+          const completedSections = userProg?.completed_sections || [];
+          const completedLen = Array.isArray(completedSections) ? completedSections.length : 0;
+          const progPercentage = Math.round((completedLen / totalSections) * 100);
+          
+          return {
+            ...profile,
+            progress_percentage: progPercentage > 100 ? 100 : progPercentage,
+            last_active: userProg?.updated_at ? new Date(userProg.updated_at).toLocaleDateString() : 'N/A'
+          };
+        });
+        
+        setUsers(enhancedUsers);
+      }
+      setLoading(false);
+    }
+    fetchUsers();
+  }, []);
+
+  const filteredUsers = users.filter(user => 
+    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalUsers = MOCK_USERS.length;
-  const completedUsers = MOCK_USERS.filter(u => u.progressPercentage === 100).length;
-  const averageProgress = Math.round(MOCK_USERS.reduce((acc, u) => acc + u.progressPercentage, 0) / totalUsers);
+  const totalUsers = users.length;
+  const completedUsers = users.filter(u => u.progress_percentage === 100).length;
+  const totalProgress = users.reduce((sum, u) => sum + (u.progress_percentage || 0), 0);
+  const averageProgress = totalUsers > 0 ? Math.round(totalProgress / totalUsers) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,7 +128,7 @@ export default function AdminDashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-black">{totalUsers}</p>
+              <p className="text-4xl font-black">{loading ? "-" : totalUsers}</p>
             </CardContent>
           </Card>
           <Card className="shadow-md border-accent/5 hover:border-accent/20 transition-colors">
@@ -129,10 +192,16 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y border-t-0">
-                  {filteredUsers.length === 0 ? (
+                  {loading ? (
                     <tr>
                       <td colSpan={5} className="text-center py-16 text-muted-foreground">
-                        No se encontraron usuarios que coincidan con "{searchQuery}".
+                        Cargando usuarios desde Supabase...
+                      </td>
+                    </tr>
+                  ) : filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-16 text-muted-foreground">
+                        No hay usuarios registrados en la base de datos aún.
                       </td>
                     </tr>
                   ) : (
@@ -144,29 +213,23 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <span className="font-bold text-xs w-8 text-right">{user.progressPercentage}%</span>
+                            <span className="font-bold text-xs w-8 text-right">{user.progress_percentage || 0}%</span>
                             <Progress 
-                              value={user.progressPercentage} 
-                              className={`h-2 flex-1 ${user.progressPercentage === 100 ? '[&>div]:bg-emerald-500 bg-emerald-100' : 'bg-primary/10'}`} 
+                              value={user.progress_percentage || 0} 
+                              className={`h-2 flex-1 bg-primary/10`} 
                             />
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center font-bold">
-                          {user.averageScore > 0 ? (
-                            <span className={user.averageScore >= 80 ? "text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md" : "text-amber-600 bg-amber-50 px-2 py-1 rounded-md"}>
-                              {user.averageScore} pts
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground/50">-</span>
-                          )}
+                          <span className="text-muted-foreground/50">-</span>
                         </td>
                         <td className="px-6 py-4 text-muted-foreground text-xs font-medium">
-                          {user.lastActive}
+                          {user.last_active || '-'}
                         </td>
                         <td className="px-6 py-4 text-center">
-                          {user.status === 'completed' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">Completado</span>}
-                          {user.status === 'active' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">Activo</span>}
-                          {user.status === 'inactive' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">Inactivo</span>}
+                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                             {user.progress_percentage === 100 ? 'Completado' : user.progress_percentage > 0 ? 'En Progreso' : 'Nuevo'}
+                           </span>
                         </td>
                       </tr>
                     ))

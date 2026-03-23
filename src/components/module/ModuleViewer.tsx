@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { DIA_CERO_MODULE, ModuleSection } from '@/lib/module-data';
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Quiz } from './Quiz';
@@ -11,6 +10,8 @@ import { ChevronRight, ChevronLeft, CheckCircle2, Circle, Menu, X } from "lucide
 import Image from 'next/image';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { createClient } from '@/utils/supabase/client';
+import { Logo } from "@/components/ui/logo";
 
 export function ModuleViewer() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -18,36 +19,95 @@ export function ModuleViewer() {
   const [quizScores, setQuizScores] = useState<Record<string, number>>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [moduleData, setModuleData] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('dia_cero_progress');
-    if (saved) {
-      const { completed, scores, index } = JSON.parse(saved);
-      setCompletedSections(completed || []);
-      setQuizScores(scores || {});
-      setCurrentSectionIndex(index || 0);
+    
+    async function loadData() {
+      // Fetch authenticated user
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUserId = authData.user?.id;
+      
+      if (currentUserId) {
+        setUserId(currentUserId);
+        
+        // Fetch existing progress
+        const { data: progress } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', currentUserId)
+          .eq('module_id', 'seguridad-laboral-chile')
+          .maybeSingle();
+          
+        if (progress) {
+          setCompletedSections(progress.completed_sections || []);
+          setQuizScores(progress.quiz_scores || {});
+          setCurrentSectionIndex(progress.current_section_index || 0);
+        }
+      }
+
+      // Fetch module data
+      const { data: modData } = await supabase
+        .from('modules')
+        .select(`
+          *,
+          module_sections(
+            *,
+            quiz_questions(*)
+          )
+        `)
+        .eq('id', 'seguridad-laboral-chile')
+        .single();
+        
+      if (modData) {
+        modData.module_sections.sort((a: any, b: any) => a.sort_order - b.sort_order);
+        setModuleData(modData);
+      }
+      
+      setDataLoaded(true);
     }
+    
+    loadData();
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('dia_cero_progress', JSON.stringify({
-        completed: completedSections,
-        scores: quizScores,
-        index: currentSectionIndex
-      }));
+    if (mounted && moduleData && dataLoaded && userId) {
+      // Save progress to database
+      async function saveProgress() {
+        await supabase.from('user_progress').upsert({
+          user_id: userId,
+          module_id: 'seguridad-laboral-chile',
+          completed_sections: completedSections,
+          quiz_scores: quizScores,
+          current_section_index: currentSectionIndex,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id, module_id' });
+      }
+      saveProgress();
     }
-  }, [completedSections, quizScores, currentSectionIndex, mounted]);
+  }, [completedSections, quizScores, currentSectionIndex, mounted, moduleData, dataLoaded, userId]);
 
-  const currentSection = DIA_CERO_MODULE.sections[currentSectionIndex];
-  const progress = Math.round(((currentSectionIndex) / (DIA_CERO_MODULE.sections.length - 1)) * 100);
+  if (!mounted || !moduleData) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="animate-pulse flex flex-col items-center">
+        <Logo className="h-10 w-auto opacity-50 mb-4" />
+        <p className="text-muted-foreground font-medium">Cargando módulo...</p>
+      </div>
+    </div>
+  );
+
+  const currentSection = moduleData.module_sections[currentSectionIndex];
+  const progress = Math.round(((currentSectionIndex) / (moduleData.module_sections.length - 1)) * 100);
 
   const handleNext = () => {
     if (!completedSections.includes(currentSection.id)) {
       setCompletedSections([...completedSections, currentSection.id]);
     }
-    if (currentSectionIndex < DIA_CERO_MODULE.sections.length - 1) {
+    if (currentSectionIndex < moduleData.module_sections.length - 1) {
       setCurrentSectionIndex(currentSectionIndex + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -71,7 +131,13 @@ export function ModuleViewer() {
     // Potentially redirect to a "Course Completed" page
   };
 
-  if (!mounted) return null;
+  // Map database fields to components expected fields format
+  const mappedQuestions = currentSection.quiz_questions?.map((q: any) => ({
+    id: q.id,
+    question: q.question,
+    options: q.options,
+    correctAnswer: q.correct_answer
+  }));
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -89,7 +155,7 @@ export function ModuleViewer() {
           </div>
           <ScrollArea className="flex-1 -mx-2 px-2">
             <nav className="space-y-1">
-              {DIA_CERO_MODULE.sections.map((section, idx) => {
+              {moduleData.module_sections.map((section: any, idx: number) => {
                 const isCompleted = completedSections.includes(section.id);
                 const isActive = currentSectionIndex === idx;
                 
@@ -142,7 +208,7 @@ export function ModuleViewer() {
           </div>
           <div className="hidden sm:flex items-center gap-4">
              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-               {DIA_CERO_MODULE.title}
+               {moduleData.title}
              </span>
           </div>
         </header>
@@ -156,23 +222,23 @@ export function ModuleViewer() {
                   
                   {/* Top: Media */}
                   <div className="w-full max-w-md md:max-w-lg lg:max-w-xl flex flex-col justify-center items-center shrink-0 mx-auto">
-                    {currentSection.imageUrl && (
+                    {currentSection.image_url && (
                       <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
                         <Image 
-                          src={currentSection.imageUrl} 
+                          src={currentSection.image_url} 
                           alt={currentSection.title}
                           fill
                           className="object-cover"
                           priority
-                          data-ai-hint={currentSection.imageHint}
+                          data-ai-hint={currentSection.image_hint}
                         />
                       </div>
                     )}
                     
-                    {currentSection.videoUrl && (
+                    {currentSection.video_url && (
                       <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl bg-black">
                         <iframe 
-                          src={currentSection.videoUrl} 
+                          src={currentSection.video_url} 
                           className="absolute inset-0 w-full h-full"
                           allowFullScreen
                         />
@@ -213,8 +279,8 @@ export function ModuleViewer() {
                     onClick={handleNext} 
                     className="h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
                   >
-                    Siguiente Sección
-                    <ChevronRight className="h-5 w-5 ml-2" />
+                    {currentSectionIndex < moduleData.module_sections.length - 1 ? 'Siguiente Sección' : 'Finalizar Módulo'}
+                    {currentSectionIndex < moduleData.module_sections.length - 1 && <ChevronRight className="h-5 w-5 ml-2" />}
                   </Button>
                 </div>
               </div>
@@ -222,7 +288,7 @@ export function ModuleViewer() {
 
             {currentSection.type === 'quiz' && (
               <div className="flex-1 flex flex-col items-center justify-center py-8 h-full">
-                <Quiz questions={currentSection.questions || []} onComplete={handleQuizComplete} />
+                <Quiz questions={mappedQuestions || []} onComplete={handleQuizComplete} />
               </div>
             )}
 

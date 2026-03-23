@@ -32,7 +32,7 @@ export const DIA_CERO_MODULE: LearningModule = {
       id: 'welcome',
       title: 'Bienvenido a DiaCero',
       type: 'content',
-      content: 'DiaCero está diseñado para llevarte de una línea base de cero a un estado altamente productivo de claridad y propósito. En esta sección introductoria, exploramos por qué el enfoque es la máxima advantage competitiva en el siglo XXI. El crecimiento intelectual no se trata solo de recopilar información; se trata de sintetizarla en sabiduría procesable.',
+      content: 'DiaCero está diseñado para llevarte de una línea base de cero a un estado altamente productivo de claridad y propósito. En esta sección introductoria, exploramos por qué el enfoque es la máxima ventaja competitiva en el siglo XXI. El crecimiento intelectual no se trata solo de recopilar información; se trata de sintetizarla en sabiduría procesable.',
       imageUrl: 'https://picsum.photos/seed/learn1/1200/600',
       imageHint: 'online learning'
     },

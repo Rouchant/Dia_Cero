@@ -8,23 +8,70 @@ import { BookOpen, Award, Clock, ArrowRight, User, Settings, LogOut, CheckCircle
 import Link from 'next/link';
 import Image from 'next/image';
 import { Logo } from "@/components/ui/logo";
-import { DIA_CERO_MODULE } from '@/lib/module-data';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Dashboard() {
   const [progress, setProgress] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [moduleData, setModuleData] = useState<any>(null);
+  const [userEmail, setUserEmail] = useState("Usuario Piloto");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('dia_cero_progress');
-    if (saved) {
-      const { completed } = JSON.parse(saved);
-      const val = Math.round(((completed?.length || 0) / DIA_CERO_MODULE.sections.length) * 100);
-      setProgress(val);
+    
+    // Fetch real module from database
+    async function fetchModule() {
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUserId = authData.user?.id;
+      if (authData.user?.email) {
+        setUserEmail(authData.user.email);
+      }
+      if (authData.user?.user_metadata?.role === 'admin') {
+        setIsAdmin(true);
+      }
+
+      const { data } = await supabase
+        .from('modules')
+        .select('*, module_sections(*)')
+        .eq('id', 'seguridad-laboral-chile')
+        .single();
+        
+      if (data) {
+        setModuleData(data);
+        
+        if (currentUserId) {
+          const { data: progressData } = await supabase
+            .from('user_progress')
+            .select('*')
+            .eq('user_id', currentUserId)
+            .eq('module_id', 'seguridad-laboral-chile')
+            .maybeSingle();
+
+          if (progressData && Array.isArray(progressData.completed_sections)) {
+            const completedLen = progressData.completed_sections.length || 0;
+            // Avoid division by zero
+            const totalSections = Math.max(1, data.module_sections.length - 1); 
+            // Note: usually progress is based on total sections, but we use length-1 matching earlier logic
+            const val = Math.round((completedLen / data.module_sections.length) * 100);
+            setProgress(val > 100 ? 100 : val);
+          }
+        }
+      }
     }
+    
+    fetchModule();
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || !moduleData) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="animate-pulse flex flex-col items-center">
+        <Logo className="h-10 w-auto opacity-50 mb-4" />
+        <p className="text-muted-foreground font-medium">Cargando tu progreso...</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,7 +83,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold">Usuario Piloto</p>
+              <p className="text-sm font-bold">{userEmail}</p>
               <p className="text-xs text-muted-foreground">Explorador de Aprendizaje</p>
             </div>
             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -85,11 +132,13 @@ export default function Dashboard() {
               <Button variant="ghost" className="w-full justify-start h-12 font-medium">
                 <Settings className="h-5 w-5 mr-3" /> Preferencias
               </Button>
-              <Link href="/admin/dashboard" className="block">
-                <Button variant="outline" className="w-full justify-start h-12 font-bold border-accent/20 bg-accent/5 text-accent hover:bg-accent/10">
-                  <Award className="h-5 w-5 mr-3" /> Panel de Administrador
-                </Button>
-              </Link>
+              {isAdmin && (
+                <Link href="/admin/dashboard" className="block">
+                  <Button variant="outline" className="w-full justify-start h-12 font-bold border-accent/20 bg-accent/5 text-accent hover:bg-accent/10">
+                    <Award className="h-5 w-5 mr-3" /> Panel de Administrador
+                  </Button>
+                </Link>
+              )}
               <Link href="/auth/login" className="block">
                 <Button variant="ghost" className="w-full justify-start h-12 font-medium text-destructive hover:text-destructive hover:bg-destructive/5">
                   <LogOut className="h-5 w-5 mr-3" /> Cerrar Sesión
@@ -116,16 +165,16 @@ export default function Dashboard() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <h3 className="text-2xl font-headline font-bold text-white mb-2">{DIA_CERO_MODULE.title}</h3>
+                  <h3 className="text-2xl font-headline font-bold text-white mb-2">{moduleData.title}</h3>
                   <div className="flex items-center gap-4 text-white/80 text-sm">
-                    <span className="flex items-center gap-1.5"><BookOpen className="h-4 w-4" /> {DIA_CERO_MODULE.sections.length} Secciones</span>
+                    <span className="flex items-center gap-1.5"><BookOpen className="h-4 w-4" /> {moduleData.module_sections.length} Secciones</span>
                     <span className="flex items-center gap-1.5"><Award className="h-4 w-4" /> Certificación Disponible</span>
                   </div>
                 </div>
               </div>
               <CardContent className="p-8 space-y-6">
                 <p className="text-muted-foreground leading-relaxed">
-                  {DIA_CERO_MODULE.description}
+                  {moduleData.description}
                 </p>
                 
                 <div className="space-y-2">
@@ -182,3 +231,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

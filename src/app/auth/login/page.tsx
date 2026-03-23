@@ -9,21 +9,49 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, Loader2, Lock } from "lucide-react";
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
+import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const supabase = createClient();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Mock authentication
-    setTimeout(() => {
-      localStorage.setItem('dia_cero_auth', 'true');
-      router.push('/dashboard');
-    }, 1500);
+    setErrorMsg("");
+    
+    // First try to sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      // If error is invalid credentials, try to sign up automatically for pilot purposes
+      if (signInError.message.includes('Invalid login credentials')) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (signUpError) {
+          setErrorMsg(signUpError.message);
+          setLoading(false);
+          return;
+        }
+      } else {
+        setErrorMsg(signInError.message);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Success! Redirect
+    router.push('/dashboard');
   };
 
   return (
@@ -43,6 +71,11 @@ export default function LoginPage() {
           <CardDescription>Ingresa tus credenciales para acceder al módulo</CardDescription>
         </CardHeader>
         <CardContent>
+          {errorMsg && (
+            <div className="bg-destructive/10 text-destructive text-sm font-bold p-3 rounded-md mb-4 border border-destructive/20 text-center">
+              {errorMsg}
+            </div>
+          )}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Correo Electrónico</Label>
