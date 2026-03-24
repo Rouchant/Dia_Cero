@@ -1,0 +1,114 @@
+﻿Listado de rutas de carpetas
+El n·mero de serie del volumen es 6853-80CE
+C:\USERS\JMEMA\ONEDRIVE\DOCUMENTOS\PROYECTOS\DIACERO\SRC
++---ai
+|   |   dev.ts
+|   |   genkit.ts
+|   |   
+|   \---flows
+|           ai-adaptive-explanation.ts
+|           ai-module-summary.ts
+|           
++---app
+|   |   globals.css
+|   |   icon.png
+|   |   layout.tsx
+|   |   page.tsx
+|   |   
+|   +---admin
+|   |   \---dashboard
+|   |           page.tsx
+|   |           
+|   +---api
+|   |   +---admin
+|   |   |   +---confirm-all-users
+|   |   |   |       route.ts
+|   |   |   |       
+|   |   |   \---users
+|   |   |           route.ts
+|   |   |           
+|   |   \---seed
+|   +---auth
+|   |   \---login
+|   |           page.tsx
+|   |           
+|   +---certificate
+|   |   \---[id]
+|   |           CertificateClient.tsx
+|   |           page.tsx
+|   |           
+|   +---dashboard
+|   |       page.tsx
+|   |       
+|   +---lib
+|   |       placeholder-images.json
+|   |       
+|   +---module
+|   |   \---[id]
+|   |           page.tsx
+|   |           
+|   \---settings
+|           page.tsx
+|           
++---components
+|   +---auth
+|   |       LoginForm.tsx
+|   |       
+|   +---module
+|   |       AIHelper.tsx
+|   |       FeedbackSurvey.tsx
+|   |       ModuleViewer.tsx
+|   |       Quiz.tsx
+|   |       
+|   \---ui
+|           accordion.tsx
+|           alert-dialog.tsx
+|           alert.tsx
+|           avatar.tsx
+|           badge.tsx
+|           button.tsx
+|           calendar.tsx
+|           card.tsx
+|           carousel.tsx
+|           chart.tsx
+|           checkbox.tsx
+|           collapsible.tsx
+|           dialog.tsx
+|           dropdown-menu.tsx
+|           form.tsx
+|           input.tsx
+|           label.tsx
+|           logo.tsx
+|           menubar.tsx
+|           popover.tsx
+|           progress.tsx
+|           radio-group.tsx
+|           scroll-area.tsx
+|           select.tsx
+|           separator.tsx
+|           sheet.tsx
+|           sidebar.tsx
+|           skeleton.tsx
+|           slider.tsx
+|           switch.tsx
+|           table.tsx
+|           tabs.tsx
+|           textarea.tsx
+|           toast.tsx
+|           toaster.tsx
+|           tooltip.tsx
+|           
++---hooks
+|       use-mobile.tsx
+|       use-toast.ts
+|       
++---lib
+|       placeholder-images.json
+|       placeholder-images.ts
+|       utils.ts
+|       
+\---utils
+    \---supabase
+            client.ts
+            server.ts
+            

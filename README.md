@@ -1,6 +1,14 @@
 # DiaCero — Plataforma de Entrenamiento Normativo
 
-> **Cero papeleo. 100% digital.** Plataforma educativa moderna para la capacitación en normativas de seguridad ocupacional chilena, diseñada para maximizar la retención y minimizar el tiempo fuera de faena.
+> **Cero papeleo. 100% digital.** Una experiencia educativa de vanguardia para la capacitación en normativas de seguridad ocupacional en Chile, diseñada para transformar el cumplimiento reactivo en aprendizaje proactivo.
+
+---
+
+## 🚀 Filosofía: El Fin del Papeleo
+DiaCero nace con una misión clara: **Digitalización total del proceso de cumplimiento**. 
+- **Eficiencia**: Eliminación de registros físicos y carpetas olvidadas.
+- **Trazabilidad**: Cada interacción, desde la lectura hasta el examen, queda registrada con firma digital.
+- **Accesibilidad**: Formación disponible 24/7 desde cualquier dispositivo móvil en faena.
 
 ---
 
@@ -8,13 +16,37 @@
 
 | Feature | Descripción |
 |---|---|
-| 🔐 **Autenticación Real** | Login / registro unificado con **Supabase Auth** (email + contraseña). Auto-registro en el primer acceso. |
-| 📚 **Módulos de Aprendizaje** | Visor estructurado verticalmente con secciones de contenido interactivas, integración multimedia (YouTube 16:9) y seguimiento de lectura por sección. |
-| 🎓 **Dashboard del Estudiante** | Resumen de módulos asignados, barra de progreso por módulo, y acceso directo al certificado al completar. |
-| 🛡️ **Panel de Administración** | Centro de monitoreo en tiempo real: progreso de cohorte, KPIs, indicadores semáforo (Activo / Inactivo / Completado) y puntajes de evaluación. |
-| 📝 **Quizzes Integrados** | Sistema de cuestionarios adaptativos al final de cada módulo para validar el aprendizaje. |
-| 🏅 **Certificados PDF** | Emisión automática de certificados firmados en formato A4 al completar un módulo. |
-| 🎨 **Diseño Premium Responsivo** | UI ligera en modo claro con glassmorphism, paleta de marca corporativa, animaciones suaves y logo vectorial dinámico. |
+| 🔐 **Autenticación Robusta** | Sistema unificado con **Supabase Auth** para un acceso seguro y trazable. |
+| 🤖 **Asistente de IA** | Integración nativa con GenAI para resúmenes automáticos y explicaciones adaptativas de conceptos técnicos. |
+| 📚 **Módulos Interactivos** | Visor de contenido dinámico con videos, lecturas y seguimiento de progreso en tiempo real. |
+| 🎓 **Dashboard Personalizado** | Visualización clara de metas, barra de progreso y descarga inmediata de certificaciones. |
+| 🛡️ **Panel de Administración** | KPIs en tiempo real, monitoreo de cumplimiento por cohorte y gestión de usuarios. |
+| 🏅 **Certificación Automática** | Generación instantánea de certificados A4 validados al completar satisfactoriamente los módulos. |
+
+---
+
+## 🧬 arquitectura del Sistema
+
+```mermaid
+graph TD
+    User((Usuario)) --> NextJS[Next.js App Router]
+    NextJS --> Auth[Supabase Auth]
+    NextJS --> DB[(PostgreSQL)]
+    NextJS --> AI[AI Engine / Genkit]
+    NextJS --> UI[Shadcn UI / Tailwind]
+    
+    subgraph "Capas de Aplicación"
+        NextJS --> Dashboard[/dashboard]
+        NextJS --> Module[/module/id]
+        NextJS --> Admin[/admin/dashboard]
+    end
+    
+    subgraph "Servicios"
+        DB --> Storage[Archivos / Certificados]
+        AI --> Summaries[Resúmenes]
+        AI --> Explanations[Explicaciones]
+    end
+```
 
 ---
 
@@ -23,117 +55,71 @@
 | Capa | Tecnología |
 |---|---|
 | **Framework** | [Next.js 15](https://nextjs.org/) (App Router + Turbopack) |
-| **Frontend** | [React 19](https://react.dev/) |
-| **Estilos** | [Tailwind CSS 3](https://tailwindcss.com/) |
-| **Componentes UI** | [Shadcn UI](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) |
-| **Base de Datos & Auth** | [Supabase](https://supabase.com/) (PostgreSQL + Auth) |
-| **Iconografía** | [Lucide React](https://lucide.dev/) |
-| **Gráficos** | [Recharts](https://recharts.org/) |
-| **IA (Opcional)** | [Genkit](https://firebase.google.com/docs/genkit) + Google GenAI |
+| **Inteligencia Artificial** | [Genkit](https://firebase.google.com/docs/genkit) + Google Gemini Pro |
+| **Backend as a Service** | [Supabase](https://supabase.com/) (PostgreSQL, Auth, Storage) |
+| **Estilos & UI** | [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/) |
+| **Visualización** | [Recharts](https://recharts.org/) + [Lucide Icons](https://lucide.dev/) |
 | **Lenguaje** | TypeScript 5 |
 
 ---
 
-## 🗄️ Arquitectura de Base de Datos (Supabase)
+## 🧠 Componentes Inteligentes (AI Features)
 
-La plataforma usa **Supabase PostgreSQL** como fuente de verdad. Las tablas principales son:
+La plataforma integra capacidades de IA para mejorar la experiencia de aprendizaje:
 
-```
-modules          → Catálogo de módulos de curso (título, descripción, orden)
-module_sections  → Secciones individuales de cada módulo (contenido, videos, tipo)
-user_progress    → Progreso por usuario/módulo (secciones completadas, puntajes)
-profiles         → Metadatos extendidos del usuario (rol: student | admin)
-```
-
-> **Row Level Security (RLS)** habilitado. Los usuarios solo pueden leer/escribir su propio progreso.
-
----
-
-## 🧭 Mapa de Rutas
-
-| Ruta | Descripción |
-|---|---|
-| `/` | Landing page + formulario de acceso unificado (login / registro) |
-| `/dashboard` | Portal individual del estudiante con módulos asignados y progreso |
-| `/module/[id]` | Visor central del módulo de curso |
-| `/admin/dashboard` | Panel del administrador / facilitador (roles via `user_metadata.role`) |
-| `/certificate/[id]` | Generación y descarga del certificado de finalización |
-
----
-
-## ⚙️ Variables de Entorno
-
-Crea un archivo `.env.local` en la raíz del proyecto con las siguientes claves (obtenidas desde tu proyecto en [supabase.com](https://supabase.com/dashboard)):
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
-```
-
----
-
-## 🚀 Desarrollo Local
-
-```bash
-# 1. Instalar dependencias
-npm install
-
-# 2. Configurar variables de entorno (ver sección anterior)
-cp .env.local.example .env.local   # o créalo manualmente
-
-# 3. Iniciar servidor de desarrollo (Turbopack, puerto 9002)
-npm run dev
-```
-
-Accede a `http://localhost:9002` en tu navegador.
-
-### Otros comandos útiles
-
-```bash
-npm run build       # Build de producción
-npm run lint        # Linting con ESLint
-npm run typecheck   # Verificación de tipos TypeScript
-```
-
----
-
-## 👤 Roles de Usuario
-
-| Rol | Acceso | Configuración |
-|---|---|---|
-| **Estudiante** | Dashboard + módulos asignados | Por defecto al registrarse |
-| **Administrador** | Todo lo anterior + `/admin/dashboard` | Requiere `user_metadata.role = 'admin'` en Supabase Auth |
-
-Para promover un usuario a administrador, actualiza su metadata desde el panel de Supabase:
-```json
-{ "role": "admin" }
-```
+1.  **AI Helper (`src/components/module/AIHelper.tsx`)**: 
+    - **Punto Clave**: Genera resúmenes ejecutivos de secciones extensas de seguridad.
+    - **Explicación Adaptativa**: Utiliza analogías del mundo cotidiano para explicar conceptos técnicos de la normativa chilena.
+2.  **Generación de Contexto**: Utiliza `ai-module-summary` y `ai-adaptive-explanation` para personalizar el aprendizaje según la sección actual.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-```
+```text
 src/
-├── app/                  # Rutas de Next.js (App Router)
-│   ├── page.tsx          # Landing / Login
+├── ai/                   # Lógica de prompts y flujos de IA (Genkit)
+├── app/                  # Sistema de rutas (App Router)
+│   ├── admin/            # Panel administrativo y reportes
+│   ├── certificate/      # Generación dinámica de certificados
 │   ├── dashboard/        # Portal del estudiante
-│   ├── module/[id]/      # Visor de módulos
-│   ├── admin/dashboard/  # Panel administrativo
-│   └── certificate/[id]/ # Generación de certificados
+│   └── module/[id]/      # Visor interactivo de cursos
 ├── components/
-│   ├── ui/               # Shadcn UI + componentes base (logo.tsx, etc.)
-│   └── module/           # Componentes del visor (Quiz, secciones, etc.)
-├── lib/                  # Utilidades y datos estáticos de respaldo
-└── utils/supabase/       # Cliente Supabase (client.ts / server.ts)
+│   ├── auth/             # Componentes de Login y Registro
+│   ├── module/           # Componentes core: AIHelper, Quiz, Feedback
+│   └── ui/               # Librería de componentes visuales (Shadcn)
+├── hooks/                # Hooks personalizados (Toast, Mobile detection)
+├── lib/                  # Utilidades y configuración compartida
+└── utils/supabase/       # Integración con el cliente de base de datos
 ```
 
 ---
 
-## 🔄 Gestión de Contenido
+## ⚙️ Configuración y Despliegue
 
-- **Módulos y Secciones**: administrados directamente desde las tablas `modules` y `module_sections` en Supabase.
-- **Logo**: coloca `logo.png` en `/public/` para sobrescribir el logo SVG predeterminado (detectado automáticamente por `components/ui/logo.tsx`).
+### Requisitos Previos
+- Cuenta en [Supabase](https://supabase.com/)
+- Claves de API de Google AI (para funciones de GenAI)
+
+### Variables de Entorno (.env.local)
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-id>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-key>
+GOOGLE_GENAI_API_KEY=<tu-google-ai-key>
+```
+
+### Comandos de Desarrollo
+```bash
+npm install         # Instalación
+npm run dev         # Desarrollo (Puerto 9002)
+npm run build       # Preparar para producción
+```
+
+---
+
+## 📄 Licencia y Créditos
+Proyecto privado — © DiaCero. Diseñado para transformar la seguridad industrial en Chile.
+public/` para sobrescribir el logo SVG predeterminado (detectado automáticamente por `components/ui/logo.tsx`).
 
 ---
 
