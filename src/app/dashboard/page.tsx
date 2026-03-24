@@ -86,7 +86,7 @@ export default function Dashboard() {
             <span className="font-headline font-black text-lg tracking-tight hidden sm:inline mt-2.5 leading-none border-l border-brand-blue/20 pl-3">Portal Piloto</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-brand-blue hover:bg-brand-lightblue/20 rounded-full">
+            <Button variant="ghost" size="icon" className="text-brand-blue hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2 bg-brand-lightblue/10 px-3 py-1.5 rounded-full border border-brand-blue/10 shadow-sm">
