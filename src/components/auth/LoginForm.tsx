@@ -107,7 +107,7 @@ export function LoginForm({
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
             <Label htmlFor="password" className="text-brand-blue font-bold uppercase tracking-wider text-[10px]">
-              Código de Seguridad Único
+              Contraseña
             </Label>
           </div>
           <Input 
