@@ -80,12 +80,12 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header Panel Light Theme */}
       <header className="bg-white/90 text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-5xl mx-auto flex items-center justify-center sm:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Logo className="h-8 w-auto" />
             <span className="font-headline font-black text-lg tracking-tight hidden sm:inline mt-2.5 leading-none border-l border-brand-blue/20 pl-3">Portal Piloto</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-4">
             <Button variant="ghost" size="icon" className="text-brand-blue hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
@@ -100,38 +100,17 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 pt-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <main className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 pt-8 pb-32 sm:pb-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Welcome Section */}
-        <section className="mb-8 animate-in fade-in slide-in-from-left duration-700 ease-out">
-          <h1 className="text-2xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
+        <section className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-left duration-700 ease-out">
+          <h1 className="text-xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
             Hola, <span className="text-brand-green pr-1 inline-block transition-transform duration-300 hover:scale-110 cursor-default">Estudiante</span> 👋
           </h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
+          <p className="text-slate-500 mt-1 sm:mt-2 text-base sm:text-lg font-medium">Resumen de tus programas de aprendizaje.</p>
         </section>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Mobile-only quick access bar for account actions */}
-          <div className="flex md:hidden gap-2 flex-wrap mb-2">
-            <Link href="/settings">
-              <Button variant="outline" size="sm" className="h-10 font-bold text-slate-600 border-brand-blue/20 hover:text-brand-blue hover:bg-brand-lightblue/10 rounded-xl">
-                <Settings className="h-4 w-4 mr-2" /> Preferencias
-              </Button>
-            </Link>
-            {isAdmin && (
-              <Link href="/admin/dashboard">
-                <Button size="sm" className="h-10 font-black bg-brand-yellow hover:bg-[#fde047] text-amber-900 rounded-xl shadow-sm active:scale-95 border border-amber-200/50">
-                  <LayoutDashboard className="h-4 w-4 mr-2 text-amber-900" /> Admin
-                </Button>
-              </Link>
-            )}
-            <Link href="/auth/login">
-              <Button variant="outline" size="sm" className="h-10 font-bold text-red-500 hover:text-white hover:bg-red-500 border-red-200 rounded-xl">
-                <LogOut className="h-4 w-4 mr-2" /> Salir
-              </Button>
-            </Link>
-          </div>
-
           {/* Main Course Feed */}
           <div className="flex-1 space-y-6">
             <h2 className="text-xl font-bold font-headline mb-4 flex items-center gap-2 text-brand-blue">
@@ -156,24 +135,24 @@ export default function Dashboard() {
                 assignedModules.map((mod, index) => (
                   <Card key={mod.id} className="hover-lift shadow-lg border-brand-blue/10 hover:border-brand-blue/30 group overflow-hidden relative rounded-3xl bg-white/90 backdrop-blur-sm">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-lightblue/10 rounded-bl-full -z-10 group-hover:bg-brand-lightblue/20 transition-colors"></div>
-                    <CardHeader className="bg-transparent pb-4 relative z-0">
+                    <CardHeader className="bg-transparent p-4 sm:p-6 pb-2 sm:pb-4 relative z-0">
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="inline-block px-3 py-1 mb-3 text-xs font-black tracking-widest rounded-full bg-brand-lightblue/20 text-brand-blue uppercase border border-brand-blue/5">
+                          <div className="inline-block px-3 py-1 mb-2 sm:mb-3 text-[10px] sm:text-xs font-black tracking-widest rounded-full bg-brand-lightblue/20 text-brand-blue uppercase border border-brand-blue/5">
                             CÁPSULA ACADÉMICA {index + 1}
                           </div>
-                          <CardTitle className="text-2xl font-headline font-black text-brand-blue leading-tight">{mod.title}</CardTitle>
-                          <CardDescription className="text-slate-500 mt-2 text-base leading-relaxed font-medium">{mod.description}</CardDescription>
+                          <CardTitle className="text-xl sm:text-2xl font-headline font-black text-brand-blue leading-tight">{mod.title}</CardTitle>
+                          <CardDescription className="text-slate-500 mt-1 sm:mt-2 text-sm sm:text-base leading-relaxed font-medium line-clamp-2 sm:line-clamp-none">{mod.description}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="pt-2">
+                    <CardContent className="p-4 sm:p-6 pt-0 sm:pt-2">
                       {/* Progress Metrics */}
-                      <div className="flex justify-between text-sm mb-2 font-bold">
+                      <div className="flex justify-between text-xs sm:text-sm mb-2 font-bold">
                         <span className="text-brand-blue flex items-center gap-1.5"><Trophy className="h-4 w-4 text-brand-gold"/> Avance General</span>
                         <span className="font-black flex items-center gap-1.5 text-brand-blue">
                           {mod.progress_percentage}%
-                          <span className="text-slate-400 font-medium text-xs">/ 100%</span>
+                          <span className="text-slate-400 font-medium text-[10px] sm:text-xs">/ 100%</span>
                         </span>
                       </div>
                       <Progress 
@@ -204,7 +183,7 @@ export default function Dashboard() {
 
           {/* Sidebar Area */}
           <div className="w-full md:w-80 space-y-6">
-            <Card className="shadow-lg border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
+            <Card className="hidden md:block shadow-lg border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
               <CardHeader className="pb-3 bg-brand-lightblue/10 border-b border-brand-blue/5">
                 <CardTitle className="text-lg font-headline font-bold flex items-center gap-2 text-brand-blue">
                   <User className="h-5 w-5 text-brand-blue" /> Atajos de Cuenta
@@ -247,6 +226,31 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-brand-blue/10 px-6 py-3 flex justify-around items-center md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-brand-blue transition-transform active:scale-90">
+          <BookOpen className="h-6 w-6" />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Módulos</span>
+        </Link>
+        
+        {isAdmin && (
+          <Link href="/admin/dashboard" className="flex flex-col items-center gap-1 text-brand-gold transition-transform active:scale-90">
+            <LayoutDashboard className="h-6 w-6" />
+            <span className="text-[10px] font-black uppercase tracking-tighter">Admin</span>
+          </Link>
+        )}
+        
+        <Link href="/settings" className="flex flex-col items-center gap-1 text-slate-500 transition-transform active:scale-90">
+          <Settings className="h-6 w-6" />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Ajustes</span>
+        </Link>
+        
+        <Link href="/auth/login" className="flex flex-col items-center gap-1 text-red-400 transition-transform active:scale-90">
+          <LogOut className="h-6 w-6" />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Salir</span>
+        </Link>
+      </div>
     </div>
   );
 }
