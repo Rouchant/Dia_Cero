@@ -135,7 +135,7 @@ export default function Home() {
                        required 
                        value={email}
                        onChange={(e) => setEmail(e.target.value)}
-                       className="h-12 bg-slate-50 border-slate-200 text-brand-blue placeholder:text-slate-400 focus:border-brand-pink focus:ring-brand-pink/50 text-sm rounded-xl transition-colors"
+                       className="h-12 bg-slate-50 border-slate-200 text-brand-blue placeholder:text-slate-400 focus:ring-brand-blue/20 text-sm rounded-xl transition-colors"
                      />
                    </div>
                    <div className="space-y-1.5">
@@ -149,7 +149,7 @@ export default function Home() {
                        placeholder="Inserte su contraseña"
                        value={password}
                        onChange={(e) => setPassword(e.target.value)}
-                       className="h-12 bg-slate-50 border-slate-200 text-brand-blue placeholder:text-slate-400 focus:border-brand-pink focus:ring-brand-pink/50 text-sm rounded-xl transition-colors"
+                       className="h-12 bg-slate-50 border-slate-200 text-brand-blue placeholder:text-slate-400  focus:ring-brand-blue/20 text-sm rounded-xl transition-colors"
                      />
                    </div>
                    <Button 
