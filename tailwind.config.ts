@@ -16,11 +16,11 @@ export default {
       },
       colors: {
         brand: {
-          pink: '#D9899E',
-          blue: '#3F6CA6',
-          lightblue: '#88C9F2',
-          yellow: '#F2DF7E',
-          gold: '#D9A648',
+          pink: '#E11D48',      /* Rosa-rojo vibrante → antes color apagado */
+          blue: '#1D4ED8',      /* Azul real saturado → antes azul grisáceo */
+          lightblue: '#38BDF8', /* Azul cielo vivo → antes azul pastel */
+          yellow: '#FEF08A',    /* Amarillo limón → antes beige amarillo */
+          gold: '#F59E0B',      /* Ámbar dorado → antes dorado apagado */
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
