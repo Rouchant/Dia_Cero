@@ -29,20 +29,20 @@ DiaCero nace con una misión clara: **Digitalización total del proceso de cumpl
 
 ```mermaid
 graph TD
-    User((Usuario)) --> NextJS[Next.js App Router]
-    NextJS --> Auth[Supabase Auth]
+    User((Usuario)) --> NextJS["Next.js App Router"]
+    NextJS --> Auth["Supabase Auth"]
     NextJS --> DB[(PostgreSQL)]
-    NextJS --> AI[AI Engine / Genkit]
-    NextJS --> UI[Shadcn UI / Tailwind]
+    NextJS --> AI["AI Engine / Genkit"]
+    NextJS --> UI["Shadcn UI / Tailwind"]
     
     subgraph "Capas de Aplicación"
-        NextJS --> Dashboard[/dashboard]
-        NextJS --> Module[/module/id]
-        NextJS --> Admin[/admin/dashboard]
+        NextJS --> Dashboard["/dashboard"]
+        NextJS --> Module["/module/id"]
+        NextJS --> Admin["/admin/dashboard"]
     end
     
     subgraph "Servicios"
-        DB --> Storage[Archivos / Certificados]
+        DB --> Storage["Archivos / Certificados"]
         AI --> Summaries[Resúmenes]
         AI --> Explanations[Explicaciones]
     end
