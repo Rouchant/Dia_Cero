@@ -89,14 +89,14 @@ export function LoginForm({
 
       <form onSubmit={handleLogin} className="space-y-4 text-left">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-brand-blue font-bold uppercase tracking-wider text-[10px]">
+          <Label htmlFor="user-email" className="text-brand-blue font-bold uppercase tracking-wider text-[10px]">
             Correo Electrónico Asignado
           </Label>
           <Input 
-            id="email" 
-            name="email"
+            id="user-email" 
+            name="username"
             type="email" 
-            autoComplete="email"
+            autoComplete="username"
             placeholder="Inserte su correo" 
             required 
             value={email}
@@ -106,15 +106,17 @@ export function LoginForm({
         </div>
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <Label htmlFor="password" className="text-brand-blue font-bold uppercase tracking-wider text-[10px]">
+            <Label htmlFor="user-password" className="text-brand-blue font-bold uppercase tracking-wider text-[10px]">
               Contraseña
             </Label>
           </div>
           <Input 
-            id="password" 
+            id="user-password" 
             name="password"
             type="password" 
             autoComplete="current-password"
+            spellCheck={false}
+            autoCorrect="off"
             required 
             placeholder="Inserte su contraseña"
             value={password}
