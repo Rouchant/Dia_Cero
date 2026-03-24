@@ -205,7 +205,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                   >
                     <div className="pt-0.5 shrink-0">
                       {isCompleted ? (
-                        <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-brand-pink")} />
+                        <CheckCircle2 className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-brand-green")} />
                       ) : (
                         <Circle className={cn("h-4 w-4 opacity-30", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
                       )}
@@ -290,7 +290,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                     </div>
 
                     {/* Celebration Card for Final Section */}
-                    {currentSectionIndex === moduleData.sections.length - 1 && progress >= 100 && (
+                    {currentSectionIndex === moduleData.module_sections.length - 1 && progress >= 100 && (
                       <Card className="bg-gradient-success border-none text-white p-6 shadow-xl animate-bounce-subtle rounded-3xl overflow-hidden relative">
                         <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/20 rounded-full blur-2xl animate-pulse"></div>
                         <div className="relative z-10 flex flex-col items-center text-center gap-3">

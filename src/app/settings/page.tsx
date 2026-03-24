@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
   if (loading) return (
      <div className="min-h-screen bg-[#F8FAFC] flex flex-col gap-4 items-center justify-center">
-       <Loader2 className="h-10 w-10 animate-spin text-brand-pink" />
+       <Loader2 className="h-10 w-10 animate-spin text-brand-green" />
        <p className="text-brand-blue font-bold text-lg animate-pulse">Autenticando Preferencias...</p>
      </div>
   );
@@ -118,7 +118,7 @@ export default function SettingsPage() {
          <Card className="shadow-xl shadow-brand-blue/5 border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
            <CardHeader className="bg-brand-lightblue/10 border-b border-brand-blue/5 pb-5">
              <CardTitle className="flex items-center gap-2 font-headline text-xl text-brand-blue">
-               <User className="h-5 w-5 text-brand-pink fill-brand-pink/20"/> Identidad Oficial
+               <User className="h-5 w-5 text-brand-green fill-brand-green/20"/> Identidad Oficial
              </CardTitle>
              <CardDescription className="text-slate-500 font-medium pt-1">
                Este es el nombre con el que tu supervisor te visualiza, y es el nombre exacto que será impreso de forma indeleble en tus <strong>Certificados A4</strong>.
@@ -128,7 +128,7 @@ export default function SettingsPage() {
              <form onSubmit={handleUpdateName} className="space-y-5">
                <div className="space-y-2">
                  <Label htmlFor="u-name" className="text-brand-blue font-bold uppercase tracking-wider text-xs">Nombre Completo Registrado</Label>
-                 <Input id="u-name" value={name} onChange={e=>setName(e.target.value)} required className="h-12 bg-slate-50 border-brand-blue/10 focus:bg-white focus:border-brand-pink focus:ring-brand-pink/30 text-lg font-bold text-brand-blue rounded-xl" />
+                 <Input id="u-name" value={name} onChange={e=>setName(e.target.value)} required className="h-12 bg-slate-50 border-brand-blue/10 focus:bg-white focus:border-brand-green focus:ring-brand-green/30 text-lg font-bold text-brand-blue rounded-xl" />
                </div>
                <div className="flex justify-end pt-2">
                  <Button type="submit" disabled={isSavingName} className="hover-lift w-full sm:w-auto bg-brand-blue hover:hover:bg-opacity-90 h-12 px-8 shadow-lg shadow-brand-blue/20 font-bold rounded-xl text-white active:scale-95">

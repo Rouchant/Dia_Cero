@@ -48,7 +48,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
   if (loading) return (
      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 text-brand-blue/70">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-pink" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-green" />
         <p className="font-bold font-headline animate-pulse">Generando certificado en papel virtual...</p>
      </div>
   );
@@ -99,7 +99,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
       {/* Action Bar - Hidden in Print */}
       <div className="w-full max-w-[8.5in] flex flex-col sm:flex-row justify-between items-center mb-8 px-4 gap-4 print:hidden">
-        <Button variant="outline" onClick={() => router.push('/dashboard')} className="bg-white hover:bg-slate-50 border-brand-blue/20 text-brand-blue font-bold shadow-sm">
+        <Button onClick={() => router.push('/dashboard')} className="hover-lift bg-brand-lightblue hover:bg-[#0ea5e9] text-white border-brand-lightblue font-black shadow-lg shadow-brand-lightblue/20 rounded-xl px-6 active:scale-95">
            <ArrowLeft className="mr-2 h-4 w-4"/> Volver al Panel
         </Button>
         <Button onClick={() => window.print()} className="bg-brand-blue hover:bg-brand-blue/90 text-white font-black shadow-lg shadow-brand-blue/20 border border-brand-blue">
@@ -131,7 +131,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-brand-blue mb-1 uppercase print:text-5xl">
                Certificado
             </h1>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-pink tracking-widest mb-8 md:mb-12 uppercase print:text-3xl print:mb-16">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-green tracking-widest mb-8 md:mb-12 uppercase print:text-3xl print:mb-16">
                de Aprobación
             </h2>
             
@@ -147,7 +147,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
               Por haber participado, asimilado y completado exitosamente con nivel de suficiencia, la examinación integral del programa de instrucción técnica:
             </p>
             
-            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-pink max-w-xl mx-auto uppercase py-4 leading-snug print:text-lg">
+            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-green max-w-xl mx-auto uppercase py-4 leading-snug print:text-lg">
               "{data.moduleTitle}"
             </h4>
 

@@ -7,13 +7,13 @@ import { BookOpen, Shield, Zap, Target } from "lucide-react";
 export default function Home() {
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-brand-pink/30 relative">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-brand-green/30 relative">
       
       {/* Background Ambience Mesh - disabled on reduced motion */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-lightblue/30 rounded-full blur-[120px] opacity-60 motion-safe:animate-pulse" style={{animationDuration: '8s'}} />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-yellow/40 rounded-full blur-[150px] opacity-60 motion-safe:animate-pulse" style={{animationDuration: '12s'}} />
-        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-brand-pink/20 rounded-full blur-[100px] opacity-50" />
+        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-brand-green/10 rounded-full blur-[100px] opacity-30" />
       </div>
 
       {/* Navigation Layer */}
@@ -40,7 +40,7 @@ export default function Home() {
             {/* Action/Login Block — order-first on mobile */}
             <div className="relative z-10 mx-auto lg:ml-auto lg:mr-0 w-full max-w-md order-first lg:order-last text-left">
               {/* Halo Glows */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-brand-pink/20 to-brand-lightblue/20 blur-[50px] rounded-full" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-brand-green/20 to-brand-lightblue/20 blur-[50px] rounded-full" />
               
               <LoginForm />
             </div>

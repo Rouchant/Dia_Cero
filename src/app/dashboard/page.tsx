@@ -105,7 +105,7 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <section className="mb-8 animate-in fade-in slide-in-from-left duration-700 ease-out">
           <h1 className="text-2xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
-            Hola, <span className="text-brand-pink pr-1 inline-block hover:animate-bounce cursor-default">Estudiante</span> 👋
+            Hola, <span className="text-brand-green pr-1 inline-block transition-transform duration-300 hover:scale-110 cursor-default">Estudiante</span> 👋
           </h1>
           <p className="text-slate-500 mt-2 text-lg font-medium">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
         </section>
@@ -120,8 +120,8 @@ export default function Dashboard() {
             </Link>
             {isAdmin && (
               <Link href="/admin/dashboard">
-                <Button size="sm" className="h-10 font-bold bg-brand-gold hover:bg-[#d98a00] text-white rounded-xl shadow-sm">
-                  <LayoutDashboard className="h-4 w-4 mr-2" /> Admin
+                <Button size="sm" className="h-10 font-black bg-brand-yellow hover:bg-[#fde047] text-amber-900 rounded-xl shadow-sm active:scale-95 border border-amber-200/50">
+                  <LayoutDashboard className="h-4 w-4 mr-2 text-amber-900" /> Admin
                 </Button>
               </Link>
             )}
@@ -219,8 +219,8 @@ export default function Dashboard() {
                 
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
-                    <Button variant="default" className="w-full justify-start h-12 font-bold bg-brand-gold hover:bg-[#d98a00] text-white transition-colors rounded-xl shadow-sm">
-                      <LayoutDashboard className="h-5 w-5 mr-3" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50"/>
+                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-black bg-brand-yellow hover:bg-[#fde047] text-amber-900 transition-all rounded-xl shadow-sm active:scale-95 border border-amber-200/50">
+                      <LayoutDashboard className="h-5 w-5 mr-3 text-amber-900" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50 text-amber-900"/>
                     </Button>
                   </Link>
                 )}

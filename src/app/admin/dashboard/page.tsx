@@ -443,7 +443,7 @@ export default function AdminDashboard() {
             </Link>
             <div className="flex items-center gap-2">
               <Logo className="h-8 w-auto hidden sm:block" />
-              <span className="text-brand-pink font-black px-3 border-l border-brand-blue/20 ml-2 hidden sm:inline mt-2.5 leading-none uppercase tracking-wide">Admin Escolar</span>
+              <span className="text-brand-green font-black px-3 border-l border-brand-blue/20 ml-2 hidden sm:inline mt-2.5 leading-none uppercase tracking-wide">Panel de administración</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -500,16 +500,16 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-4xl font-black text-accent">{averageProgress}%</p>
+                    <p className="text-4xl font-black text-brand-green">{averageProgress}%</p>
                   </div>
-                  <Progress value={averageProgress} className="h-2 mt-3 bg-accent/20" />
+                  <Progress value={averageProgress} className="h-2 mt-3 bg-brand-green/20 [&>div]:bg-brand-green" />
                 </CardContent>
               </Card>
-              <Card className="shadow-lg shadow-brand-blue/5 border-brand-pink/20 hover:border-brand-pink/50 transition-colors bg-white/90 backdrop-blur-sm rounded-2xl">
+              <Card className="shadow-lg shadow-brand-blue/5 border-brand-green/20 hover:border-brand-green/50 transition-colors bg-white/90 backdrop-blur-sm rounded-2xl">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
                   <CardTitle className="text-base font-bold text-slate-500">Completados Perfectos</CardTitle>
-                  <div className="p-2.5 bg-brand-pink/10 rounded-xl border border-brand-pink/20">
-                    <Award className="h-5 w-5 text-brand-pink" />
+                  <div className="p-2.5 bg-brand-green/10 rounded-xl border border-brand-green/20">
+                    <Award className="h-5 w-5 text-brand-green" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -559,9 +559,9 @@ export default function AdminDashboard() {
                             </p>
                             <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
-                          <span className="font-black text-primary text-lg">{user.progress_percentage || 0}%</span>
+                          <span className="font-black text-brand-green text-lg">{user.progress_percentage || 0}%</span>
                         </div>
-                        <Progress value={user.progress_percentage || 0} className="h-1.5 bg-primary/10" />
+                        <Progress value={user.progress_percentage || 0} className="h-1.5 bg-brand-green/10 [&>div]:bg-brand-green" />
                       </button>
                     ))
                   )}
@@ -611,7 +611,7 @@ export default function AdminDashboard() {
                                 <span className="font-bold text-xs w-8 text-right text-slate-700">{user.progress_percentage || 0}%</span>
                                 <Progress 
                                   value={user.progress_percentage || 0} 
-                                  className={`h-2 flex-1 bg-primary/10`} 
+                                  className={`h-2 flex-1 bg-brand-green/10 [&>div]:bg-brand-green`} 
                                 />
                               </div>
                             </td>
@@ -643,12 +643,12 @@ export default function AdminDashboard() {
                   {selectedUserStats?.moduleBreakdown && selectedUserStats.moduleBreakdown.length > 0 ? (
                      selectedUserStats.moduleBreakdown.map((mb: any, idx: number) => (
                         <div key={idx} className="bg-white p-4 rounded-xl border border-brand-blue/10 hover:border-brand-blue/30 transition-colors shadow-sm relative overflow-hidden">
-                          {mb.percentage >= 100 && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-pink/10 rounded-bl-[100px] pointer-events-none"></div>}
+                          {mb.percentage >= 100 && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-green/10 rounded-bl-[100px] pointer-events-none"></div>}
                           <div className="flex justify-between items-start mb-3 gap-4">
                              <span className="font-bold text-brand-blue text-sm leading-tight">{mb.title}</span>
-                             <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-brand-pink/10 text-brand-pink' : 'text-brand-blue bg-brand-lightblue/20'}`}>{mb.percentage}%</span>
+                             <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-brand-green/10 text-brand-green' : 'text-brand-blue bg-brand-lightblue/20'}`}>{mb.percentage}%</span>
                           </div>
-                          <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-brand-pink bg-brand-pink/20' : 'bg-slate-100'}`} />
+                          <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-brand-green bg-brand-green/20' : 'bg-slate-100'}`} />
                         </div>
                      ))
                   ) : (
