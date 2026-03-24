@@ -466,9 +466,15 @@ export default function AdminDashboard() {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="mb-6 bg-slate-100 p-1.5 rounded-lg flex flex-wrap h-auto w-full max-w-[600px] border border-slate-200">
-            <TabsTrigger value="overview" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">📉 Estadísticas Globales</TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">👥 Alta de Usuarios</TabsTrigger>
-            <TabsTrigger value="modules" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">📚 Curriculums Módulos</TabsTrigger>
+            <TabsTrigger value="overview" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+              <TrendingUp className="h-4 w-4" /> <span className="hidden xs:inline">Estadísticas</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+              <Users className="h-4 w-4" /> <span className="hidden xs:inline">Usuarios</span>
+            </TabsTrigger>
+            <TabsTrigger value="modules" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+              <Book className="h-4 w-4" /> <span className="hidden xs:inline">Módulos</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* TAB 1: OVERVIEW / ESTADISTICAS */}
@@ -532,7 +538,36 @@ export default function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                {/* Mobile card list */}
+                <div className="md:hidden divide-y">
+                  {loading ? (
+                    <div className="text-center py-12 text-muted-foreground">Cargando datos...</div>
+                  ) : filteredUsers.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">No hay cuentas en base de datos.</div>
+                  ) : (
+                    filteredUsers.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => setSelectedUserStats(user)}
+                        className="w-full text-left p-4 hover:bg-muted/40 transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="font-bold text-sm text-foreground uppercase">
+                              {user.name}
+                              {user.role === 'admin' && <span className="ml-2 px-1.5 py-0.5 rounded bg-brand-yellow/30 text-brand-gold font-black text-[10px] tracking-widest border border-brand-gold/30">ADMIN</span>}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                          </div>
+                          <span className="font-black text-primary text-lg">{user.progress_percentage || 0}%</span>
+                        </div>
+                        <Progress value={user.progress_percentage || 0} className="h-1.5 bg-primary/10" />
+                      </button>
+                    ))
+                  )}
+                </div>
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead className="text-xs text-muted-foreground uppercase bg-muted/40 border-b">
                       <tr>
@@ -591,6 +626,7 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+
 
             {/* Drilldown User Dialog Overlay */}
             <Dialog open={!!selectedUserStats} onOpenChange={(open) => !open && setSelectedUserStats(null)}>

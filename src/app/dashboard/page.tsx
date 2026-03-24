@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRight, Award } from "lucide-react";
+import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRight, Award, LayoutDashboard } from "lucide-react";
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
@@ -104,18 +104,40 @@ export default function Dashboard() {
         
         {/* Welcome Section */}
         <section className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
             Hola, <span className="text-brand-pink pr-1">Estudiante</span> 👋
           </h1>
           <p className="text-slate-500 mt-2 text-lg font-medium">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
         </section>
 
         <div className="flex flex-col md:flex-row gap-8">
+          {/* Mobile-only quick access bar for account actions */}
+          <div className="flex md:hidden gap-2 flex-wrap mb-2">
+            <Link href="/settings">
+              <Button variant="outline" size="sm" className="h-10 font-bold text-slate-600 border-brand-blue/20 hover:text-brand-blue hover:bg-brand-lightblue/10 rounded-xl">
+                <Settings className="h-4 w-4 mr-2" /> Preferencias
+              </Button>
+            </Link>
+            {isAdmin && (
+              <Link href="/admin/dashboard">
+                <Button size="sm" className="h-10 font-bold bg-brand-gold hover:bg-[#d98a00] text-white rounded-xl shadow-sm">
+                  <LayoutDashboard className="h-4 w-4 mr-2" /> Admin
+                </Button>
+              </Link>
+            )}
+            <Link href="/auth/login">
+              <Button variant="outline" size="sm" className="h-10 font-bold text-red-500 hover:text-white hover:bg-red-500 border-red-200 rounded-xl">
+                <LogOut className="h-4 w-4 mr-2" /> Salir
+              </Button>
+            </Link>
+          </div>
+
           {/* Main Course Feed */}
           <div className="flex-1 space-y-6">
             <h2 className="text-xl font-bold font-headline mb-4 flex items-center gap-2 text-brand-blue">
               <BookOpen className="text-brand-lightblue h-5 w-5 fill-brand-lightblue/20" /> Tus Módulos Activos
             </h2>
+
             
             {loading ? (
               <div className="text-center py-16 animate-pulse opacity-50 bg-white rounded-3xl border border-brand-blue/10 shadow-sm">
@@ -192,7 +214,7 @@ export default function Dashboard() {
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
                     <Button variant="default" className="w-full justify-start h-12 font-bold bg-brand-gold hover:bg-[#d98a00] text-white transition-colors rounded-xl shadow-sm">
-                      <Award className="h-5 w-5 mr-3" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50"/>
+                      <LayoutDashboard className="h-5 w-5 mr-3" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50"/>
                     </Button>
                   </Link>
                 )}

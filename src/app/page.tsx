@@ -9,10 +9,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-brand-pink/30 relative">
       
-      {/* Background Ambience Mesh (Light Theme using Brand Colors) */}
+      {/* Background Ambience Mesh - disabled on reduced motion */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-lightblue/30 rounded-full blur-[120px] opacity-60 animate-pulse" style={{animationDuration: '8s'}} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-yellow/40 rounded-full blur-[150px] opacity-60 animate-pulse" style={{animationDuration: '12s'}} />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-lightblue/30 rounded-full blur-[120px] opacity-60 motion-safe:animate-pulse" style={{animationDuration: '8s'}} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-yellow/40 rounded-full blur-[150px] opacity-60 motion-safe:animate-pulse" style={{animationDuration: '12s'}} />
         <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-brand-pink/20 rounded-full blur-[100px] opacity-50" />
       </div>
 
@@ -34,11 +34,19 @@ export default function Home() {
       <main className="relative min-h-[100dvh] pt-24 pb-8 px-6 lg:px-8 flex flex-col justify-center z-10 overflow-hidden">
         <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center gap-10 sm:gap-14 lg:gap-16 mt-4">
           
-          {/* Top Half: Hero & Login */}
+          {/* Top Half: Hero & Login — login shown first on mobile */}
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-8 items-center w-full">
             
-            {/* Typographic Pillar */}
-            <div className="space-y-6 relative z-20 text-center lg:text-left flex flex-col items-center lg:items-start">
+            {/* Action/Login Block — order-first on mobile */}
+            <div className="relative z-10 mx-auto lg:ml-auto lg:mr-0 w-full max-w-md order-first lg:order-last text-left">
+              {/* Halo Glows */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-brand-pink/20 to-brand-lightblue/20 blur-[50px] rounded-full" />
+              
+              <LoginForm />
+            </div>
+
+            {/* Typographic Pillar — order-last on mobile */}
+            <div className="space-y-6 relative z-20 text-center lg:text-left flex flex-col items-center lg:items-start order-last lg:order-first">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-lightblue/30 border border-brand-blue/20 text-brand-blue text-[11px] font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
                 <Zap className="h-3 w-3 fill-brand-gold text-brand-gold" />
                 Cero Papeleo. 100% Digital.
@@ -55,18 +63,10 @@ export default function Home() {
                 Bienvenido a <strong className="text-brand-blue font-black">DiaCero</strong>. Nuestra misión es <strong className="text-brand-blue">erradicar el tiempo de inactividad</strong>. Absorbe normativas técnicas en minutos, supera módulos rápidos directamente desde tu teléfono, y obtén tus <strong>certificados</strong> al instante para volver a la acción en faena sin atascos burocráticos.
               </p>
             </div>
-
-            {/* Action/Login Block */}
-            <div className="relative z-10 mx-auto lg:ml-auto lg:mr-0 w-full max-w-md mt-6 lg:mt-0 text-left">
-              {/* Halo Glows */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-brand-pink/20 to-brand-lightblue/20 blur-[50px] rounded-full" />
-              
-              <LoginForm />
-            </div>
           </div>
 
-          {/* Bottom Half: Feature Architecture Base (Light Mode Cards) */}
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-6 w-full">
+          {/* Bottom Half: Feature Cards — Hidden on mobile */}
+          <div className="hidden md:grid md:grid-cols-3 gap-4 sm:gap-6 w-full">
             <div className="bg-white/80 backdrop-blur-md border border-brand-blue/10 rounded-3xl p-6 sm:p-7 hover:border-brand-blue/30 transition-colors shadow-xl shadow-brand-blue/5">
               <div className="bg-brand-lightblue/30 w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-brand-blue/10">
                 <BookOpen className="h-5 w-5 text-brand-blue" />

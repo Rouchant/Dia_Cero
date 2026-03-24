@@ -244,7 +244,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
 
         {/* Section Content */}
         <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100vh-4rem)] relative flex flex-col [&>div>div]:!block">
-          <div className="max-w-6xl mx-auto px-4 md:px-12 py-6 min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in duration-500">
+          <div className="max-w-6xl mx-auto px-4 md:px-12 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in duration-500">
             {currentSection.type === 'content' && (
               <div className="flex flex-col flex-1 h-full">
                 <div className="flex-1 flex flex-col gap-6 md:gap-8 items-center justify-start min-h-0 h-full overflow-y-auto py-4 px-2">
