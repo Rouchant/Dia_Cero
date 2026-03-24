@@ -9,34 +9,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan datos requeridos (email, password, name)' }, { status: 400 });
     }
 
-    // Usamos el cliente regular pero deshabilitamos la persistencia en cookies.
-    // Esto es CLAVE para poder crear en Auth.Users sin que se cierre la sesión 
-    // del Administrador que está activo operando en el navegador.
-    const adminAuthClient = createClient(
+    // Usamos la Service Role Key (solo disponible en el servidor) para
+    // crear usuarios como admin, lo que evita el envío del email de verificación.
+    const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const { data: authData, error: signUpError } = await adminAuthClient.auth.signUp({
+    const { data: authData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: {
-          name: name,
-          role: 'estudiante' // Por defecto se crean como estudiantes normales
-        }
+      email_confirm: true, // ← Confirma el email automáticamente, sin requerir verificación
+      user_metadata: {
+        name: name,
+        role: 'estudiante'
       }
     });
 
-    if (signUpError) {
-      return NextResponse.json({ error: signUpError.message }, { status: 400 });
+    if (createError) {
+      return NextResponse.json({ error: createError.message }, { status: 400 });
     }
 
-    // Insertar su perfil explícitamente en la tabla pública usando 
-    // la sesión recién generada en memoria de este cliente.
+    // Insertar su perfil en la tabla pública de perfiles
     if (authData.user) {
-      const { error: profileError } = await adminAuthClient.from('profiles').upsert({
+      const { error: profileError } = await supabaseAdmin.from('profiles').upsert({
         id: authData.user.id,
         email: authData.user.email,
         name: name,
@@ -48,7 +45,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, message: 'Usuario creado exitosamente en Auth y Profiles', user: authData.user });
+    return NextResponse.json({ success: true, message: 'Estudiante dado de alta exitosamente sin requerir verificación de correo', user: authData.user });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
