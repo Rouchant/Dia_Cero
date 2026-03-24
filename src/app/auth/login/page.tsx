@@ -82,7 +82,7 @@ export default function LoginPage() {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="piloto@diacero.com" 
+                placeholder="Inserte su correo" 
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -100,6 +100,7 @@ export default function LoginPage() {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Inserte su contraseña"
                 className="h-12 border-primary/10"
               />
             </div>

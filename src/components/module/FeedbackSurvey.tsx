@@ -89,7 +89,7 @@ export function FeedbackSurvey({ onComplete }: FeedbackSurveyProps) {
             <Label htmlFor="comments" className="text-sm font-semibold">¿Algún pensamiento adicional?</Label>
             <Textarea
               id="comments"
-              placeholder="¿Qué te gustó? ¿Qué podríamos mejorar?"
+              placeholder="Inserte sus comentarios o sugerencias"
               className="min-h-[150px] resize-none border-primary/10 focus-visible:ring-primary"
               value={comment}
               onChange={(e) => setComment(e.target.value)}

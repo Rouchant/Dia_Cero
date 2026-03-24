@@ -131,7 +131,7 @@ export default function Home() {
                      <Input 
                        id="email" 
                        type="email" 
-                       placeholder="numero.operario@diacero.cl" 
+                       placeholder="Inserte su correo" 
                        required 
                        value={email}
                        onChange={(e) => setEmail(e.target.value)}
@@ -146,7 +146,7 @@ export default function Home() {
                        id="password" 
                        type="password" 
                        required 
-                       placeholder="••••••••"
+                       placeholder="Inserte su contraseña"
                        value={password}
                        onChange={(e) => setPassword(e.target.value)}
                        className="h-12 bg-slate-50 border-slate-200 text-brand-blue placeholder:text-slate-400 focus:border-brand-pink focus:ring-brand-pink/50 text-sm rounded-xl transition-colors"

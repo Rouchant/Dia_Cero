@@ -153,7 +153,7 @@ export default function SettingsPage() {
              <form onSubmit={handleUpdatePassword} className="space-y-5">
                <div className="space-y-2">
                  <Label htmlFor="u-pwd" className="text-brand-blue font-bold uppercase tracking-wider text-xs">Inyectar Nueva Contraseña</Label>
-                 <Input id="u-pwd" type="password" placeholder="Mínimo 6 caracteres" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required minLength={6} className="h-12 bg-slate-50 border-brand-gold/20 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-lg rounded-xl text-brand-blue pl-4" />
+                 <Input id="u-pwd" type="password" placeholder="Inserte nueva contraseña" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required minLength={6} className="h-12 bg-slate-50 border-brand-gold/20 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-lg rounded-xl text-brand-blue pl-4" />
                </div>
                <div className="flex justify-end pt-2">
                  <Button type="submit" disabled={isSavingPassword || newPassword.length < 6} className="bg-brand-gold hover:bg-[#c2933d] text-white h-12 px-8 shadow-lg shadow-brand-gold/20 font-bold tracking-wide rounded-xl">

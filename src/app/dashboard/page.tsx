@@ -155,14 +155,14 @@ export default function Dashboard() {
                       
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Link href={`/module/${mod.id}`} className={mod.progress_percentage >= 100 ? "flex-1" : "w-full"}>
-                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all ${mod.progress_percentage >= 100 ? "bg-white text-brand-blue border border-brand-blue/20 hover:bg-slate-50" : "bg-brand-blue hover:bg-opacity-90 text-white"}`} variant={mod.progress_percentage >= 100 ? "outline" : "default"} size="lg">
+                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all ${mod.progress_percentage >= 100 ? "bg-brand-blue hover:bg-[#163BB5] text-white" : "bg-brand-blue hover:bg-[#163BB5] text-white"}`} variant="default" size="lg">
                             {mod.progress_percentage > 0 && mod.progress_percentage < 100 ? "Continuar Entrenando" : 
                              mod.progress_percentage >= 100 ? "Repasar Módulo" : "Comenzar Ahora"}
                           </Button>
                         </Link>
                         {mod.progress_percentage >= 100 && (
                           <Link href={`/certificate/${mod.id}`} className="flex-1">
-                            <Button className="w-full h-12 text-base font-bold shadow-lg shadow-brand-pink/20 hover:shadow-brand-pink/40 transition-all bg-brand-pink hover:bg-[#c9788d] text-white" size="lg">
+                              <Button className="w-full h-12 text-base font-bold shadow-lg shadow-brand-gold/30 hover:shadow-brand-gold/50 transition-all bg-brand-gold hover:bg-[#d98a00] text-white" size="lg">
                               <Award className="mr-2 h-5 w-5"/> Ir al Certificado
                             </Button>
                           </Link>
@@ -191,7 +191,7 @@ export default function Dashboard() {
                 
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
-                    <Button variant="outline" className="w-full justify-start h-12 font-bold border-brand-gold/30 bg-brand-yellow/10 text-brand-gold hover:bg-brand-yellow/30 transition-colors rounded-xl shadow-sm">
+                    <Button variant="default" className="w-full justify-start h-12 font-bold bg-brand-gold hover:bg-[#d98a00] text-white transition-colors rounded-xl shadow-sm">
                       <Award className="h-5 w-5 mr-3" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50"/>
                     </Button>
                   </Link>

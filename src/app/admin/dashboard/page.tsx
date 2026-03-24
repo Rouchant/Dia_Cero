@@ -640,11 +640,11 @@ export default function AdminDashboard() {
                 <form onSubmit={handleCreateUser} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="c-name" className="text-slate-800 font-bold">Nombre del Operador (Estudiante)</Label>
-                    <Input id="c-name" placeholder="Roberto C. González" value={newUserName} onChange={e=>setNewUserName(e.target.value)} required />
+                    <Input id="c-name" placeholder="Inserte nombre completo" value={newUserName} onChange={e=>setNewUserName(e.target.value)} required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="c-email" className="text-slate-800 font-bold">Correo Acceso Oficial</Label>
-                    <Input id="c-email" type="email" placeholder="operador@lafaena.xyz" value={newUserEmail} onChange={e=>setNewUserEmail(e.target.value)} required />
+                    <Input id="c-email" type="email" placeholder="Inserte correo electrónico" value={newUserEmail} onChange={e=>setNewUserEmail(e.target.value)} required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="c-pwd" className="text-slate-800 font-bold">Contraseña Preasignada (Temporal)</Label>
@@ -674,7 +674,7 @@ export default function AdminDashboard() {
                   <form onSubmit={handleCreateModule} className="space-y-5 flex flex-col h-full">
                     <div className="space-y-2">
                       <Label htmlFor="m-title" className="text-slate-800 font-bold">Concepto Matriz (Título)</Label>
-                      <Input id="m-title" placeholder="Ej. Liderazgo en Terreno" value={newModuleTitle} onChange={e=>setNewModuleTitle(e.target.value)} required />
+                      <Input id="m-title" placeholder="Inserte título" value={newModuleTitle} onChange={e=>setNewModuleTitle(e.target.value)} required />
                     </div>
                     <div className="space-y-2 flex-1">
                       <Label htmlFor="m-desc" className="text-slate-800 font-bold">Descripción Orientativa</Label>
@@ -682,12 +682,12 @@ export default function AdminDashboard() {
                         id="m-desc"
                         required
                         className="flex min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Las habilidades clave para jefaturas en faena frente al control de riesgo biológico..."
+                        placeholder="Inserte descripción orientativa para el módulo"
                         value={newModuleDesc}
                         onChange={e=>setNewModuleDesc(e.target.value)}
                       />
                     </div>
-                    <Button type="submit" disabled={isCreatingModule} className="w-full h-12 bg-slate-900 px-8 text-white mt-4 hover:shadow-lg shadow-black/20 font-bold">
+                    <Button type="submit" disabled={isCreatingModule} className="w-full h-12 bg-brand-blue hover:bg-[#163BB5] px-8 text-white mt-4 hover:shadow-lg shadow-brand-blue/20 font-bold">
                       {isCreatingModule ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Ensamblando Base de Datos...</> : "Ensamblar Módulo Cero"}
                     </Button>
                   </form>
@@ -793,7 +793,7 @@ export default function AdminDashboard() {
                           onClick={handleAddNewContentSection} 
                           disabled={isSavingContent || !editContentModuleId} 
                           variant="outline" 
-                          className="w-full bg-white border-dashed border-2 border-sky-300 text-sky-700 hover:bg-sky-50 font-bold"
+                          className="w-full bg-sky-100 border-2 border-sky-300 text-sky-700 hover:bg-brand-blue hover:text-white hover:border-brand-blue font-bold transition-colors"
                         >
                           + Inyectar Nueva Lección
                         </Button>
@@ -807,12 +807,13 @@ export default function AdminDashboard() {
                           
                           <div className="space-y-2">
                              <Label className="text-slate-800 font-black text-lg">Título de la Diapositiva</Label>
-                             <Input 
-                               className="h-14 bg-sky-50 border-sky-100 text-lg font-headline font-bold" 
-                               value={editSecTitle} 
-                               onChange={e=>setEditSecTitle(e.target.value)} 
-                               required 
-                             />
+                              <Input 
+                                className="h-14 bg-sky-50 border-sky-100 text-lg font-headline font-bold" 
+                                placeholder="Inserte título"
+                                value={editSecTitle} 
+                                onChange={e=>setEditSecTitle(e.target.value)} 
+                                required 
+                              />
                           </div>
 
                           <div className="space-y-2">
@@ -820,6 +821,7 @@ export default function AdminDashboard() {
                              <textarea 
                                 required
                                 className="flex min-h-[220px] w-full rounded-md border border-slate-200 shadow-inner bg-slate-50 px-4 py-3 text-base leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500"
+                                placeholder="Inserte contenido"
                                 value={editSecContent}
                                 onChange={e=>setEditSecContent(e.target.value)}
                              />
@@ -830,7 +832,7 @@ export default function AdminDashboard() {
                                <Label className="text-slate-700 font-bold flex items-center gap-1.5"><Video className="w-4 h-4 text-rose-500"/> URL Video YouTube (Opcional)</Label>
                                <Input 
                                  className="h-10 text-xs bg-white" 
-                                 placeholder="https://www.youtube.com/watch?v=..." 
+                                 placeholder="Inserte URL de YouTube" 
                                  value={editSecVideo} 
                                  onChange={e=>setEditSecVideo(e.target.value)} 
                                />
@@ -841,7 +843,7 @@ export default function AdminDashboard() {
                                <Input 
                                  className="h-10 text-xs bg-white" 
                                  type="url"
-                                 placeholder="https://images.unsplash.com/photo-..." 
+                                 placeholder="Inserte URL de imagen" 
                                  value={editSecImage} 
                                  onChange={e=>setEditSecImage(e.target.value)} 
                                />
@@ -932,19 +934,19 @@ export default function AdminDashboard() {
                           <h4 className="font-black text-rose-900 font-headline text-lg">Inyectar Nuevo Paradigma de Pregunta</h4>
                           <div className="space-y-2">
                              <Label className="text-slate-800 font-bold">Enunciado / Condición</Label>
-                             <Input className="h-11 bg-white" placeholder="Ej. ¿Qué color tiene el casco de seguridad estándar frente a impacto eléctrico?" value={newQuizQuestion} onChange={e=>setNewQuizQuestion(e.target.value)} required />
+                             <Input className="h-11 bg-white" placeholder="Inserte el enunciado o condición de la pregunta" value={newQuizQuestion} onChange={e=>setNewQuizQuestion(e.target.value)} required />
                           </div>
                           <div className="grid sm:grid-cols-4 gap-6">
                             <div className="sm:col-span-3 space-y-2">
                                <Label className="text-slate-800 font-bold">Posibles Respuestas (Separar estrictamente por comas ",")</Label>
-                               <Input className="h-11 bg-white border-rose-200" placeholder="Rojo ignífugo, Azul marino, Amarillo reflectante, Blanco reforzado" value={newQuizOptions} onChange={e=>setNewQuizOptions(e.target.value)} required />
+                               <Input className="h-11 bg-white border-rose-200" placeholder="Inserte opciones separadas por comas" value={newQuizOptions} onChange={e=>setNewQuizOptions(e.target.value)} required />
                             </div>
                             <div className="space-y-2">
                                <Label className="text-slate-800 font-bold">El Nº Correcto Es</Label>
-                               <Input className="h-11 bg-white border-emerald-200 font-bold text-center text-lg" type="number" min={1} placeholder="1" value={newQuizAnswerIdx} onChange={e=>setNewQuizAnswerIdx(parseInt(e.target.value))} required />
+                               <Input className="h-11 bg-white border-emerald-200 font-bold text-center text-lg" type="number" min={1} placeholder="Inserte el número" value={newQuizAnswerIdx} onChange={e=>setNewQuizAnswerIdx(parseInt(e.target.value))} required />
                             </div>
                           </div>
-                          <Button type="submit" disabled={isCreatingQuizQuestion} className="w-full h-14 bg-slate-900 mt-4 text-white font-bold hover:shadow-xl transition-all font-headline text-lg shadow-black/20">
+                          <Button type="submit" disabled={isCreatingQuizQuestion} className="w-full h-14 bg-rose-900 hover:bg-rose-950 mt-4 text-white font-bold hover:shadow-xl transition-all font-headline text-lg shadow-rose-900/20">
                              {isCreatingQuizQuestion ? <><Loader2 className="mr-2 h-5 w-5 animate-spin"/> Transmitiendo Nodo Server-Side...</> : "Ensamblar e Inyectar Pregunta Oficial"}
                           </Button>
                        </form>

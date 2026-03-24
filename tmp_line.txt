@@ -1,0 +1,1 @@
+﻿                             <Input className="h-11 bg-white" placeholder="Ej. Â¿QuÃ© color tiene el casco de seguridad estÃ¡ndar frente a impacto elÃ©ctrico?" value={newQuizQuestion} onChange={e=>setNewQuizQuestion(e.target.value)} required />
