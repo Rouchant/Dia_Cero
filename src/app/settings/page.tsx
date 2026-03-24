@@ -131,7 +131,7 @@ export default function SettingsPage() {
                  <Input id="u-name" value={name} onChange={e=>setName(e.target.value)} required className="h-12 bg-slate-50 border-brand-blue/10 focus:bg-white focus:border-brand-pink focus:ring-brand-pink/30 text-lg font-bold text-brand-blue rounded-xl" />
                </div>
                <div className="flex justify-end pt-2">
-                 <Button type="submit" disabled={isSavingName} className="bg-brand-blue hover:hover:bg-opacity-90 h-12 px-8 shadow-lg shadow-brand-blue/20 font-bold rounded-xl text-white">
+                 <Button type="submit" disabled={isSavingName} className="hover-lift w-full sm:w-auto bg-brand-blue hover:hover:bg-opacity-90 h-12 px-8 shadow-lg shadow-brand-blue/20 font-bold rounded-xl text-white active:scale-95">
                    {isSavingName ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
                    Sellar Identidad
                  </Button>
@@ -156,7 +156,7 @@ export default function SettingsPage() {
                  <Input id="u-pwd" type="password" placeholder="Inserte nueva contraseña" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required minLength={6} className="h-12 bg-slate-50 border-brand-gold/20 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-lg rounded-xl text-brand-blue pl-4" />
                </div>
                <div className="flex justify-end pt-2">
-                 <Button type="submit" disabled={isSavingPassword || newPassword.length < 6} className="bg-brand-gold hover:bg-[#c2933d] text-white h-12 px-8 shadow-lg shadow-brand-gold/20 font-bold tracking-wide rounded-xl">
+                 <Button type="submit" disabled={isSavingPassword || newPassword.length < 6} className="hover-lift w-full sm:w-auto bg-brand-gold hover:bg-[#c2933d] text-white h-12 px-8 shadow-lg shadow-brand-gold/20 font-bold tracking-wide rounded-xl active:scale-95">
                    {isSavingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Reforzar Contraseña"}
                  </Button>
                </div>

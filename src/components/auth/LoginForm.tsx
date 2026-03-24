@@ -126,7 +126,7 @@ export function LoginForm({
         </div>
         <Button 
           type="submit" 
-          className="w-full h-12 text-sm font-black bg-brand-pink hover:bg-[#c9788d] text-white mt-4 rounded-xl shadow-lg shadow-brand-pink/30 transition-all uppercase tracking-wide" 
+          className="hover-lift w-full h-12 text-sm font-black bg-brand-green hover:bg-[#06c283] text-white mt-4 rounded-xl shadow-lg shadow-brand-green/30 transition-all uppercase tracking-wide active:scale-95" 
           disabled={loading}
         >
           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Iniciar Formación Ahora"}

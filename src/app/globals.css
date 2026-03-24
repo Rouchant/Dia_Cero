@@ -35,7 +35,7 @@
     --border: 220 25% 88%;
     --input: 220 25% 88%;
     --ring: 224 71% 47%;
-    --radius: 0.75rem;
+    --radius: 1rem; /* Aumentado para Playful UI */
 
     /* Data Viz */
     --chart-1: 224 71% 47%; /* azul primary */
@@ -82,5 +82,28 @@
     color: #94a3b8;      /* slate-400 — visible pero claramente secundario */
     font-style: italic;  /* cursiva para indicar que no es contenido real */
     opacity: 1;          /* Firefox normalización */
+  }
+}
+
+@layer utilities {
+  .animate-bounce-subtle {
+    animation: bounce-subtle 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95;
+  }
+
+  .bg-gradient-playful {
+    @apply bg-gradient-to-br from-brand-blue to-brand-lightblue;
+  }
+
+  .bg-gradient-success {
+    @apply bg-gradient-to-br from-[#08dd96] to-[#04b87d];
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
   }
 }

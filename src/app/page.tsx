@@ -49,12 +49,12 @@ export default function Home() {
             <div className="space-y-6 relative z-20 text-center lg:text-left flex flex-col items-center lg:items-start order-last lg:order-first">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-lightblue/30 border border-brand-blue/20 text-brand-blue text-[11px] font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
                 <Zap className="h-3 w-3 fill-brand-gold text-brand-gold" />
-                Cero Papeleo. 100% Digital.
+                Cero Papeleo y 100% Digital
               </div>
               
               <h1 className="text-5xl sm:text-6xl lg:text-[4.5rem] font-headline font-black leading-[1.05] tracking-tighter text-brand-blue">
                 Entrenamiento <br className="hidden lg:block" />
-                <span className="text-brand-pink lg:block">
+                <span className="text-brand-green lg:block">
                   Directo y Vital
                 </span>
               </h1>
@@ -84,11 +84,11 @@ export default function Home() {
             </div>
             
             <div className="bg-white/80 backdrop-blur-md border border-brand-blue/10 rounded-3xl p-6 sm:p-7 hover:border-brand-blue/30 transition-colors shadow-xl shadow-brand-blue/5">
-              <div className="bg-brand-pink/20 w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-brand-pink/30">
-                <Shield className="h-5 w-5 text-brand-pink" />
+              <div className="bg-brand-green/20 w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-brand-green/30">
+                <Shield className="h-5 w-5 text-brand-green" />
               </div>
               <h3 className="text-lg sm:text-xl font-headline font-bold text-brand-blue mb-2">Diplomas Encriptados</h3>
-              <p className="text-slate-600 text-sm leading-relaxed font-medium">DiaCero firma encriptadamente tu evaluación finalizada, emitiendo PDFs directos ajustados automáticamente a hoja física formato A4.</p>
+              <p className="text-slate-600 text-sm leading-relaxed font-medium">DiaCero firma encriptadamente tu evaluación finalizada, emitiendo PDFs directos listos para ser impresos.</p>
             </div>
           </div>
 

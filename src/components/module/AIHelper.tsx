@@ -56,16 +56,16 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 transition-all duration-500 ${loading ? 'opacity-80 scale-[0.98]' : 'opacity-100 scale-100'}`}>
       <div className="flex flex-col sm:flex-row gap-2">
         <Button 
           variant="outline" 
           size="sm" 
           onClick={handleSummarize} 
           disabled={loading}
-          className="border-accent/30 text-accent hover:bg-accent/5 flex-1 sm:flex-initial"
+          className="hover-lift border-accent/30 text-accent hover:bg-accent/5 flex-1 sm:flex-initial active:scale-95"
         >
-          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2 animate-bounce-subtle" />}
           Resumen Rápido
         </Button>
         <Button 
@@ -73,9 +73,9 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           size="sm" 
           onClick={handleSimplify} 
           disabled={loading}
-          className="border-primary/30 text-primary hover:bg-primary/5 flex-1 sm:flex-initial"
+          className="hover-lift border-primary/30 text-primary hover:bg-primary/5 flex-1 sm:flex-initial active:scale-95"
         >
-          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
+          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2 animate-pulse" />}
           Explicar de Forma Sencilla
         </Button>
       </div>

@@ -466,13 +466,13 @@ export default function AdminDashboard() {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="mb-6 bg-slate-100 p-1.5 rounded-lg flex flex-wrap h-auto w-full max-w-[600px] border border-slate-200">
-            <TabsTrigger value="overview" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+            <TabsTrigger value="overview" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
               <TrendingUp className="h-4 w-4" /> <span className="hidden xs:inline">Estadísticas</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+            <TabsTrigger value="users" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
               <Users className="h-4 w-4" /> <span className="hidden xs:inline">Usuarios</span>
             </TabsTrigger>
-            <TabsTrigger value="modules" className="flex-1 py-2 rounded-md font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5 justify-center">
+            <TabsTrigger value="modules" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
               <Book className="h-4 w-4" /> <span className="hidden xs:inline">Módulos</span>
             </TabsTrigger>
           </TabsList>
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                       <button
                         key={user.id}
                         onClick={() => setSelectedUserStats(user)}
-                        className="w-full text-left p-4 hover:bg-muted/40 transition-colors"
+                        className="w-full text-left p-4 hover:bg-brand-blue/5 transition-all active:scale-[0.98] border-l-4 border-transparent hover:border-brand-blue"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div>

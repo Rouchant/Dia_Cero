@@ -29,6 +29,7 @@ export default {
           lightblue: '#38BDF8', /* Azul cielo vivo → antes azul pastel */
           yellow: '#FEF08A',    /* Amarillo limón → antes beige amarillo */
           gold: '#F59E0B',      /* Ámbar dorado → antes dorado apagado */
+          green: '#08dd96',     /* Verde Cero → nuevo color Playful */
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

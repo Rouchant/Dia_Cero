@@ -13,6 +13,9 @@ import { cn } from "@/lib/utils";
 import { createClient } from '@/utils/supabase/client';
 import { Logo } from "@/components/ui/logo";
 import { useRouter } from 'next/navigation';
+import { Card } from "@/components/ui/card";
+import { Trophy } from "lucide-react";
+import Link from 'next/link';
 
 export function ModuleViewer({ moduleId }: { moduleId: string }) {
   const router = useRouter();
@@ -218,7 +221,10 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
               <span>Progreso General</span>
               <span>{progress}%</span>
             </div>
-            <Progress value={progress} className="h-2 bg-primary/10" />
+            <Progress 
+              value={progress} 
+              className={`h-2 transition-all duration-1000 ${progress >= 100 ? '[&>div]:bg-brand-green' : 'bg-primary/10'}`} 
+            />
           </div>
         </div>
       </aside>
@@ -243,8 +249,8 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
         </header>
 
         {/* Section Content */}
-        <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100vh-4rem)] relative flex flex-col [&>div>div]:!block">
-          <div className="max-w-6xl mx-auto px-4 md:px-12 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in duration-500">
+        <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100vh-4rem)] relative flex flex-col [&>div>div]:!block overflow-hidden">
+          <div key={currentSection.id} className="max-w-6xl mx-auto px-4 md:px-12 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
             {currentSection.type === 'content' && (
               <div className="flex flex-col flex-1 h-full">
                 <div className="flex-1 flex flex-col gap-6 md:gap-8 items-center justify-start min-h-0 h-full overflow-y-auto py-4 px-2">
@@ -282,6 +288,25 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                         {currentSection.content}
                       </p>
                     </div>
+
+                    {/* Celebration Card for Final Section */}
+                    {currentSectionIndex === moduleData.sections.length - 1 && progress >= 100 && (
+                      <Card className="bg-gradient-success border-none text-white p-6 shadow-xl animate-bounce-subtle rounded-3xl overflow-hidden relative">
+                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/20 rounded-full blur-2xl animate-pulse"></div>
+                        <div className="relative z-10 flex flex-col items-center text-center gap-3">
+                          <Trophy className="h-12 w-12 text-brand-yellow drop-shadow-md" />
+                          <div>
+                            <h3 className="text-xl font-black font-headline tracking-tight">¡Módulo Completado!</h3>
+                            <p className="text-sm font-medium opacity-90">Has dominado satisfactoriamente todo el contenido de este currículum.</p>
+                          </div>
+                          <Link href="/dashboard" className="mt-2 w-full">
+                            <Button variant="secondary" className="w-full font-bold h-11 bg-white text-[#08dd96] hover:bg-white/90 border-none shadow-lg active:scale-95">
+                              Volver al Dashboard
+                            </Button>
+                          </Link>
+                        </div>
+                      </Card>
+                    )}
 
                     <div className="pt-4 border-t border-border/50 shrink-0">
                       <AIHelper 

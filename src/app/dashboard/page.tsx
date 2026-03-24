@@ -103,9 +103,9 @@ export default function Dashboard() {
       <main className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 pt-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Welcome Section */}
-        <section className="mb-8">
+        <section className="mb-8 animate-in fade-in slide-in-from-left duration-700 ease-out">
           <h1 className="text-2xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
-            Hola, <span className="text-brand-pink pr-1">Estudiante</span> 👋
+            Hola, <span className="text-brand-pink pr-1 inline-block hover:animate-bounce cursor-default">Estudiante</span> 👋
           </h1>
           <p className="text-slate-500 mt-2 text-lg font-medium">Aquí tienes un resumen de todos los currículums de aprendizaje que te han sido asignados.</p>
         </section>
@@ -154,7 +154,7 @@ export default function Dashboard() {
               </Card>
             ) : (
                 assignedModules.map((mod, index) => (
-                  <Card key={mod.id} className="shadow-lg border-brand-blue/10 hover:border-brand-blue/30 transition-all duration-300 hover:shadow-xl group overflow-hidden relative rounded-3xl bg-white/90 backdrop-blur-sm">
+                  <Card key={mod.id} className="hover-lift shadow-lg border-brand-blue/10 hover:border-brand-blue/30 group overflow-hidden relative rounded-3xl bg-white/90 backdrop-blur-sm">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-lightblue/10 rounded-bl-full -z-10 group-hover:bg-brand-lightblue/20 transition-colors"></div>
                     <CardHeader className="bg-transparent pb-4 relative z-0">
                       <div className="flex justify-between items-start">
@@ -171,13 +171,19 @@ export default function Dashboard() {
                       {/* Progress Metrics */}
                       <div className="flex justify-between text-sm mb-2 font-bold">
                         <span className="text-brand-blue flex items-center gap-1.5"><Trophy className="h-4 w-4 text-brand-gold"/> Avance General</span>
-                        <span className="font-black flex items-center gap-1.5 text-brand-blue">{mod.progress_percentage}%<span className="text-slate-400 font-medium text-xs">/ 100%</span></span>
+                        <span className="font-black flex items-center gap-1.5 text-brand-blue">
+                          {mod.progress_percentage}%
+                          <span className="text-slate-400 font-medium text-xs">/ 100%</span>
+                        </span>
                       </div>
-                      <Progress value={mod.progress_percentage || 0} className="h-3 mb-6 bg-slate-100" />
+                      <Progress 
+                        value={mod.progress_percentage || 0} 
+                        className={`h-3 mb-6 bg-slate-100 transition-all duration-1000 ${mod.progress_percentage >= 100 ? '[&>div]:bg-brand-green' : '[&>div]:bg-brand-blue'}`} 
+                      />
                       
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Link href={`/module/${mod.id}`} className={mod.progress_percentage >= 100 ? "flex-1" : "w-full"}>
-                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all ${mod.progress_percentage >= 100 ? "bg-brand-blue hover:bg-[#163BB5] text-white" : "bg-brand-blue hover:bg-[#163BB5] text-white"}`} variant="default" size="lg">
+                          <Button className={`w-full h-12 text-base font-bold shadow-md hover:shadow-lg transition-all active:scale-95 ${mod.progress_percentage >= 100 ? "bg-brand-blue hover:bg-[#163BB5] text-white" : "bg-gradient-playful hover:opacity-90 text-white"}`} variant="default" size="lg">
                             {mod.progress_percentage > 0 && mod.progress_percentage < 100 ? "Continuar Entrenando" : 
                              mod.progress_percentage >= 100 ? "Repasar Módulo" : "Comenzar Ahora"}
                           </Button>
