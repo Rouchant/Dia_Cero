@@ -57,13 +57,13 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Button 
           variant="outline" 
           size="sm" 
           onClick={handleSummarize} 
           disabled={loading}
-          className="border-accent/30 text-accent hover:bg-accent/5"
+          className="border-accent/30 text-accent hover:bg-accent/5 flex-1 sm:flex-initial"
         >
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
           Resumen Rápido
@@ -73,7 +73,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           size="sm" 
           onClick={handleSimplify} 
           disabled={loading}
-          className="border-primary/30 text-primary hover:bg-primary/5"
+          className="border-primary/30 text-primary hover:bg-primary/5 flex-1 sm:flex-initial"
         >
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
           Explicar de Forma Sencilla

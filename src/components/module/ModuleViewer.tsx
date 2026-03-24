@@ -162,6 +162,14 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Sidebar Overlay (Mobile) */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 w-[85vw] sm:w-[400px] lg:w-[450px] shrink-0 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
@@ -223,7 +231,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-headline font-bold text-foreground truncate max-w-[200px] sm:max-w-md">
+            <h1 className="text-sm sm:text-lg font-headline font-bold text-foreground truncate flex-1 min-w-0">
               {currentSection.title}
             </h1>
           </div>
@@ -286,22 +294,25 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                 </div>
 
                 {/* Navigation Buttons Pinned to Bottom */}
-                <div className="flex items-center justify-between pt-6 mt-8 border-t border-border/50 shrink-0">
+                <div className="flex items-center justify-between pt-4 mt-6 border-t border-border/50 shrink-0 gap-4">
                   <Button 
                     variant="outline" 
                     onClick={handlePrev} 
                     disabled={currentSectionIndex === 0}
-                    className="h-12 px-6"
+                    className="h-12 w-12 xs:w-auto xs:px-6 rounded-full xs:rounded-xl border-border/50"
                   >
-                    <ChevronLeft className="h-5 w-5 mr-2" />
-                    Anterior
+                    <ChevronLeft className="h-5 w-5 xs:mr-2" />
+                    <span className="hidden xs:inline">Anterior</span>
                   </Button>
                   <Button 
                     onClick={handleNext} 
-                    className="h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                    className="h-12 px-6 xs:px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-full xs:rounded-xl flex-1 xs:flex-initial"
                   >
-                    {currentSectionIndex < moduleData.module_sections.length - 1 ? 'Siguiente Sección' : 'Finalizar Módulo'}
-                    {currentSectionIndex < moduleData.module_sections.length - 1 && <ChevronRight className="h-5 w-5 ml-2" />}
+                    <span className="truncate mr-1 xs:mr-2">
+                      {currentSectionIndex < moduleData.module_sections.length - 1 ? 'Siguiente' : 'Finalizar'}
+                      <span className="hidden sm:inline">{currentSectionIndex < moduleData.module_sections.length - 1 ? ' Sección' : ' Módulo'}</span>
+                    </span>
+                    {currentSectionIndex < moduleData.module_sections.length - 1 && <ChevronRight className="h-5 w-5" />}
                   </Button>
                 </div>
               </div>
