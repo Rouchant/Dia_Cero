@@ -183,12 +183,11 @@ export default function Dashboard() {
 
           {/* Sidebar Area */}
           <div className="w-full md:w-80 space-y-6">
+            <h2 className="hidden md:flex text-xl font-bold font-headline mb-4 items-center gap-2 text-brand-blue">
+              <User className="h-5 w-5 text-brand-lightblue fill-brand-lightblue/20" /> Atajos de cuenta
+            </h2>
             <Card className="hidden md:block shadow-lg border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
-              <CardHeader className="pb-3 bg-brand-lightblue/10 border-b border-brand-blue/5">
-                <CardTitle className="text-lg font-headline font-bold flex items-center gap-2 text-brand-blue">
-                  <User className="h-5 w-5 text-brand-blue" /> Atajos de Cuenta
-                </CardTitle>
-              </CardHeader>
+
               <CardContent className="p-4 space-y-2">
                 <Link href="/settings" className="block">
                   <Button variant="ghost" className="w-full justify-start h-12 font-bold text-slate-600 hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-xl">
