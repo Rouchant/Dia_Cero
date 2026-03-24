@@ -93,7 +93,7 @@ export default function Home() {
               <h1 className="text-5xl sm:text-6xl lg:text-[4.5rem] font-headline font-black leading-[1.05] tracking-tighter text-brand-blue">
                 Entrenamiento <br className="hidden lg:block" />
                 <span className="text-brand-pink lg:block">
-                  Directo y Vital.
+                  Directo y Vital
                 </span>
               </h1>
               

@@ -82,11 +82,13 @@ export default function LoginPage() {
               <Input 
                 id="email" 
                 type="email" 
+                name="email"
+                autoComplete="email"
                 placeholder="Inserte su correo" 
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 border-primary/10"
+                className="h-12 border-primary/10 text-base"
               />
             </div>
             <div className="space-y-2">
@@ -96,12 +98,14 @@ export default function LoginPage() {
               </div>
               <Input 
                 id="password" 
+                name="password"
                 type="password" 
+                autoComplete="current-password"
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Inserte su contraseña"
-                className="h-12 border-primary/10"
+                className="h-12 border-primary/10 text-base"
               />
             </div>
             <Button 
