@@ -99,7 +99,7 @@ export default function SettingsPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <Logo className="h-8 w-auto hidden sm:block" />
+            <Logo className="hidden sm:block" />
             <span className="font-headline font-black text-lg tracking-tight uppercase border-l border-brand-blue/20 sm:ml-2 sm:pl-3 mt-2.5 leading-none text-brand-blue">Preferencias</span>
           </div>
           <div className="flex items-center gap-2">

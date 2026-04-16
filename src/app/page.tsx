@@ -20,7 +20,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-brand-blue/10">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2 mt-1 hover:opacity-80 transition-opacity">
-            <Logo className="h-8 w-auto" />
+            <Logo />
           </div>
           <div className="flex items-center gap-6">
             <span className="hidden sm:block text-brand-blue font-bold text-sm tracking-wide">

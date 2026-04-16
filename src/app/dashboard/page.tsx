@@ -82,7 +82,7 @@ export default function Dashboard() {
       <header className="bg-white/90 text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-5xl mx-auto flex items-center justify-center sm:justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Logo className="h-8 w-auto" />
+            <Logo />
             <span className="font-headline font-black text-lg tracking-tight hidden sm:inline mt-2.5 leading-none border-l border-brand-blue/20 pl-3">Portal Piloto</span>
           </div>
           <div className="hidden sm:flex items-center gap-4">

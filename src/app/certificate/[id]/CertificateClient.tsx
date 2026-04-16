@@ -122,7 +122,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                    <p className="text-[10px] md:text-sm font-black text-brand-blue font-mono tracking-wider">ID-{certId}</p>
                  </div>
                </div>
-               <Logo className="h-10 md:h-12 w-auto opacity-90" />
+               <Logo className="opacity-90" />
             </div>
 
             <Award className="h-16 w-16 md:h-24 md:w-24 text-brand-blue/5 mb-6 md:mb-8 print:mb-10 block pointer-events-none" />

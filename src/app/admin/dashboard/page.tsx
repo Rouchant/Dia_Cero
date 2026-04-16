@@ -442,7 +442,7 @@ export default function AdminDashboard() {
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <Logo className="h-8 w-auto hidden sm:block" />
+              <Logo className="hidden sm:block" />
               <span className="text-brand-green font-black px-3 border-l border-brand-blue/20 ml-2 hidden sm:inline mt-2.5 leading-none uppercase tracking-wide">Panel de administración</span>
             </div>
           </div>

@@ -99,7 +99,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   if (!mounted || !moduleData) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="animate-pulse flex flex-col items-center">
-        <Logo className="h-10 w-auto opacity-50 mb-4" />
+        <Logo className="opacity-50 mb-4" />
         <p className="text-muted-foreground font-medium">Cargando módulo...</p>
       </div>
     </div>
