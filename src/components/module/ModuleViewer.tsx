@@ -28,6 +28,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const supabase = createClient();
+  const [isWindowBlurred, setIsWindowBlurred] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -95,6 +96,90 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       saveProgress();
     }
   }, [completedSections, quizScores, currentSectionIndex, mounted, moduleData, dataLoaded, userId]);
+
+  // Anti-cheat controls (no copy/paste, no text selection, anti-screenshot deterrents)
+  useEffect(() => {
+    if (!mounted) return;
+
+    // 1. Prevent copy, cut, paste
+    const handleCopyCutPaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', 'Contenido protegido por DiaCero.');
+      }
+    };
+
+    // 2. Prevent drag of images
+    const handleDragStart = (e: DragEvent) => {
+      if ((e.target as HTMLElement).tagName === 'IMG') {
+        e.preventDefault();
+      }
+    };
+
+    // 3. Prevent context menu (right click)
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    // 4. Prevent screenshot keys and print shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent PrintScreen key
+      if (e.key === 'PrintScreen') {
+        try {
+          navigator.clipboard.writeText(''); // Clear clipboard immediately
+        } catch(err) {}
+        alert('Las capturas de pantalla están restringidas para proteger el material de evaluación.');
+        e.preventDefault();
+      }
+      
+      // Prevent Ctrl+P / Cmd+P (Print)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        alert('La impresión de este material de estudio está desactivada.');
+      }
+
+      // Prevent Ctrl+C / Cmd+C (Copy)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+      }
+
+      // Prevent Ctrl+U (View Source)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
+        e.preventDefault();
+      }
+    };
+
+    // 5. Blur screen when user leaves the window
+    const handleWindowBlur = () => {
+      setIsWindowBlurred(true);
+    };
+    
+    const handleWindowFocus = () => {
+      setIsWindowBlurred(false);
+    };
+
+    // Attach listeners
+    document.addEventListener('copy', handleCopyCutPaste);
+    document.addEventListener('cut', handleCopyCutPaste);
+    document.addEventListener('paste', handleCopyCutPaste);
+    document.addEventListener('dragstart', handleDragStart);
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      // Clean up listeners
+      document.removeEventListener('copy', handleCopyCutPaste);
+      document.removeEventListener('cut', handleCopyCutPaste);
+      document.removeEventListener('paste', handleCopyCutPaste);
+      document.removeEventListener('dragstart', handleDragStart);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [mounted]);
 
   if (!mounted || !moduleData) return (
     <div className="min-h-dvh flex items-center justify-center bg-background">
@@ -164,7 +249,20 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   }));
 
   return (
-    <div className="flex h-dvh bg-background overflow-hidden">
+    <div className="flex h-dvh bg-background overflow-hidden select-none">
+      {isWindowBlurred && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+          <div className="p-4 bg-primary/10 rounded-full mb-4">
+            <svg className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold font-headline mb-2 text-primary">Contenido Protegido</h2>
+          <p className="text-muted-foreground max-w-sm">
+            Para ver el contenido de este módulo de estudio, mantén el foco en esta ventana.
+          </p>
+        </div>
+      )}
       {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
         <div 
