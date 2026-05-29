@@ -97,7 +97,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   }, [completedSections, quizScores, currentSectionIndex, mounted, moduleData, dataLoaded, userId]);
 
   if (!mounted || !moduleData) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-dvh flex items-center justify-center bg-background">
       <div className="animate-pulse flex flex-col items-center">
         <Logo className="opacity-50 mb-4" />
         <p className="text-muted-foreground font-medium">Cargando módulo...</p>
@@ -164,7 +164,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   }));
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-dvh bg-background overflow-hidden">
       {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
         <div 
@@ -249,8 +249,8 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
         </header>
 
         {/* Section Content */}
-        <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100vh-4rem)] relative flex flex-col [&>div>div]:!block overflow-hidden">
-          <div key={currentSection.id} className="max-w-6xl mx-auto px-4 md:px-12 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] min-h-[calc(100vh-4rem)] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+        <ScrollArea className="flex-1 bg-background/50 h-full max-h-[calc(100dvh-4rem)] relative flex flex-col [&>div>div]:!block overflow-hidden">
+          <div key={currentSection.id} className="max-w-6xl mx-auto px-4 md:px-12 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] min-h-[calc(100dvh-4rem)] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
             {currentSection.type === 'content' && (
               <div className="flex flex-col flex-1 h-full">
                 <div className="flex-1 flex flex-col gap-6 md:gap-8 items-center justify-start min-h-0 h-full overflow-y-auto py-4 px-2">

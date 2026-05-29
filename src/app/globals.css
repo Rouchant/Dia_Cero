@@ -107,3 +107,10 @@
     50% { transform: scale(1.05); }
   }
 }
+
+/* Protecciones anti-copia / impresión */
+@media print {
+  body {
+    display: none !important;
+  }
+}
