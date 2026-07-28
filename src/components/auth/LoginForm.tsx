@@ -34,14 +34,14 @@ export function LoginForm({
     setLoading(true);
     setErrorMsg("");
     
-    // First try to sign in
+    // 1. Intentar iniciar sesión
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (signInError) {
-      // If error is invalid credentials, try to sign up automatically for pilot purposes
+      // Si la credencial falla, intentar registro automático sólo para fines de prueba piloto
       if (signInError.message.includes('Invalid login credentials')) {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -49,18 +49,28 @@ export function LoginForm({
         });
         
         if (signUpError) {
-          setErrorMsg(signUpError.message);
+          if (
+            signUpError.message.toLowerCase().includes('already registered') || 
+            signUpError.message.toLowerCase().includes('already exists')
+          ) {
+            // El usuario ya existe en la base de datos, por lo que el error real fue una contraseña incorrecta
+            setErrorMsg("Contraseña incorrecta. Por favor verifica tus credenciales.");
+          } else if (signUpError.message.includes('Password should be at least')) {
+            setErrorMsg("La contraseña debe tener al menos 6 caracteres.");
+          } else {
+            setErrorMsg("Error de autenticación: " + signUpError.message);
+          }
           setLoading(false);
           return;
         }
       } else {
-        setErrorMsg(signInError.message);
+        setErrorMsg("Correo electrónico o contraseña incorrectos.");
         setLoading(false);
         return;
       }
     }
 
-    // Success! Redirect
+    // ¡Éxito! Redirección al panel del estudiante
     router.push('/dashboard');
   };
 
