@@ -163,9 +163,9 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                </div>
                
                <div className="flex flex-col items-center justify-end w-1/3">
-                 <div className="bg-brand-yellow/10 text-brand-gold border-[3px] border-brand-gold/30 rounded-full h-16 w-16 md:h-24 md:w-24 flex flex-col items-center justify-center shadow-lg relative -top-6 md:-top-8 print:shadow-none print:bg-white print:border-brand-gold">
-                    <span className="text-[6px] md:text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5 print:text-[8px]">Rendimiento</span>
-                    <span className="text-xl md:text-3xl font-black tracking-tighter print:text-3xl">{data.score}%</span>
+                 <div className="bg-brand-yellow/10 text-brand-gold border-[3px] border-brand-gold/30 rounded-full h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 flex flex-col items-center justify-center p-2 shadow-lg relative -top-4 sm:-top-6 md:-top-8 print:h-28 print:w-28 print:shadow-none print:bg-white print:border-brand-gold">
+                    <span className="text-[7px] sm:text-[8px] md:text-[9px] font-black uppercase tracking-wider opacity-80 mb-0.5 print:text-[8px] print:tracking-wider">Rendimiento</span>
+                    <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight print:text-2xl">{data.score}%</span>
                  </div>
                </div>
 
