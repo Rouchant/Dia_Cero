@@ -249,7 +249,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   }));
 
   return (
-    <div className="flex h-dvh bg-background overflow-hidden select-none">
+    <div className="flex h-dvh bg-background overflow-hidden select-none protect-print">
       {isWindowBlurred && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
           <div className="p-4 bg-primary/10 rounded-full mb-4">

@@ -110,7 +110,7 @@
 
 /* Protecciones anti-copia / impresión */
 @media print {
-  body {
+  .protect-print {
     display: none !important;
   }
 }
