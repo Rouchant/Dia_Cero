@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,15 +104,29 @@
     @apply bg-gradient-to-br from-[#08dd96] to-[#04b87d];
   }
 
+  .font-signature {
+    font-family: 'Dancing Script', 'Great Vibes', cursive, sans-serif;
+  }
+
   @keyframes bounce-subtle {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
   }
 }
 
-/* Protecciones anti-copia / impresión */
+/* Protecciones anti-copia / impresión / captura */
 @media print {
   .protect-print {
     display: none !important;
   }
 }
+
+/* Blur instantáneo aplicado al contenedor de contenido de estudio */
+.anti-cheat-content-blurred {
+  filter: blur(40px) !important;
+  opacity: 0.05 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+

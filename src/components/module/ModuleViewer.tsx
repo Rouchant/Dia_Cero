@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Quiz } from './Quiz';
 import { AIHelper } from './AIHelper';
 import { FeedbackSurvey } from './FeedbackSurvey';
-import { ChevronRight, ChevronLeft, CheckCircle2, Circle, Menu, X } from "lucide-react";
+import { ChevronRight, ChevronLeft, CheckCircle2, Circle, Menu, X, ShieldCheck } from "lucide-react";
 import Image from 'next/image';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -97,9 +97,37 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     }
   }, [completedSections, quizScores, currentSectionIndex, mounted, moduleData, dataLoaded, userId]);
 
-  // Anti-cheat controls (no copy/paste, no text selection, anti-screenshot deterrents)
+  // Anti-cheat controls (Chrome Windows optimized: instant synchronous DOM blur, clipboard wipe, multi-event monitoring)
   useEffect(() => {
     if (!mounted) return;
+
+    // Synchronous instant DOM blur on content container (0ms delay before React re-render)
+    const triggerInstantBlur = () => {
+      setIsWindowBlurred(true);
+      const contentEl = document.getElementById('module-protected-content');
+      if (contentEl) {
+        contentEl.classList.add('anti-cheat-content-blurred');
+      }
+    };
+
+    const triggerInstantFocus = () => {
+      setIsWindowBlurred(false);
+      const contentEl = document.getElementById('module-protected-content');
+      if (contentEl) {
+        contentEl.classList.remove('anti-cheat-content-blurred');
+      }
+    };
+
+    // Active clipboard wipe to overwrite OS screenshot buffer
+    const wipeClipboard = () => {
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          navigator.clipboard.writeText('Contenido protegido por DiaCero.').catch(() => {
+            // Silently ignore clipboard write permission denied errors
+          });
+        }
+      } catch (err) {}
+    };
 
     // 1. Prevent copy, cut, paste
     const handleCopyCutPaste = (e: ClipboardEvent) => {
@@ -121,52 +149,82 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       e.preventDefault();
     };
 
-    // 4. Prevent screenshot keys and print shortcuts
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent PrintScreen key
-      if (e.key === 'PrintScreen') {
-        try {
-          navigator.clipboard.writeText(''); // Clear clipboard immediately
-        } catch(err) {}
-        alert('Las capturas de pantalla están restringidas para proteger el material de evaluación.');
+    // 4. Prevent screenshot keys and DevTools shortcuts (keydown & keyup)
+    const handleKeySecurity = (e: KeyboardEvent) => {
+      const key = e.key ? e.key.toLowerCase() : '';
+      const code = e.code ? e.code.toLowerCase() : '';
+
+      // PrintScreen key (Windows PrtScn)
+      if (e.key === 'PrintScreen' || code === 'printscreen') {
+        triggerInstantBlur();
+        wipeClipboard();
+        setTimeout(wipeClipboard, 50);
+        setTimeout(wipeClipboard, 250);
+        setTimeout(wipeClipboard, 500);
         e.preventDefault();
       }
-      
-      // Prevent Ctrl+P / Cmd+P (Print)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+
+      // Windows Snipping Tool (Win + Shift + S) or Cmd + Shift + 4 / 3
+      if ((e.metaKey || e.key === 'Meta') && (e.shiftKey || key === 'shift') && (key === 's' || code === 'keys')) {
+        triggerInstantBlur();
+        wipeClipboard();
         e.preventDefault();
+      }
+
+      // Print shortcut (Ctrl + P / Cmd + P)
+      if ((e.ctrlKey || e.metaKey) && key === 'p') {
+        e.preventDefault();
+        triggerInstantBlur();
         alert('La impresión de este material de estudio está desactivada.');
       }
 
-      // Prevent Ctrl+C / Cmd+C (Copy)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-        e.preventDefault();
-      }
-
-      // Prevent Ctrl+U (View Source)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
+      // DevTools & Source Code shortcuts (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S, Ctrl+C)
+      if (
+        e.key === 'F12' ||
+        ((e.ctrlKey || e.metaKey) && (key === 'u' || key === 's' || key === 'c')) ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === 'i' || key === 'j' || key === 'c'))
+      ) {
         e.preventDefault();
       }
     };
 
-    // 5. Blur screen when user leaves the window
+    // 5. Multi-event window loss detection (blur, focusout, visibilitychange)
     const handleWindowBlur = () => {
-      setIsWindowBlurred(true);
-    };
-    
-    const handleWindowFocus = () => {
-      setIsWindowBlurred(false);
+      triggerInstantBlur();
     };
 
-    // Attach listeners
+    const handleWindowFocus = () => {
+      triggerInstantFocus();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        triggerInstantBlur();
+      } else {
+        triggerInstantFocus();
+      }
+    };
+
+    const handleUserInteractionRestores = () => {
+      if (document.hasFocus() && document.visibilityState === 'visible') {
+        triggerInstantFocus();
+      }
+    };
+
+    // Attach listeners on both keydown and keyup for maximum Windows event coverage
     document.addEventListener('copy', handleCopyCutPaste);
     document.addEventListener('cut', handleCopyCutPaste);
     document.addEventListener('paste', handleCopyCutPaste);
     document.addEventListener('dragstart', handleDragStart);
     document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeySecurity, true);
+    document.addEventListener('keyup', handleKeySecurity, true);
     window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focusout', handleWindowBlur);
     window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('click', handleUserInteractionRestores);
+    window.addEventListener('pointerdown', handleUserInteractionRestores);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       // Clean up listeners
@@ -175,9 +233,18 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       document.removeEventListener('paste', handleCopyCutPaste);
       document.removeEventListener('dragstart', handleDragStart);
       document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeySecurity, true);
+      document.removeEventListener('keyup', handleKeySecurity, true);
       window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focusout', handleWindowBlur);
       window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('click', handleUserInteractionRestores);
+      window.removeEventListener('pointerdown', handleUserInteractionRestores);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      const contentEl = document.getElementById('module-protected-content');
+      if (contentEl) {
+        contentEl.classList.remove('anti-cheat-content-blurred');
+      }
     };
   }, [mounted]);
 
@@ -249,20 +316,39 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   }));
 
   return (
-    <div className="flex h-dvh bg-background overflow-hidden select-none protect-print">
+    <div id="module-protected-area" className="flex h-dvh bg-background overflow-hidden select-none protect-print relative">
       {isWindowBlurred && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
-          <div className="p-4 bg-primary/10 rounded-full mb-4">
-            <svg className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+        <div 
+          onClick={() => {
+            const contentEl = document.getElementById('module-protected-content');
+            if (contentEl) contentEl.classList.remove('anti-cheat-content-blurred');
+            setIsWindowBlurred(false);
+          }}
+          className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[99999] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200 cursor-pointer select-none"
+        >
+          <div className="p-4 bg-brand-blue/20 rounded-full mb-4 border border-brand-blue/30 text-white shadow-2xl animate-bounce-subtle">
+            <ShieldCheck className="h-12 w-12 text-brand-lightblue" />
           </div>
-          <h2 className="text-2xl font-bold font-headline mb-2 text-primary">Contenido Protegido</h2>
-          <p className="text-muted-foreground max-w-sm">
-            Para ver el contenido de este módulo de estudio, mantén el foco en esta ventana.
+          <h2 className="text-2xl font-black font-headline mb-2 text-white tracking-tight">Contenido Protegido por DiaCero</h2>
+          <p className="text-slate-300 max-w-md text-sm mb-6 font-medium leading-relaxed">
+            Se ha pausado la lectura porque la ventana perdió el foco o se intentó una captura de pantalla. Haz clic en cualquier lugar o presiona el botón para continuar.
           </p>
+          <Button 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              const contentEl = document.getElementById('module-protected-content');
+              if (contentEl) contentEl.classList.remove('anti-cheat-content-blurred');
+              setIsWindowBlurred(false); 
+            }}
+            className="bg-brand-green hover:bg-[#06c283] text-white font-black text-sm px-8 h-12 rounded-xl shadow-xl shadow-brand-green/30 tracking-wide uppercase active:scale-95 transition-all"
+          >
+            Continuar Estudiando
+          </Button>
         </div>
       )}
+
+      {/* Container for Protected Module Content */}
+      <div id="module-protected-content" className="flex h-full w-full overflow-hidden transition-all">
       {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
         <div 
@@ -455,6 +541,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
           </div>
         </ScrollArea>
       </main>
+      </div>
     </div>
   );
 }

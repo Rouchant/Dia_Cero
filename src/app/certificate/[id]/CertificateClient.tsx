@@ -10,9 +10,19 @@ import { Logo } from '@/components/ui/logo';
 export default function CertificateClient({ moduleId }: { moduleId: string }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [origin, setOrigin] = useState('');
   const router = useRouter();
   const supabase = createClient();
   const certId = React.useMemo(() => Math.random().toString(36).substring(2, 8).toUpperCase(), []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  const verifyUrl = `${origin || 'http://localhost:9002'}/verify/${certId}?student=${encodeURIComponent(data?.userName || '')}&module=${encodeURIComponent(data?.moduleTitle || '')}&score=${data?.score || 100}&date=${encodeURIComponent(data?.date || '')}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&ecc=L&data=${encodeURIComponent(verifyUrl)}&color=0F1F4B&bgcolor=FFFFFF`;
 
   useEffect(() => {
     async function loadCert() {
@@ -156,7 +166,12 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
             {/* Footer Signatures (Stacked or spaced differently for Vertical) */}
             <div className="w-full flex justify-between items-end mt-12 md:mt-24 px-2 md:px-8 pb-4 print:mt-16">
-               <div className="text-center w-1/3">
+               <div className="text-center w-1/3 flex flex-col items-center justify-end">
+                 <div className="relative mb-1">
+                   <span className="font-signature text-3xl sm:text-4xl text-brand-blue font-bold tracking-wide transform -rotate-6 block select-none pointer-events-none drop-shadow-sm">
+                     DiaCero
+                   </span>
+                 </div>
                  <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
                  <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Comité Evaluador</p>
                  <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Plataforma Diacero</p>
@@ -169,10 +184,17 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                  </div>
                </div>
 
-               <div className="text-center w-1/3">
+               <div className="text-center w-1/3 flex flex-col items-center justify-end">
+                 <div className="inline-block mb-2">
+                   <img 
+                     src={qrCodeUrl} 
+                     alt="QR Sello Electrónico Formal" 
+                     className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 print:h-20 print:w-20 object-contain mx-auto border-0 rounded-none shadow-none pointer-events-none select-none" 
+                   />
+                 </div>
                  <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
                  <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Otorgado el {data.date}</p>
-                 <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal</p>
+                 <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal (ID-{certId})</p>
                </div>
             </div>
 
