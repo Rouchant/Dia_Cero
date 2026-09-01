@@ -54,7 +54,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
           userName: profile.name,
           moduleTitle: moduleData.title,
           score: modPercentage > 100 ? 100 : modPercentage,
-          date: new Date(progress.updated_at || new Date()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+          date: new Date(progress.updated_at || new Date()).toLocaleDateString('es-ES', { timeZone: 'America/Santiago', year: 'numeric', month: 'long', day: 'numeric' })
         });
       }
       setLoading(false);

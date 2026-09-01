@@ -104,28 +104,48 @@ export function Quiz({ questions, onComplete }: QuizProps) {
           className="space-y-3"
         >
           {currentQuestion.options.map((option, idx) => {
-            let itemClass = "flex items-center space-x-3 space-y-0 border p-4 rounded-lg transition-all cursor-pointer hover:bg-muted/50";
+            const isSelected = selectedAnswer === idx;
+
+            let containerStyles = "flex items-center space-x-3.5 border-2 p-4 rounded-xl transition-colors duration-150 cursor-pointer select-none";
+
             if (showFeedback) {
               if (idx === currentQuestion.correctAnswer) {
-                itemClass = "flex items-center space-x-3 space-y-0 border-emerald-500 bg-emerald-50 p-4 rounded-lg";
-              } else if (idx === selectedAnswer) {
-                itemClass = "flex items-center space-x-3 space-y-0 border-destructive bg-destructive/5 p-4 rounded-lg";
+                containerStyles += " border-brand-green bg-brand-green/10 text-slate-900 font-bold";
+              } else if (isSelected) {
+                containerStyles += " border-red-500 bg-red-50 text-red-900 font-bold";
               } else {
-                itemClass = "flex items-center space-x-3 space-y-0 border opacity-50 p-4 rounded-lg";
+                containerStyles += " border-slate-200 opacity-40 text-slate-500";
               }
-            } else if (selectedAnswer === idx) {
-              itemClass = "flex items-center space-x-3 space-y-0 border-primary bg-primary/5 p-4 rounded-lg shadow-sm";
+            } else if (isSelected) {
+              containerStyles += " border-brand-blue bg-brand-blue/10 text-brand-blue font-bold shadow-md shadow-brand-blue/10";
+            } else {
+              containerStyles += " border-slate-200 hover:border-brand-blue/40 hover:bg-slate-50 text-slate-800 font-medium";
             }
 
             return (
               <Label
                 key={idx}
-                className={itemClass}
+                onClick={() => !showFeedback && setSelectedAnswer(idx)}
+                className={containerStyles}
               >
                 <RadioGroupItem value={idx.toString()} disabled={showFeedback} className="sr-only" />
-                <span className="flex-1 text-base">{option}</span>
-                {showFeedback && idx === currentQuestion.correctAnswer && <CheckCircle2 className="h-5 w-5 text-emerald-600" />}
-                {showFeedback && idx === selectedAnswer && idx !== currentQuestion.correctAnswer && <XCircle className="h-5 w-5 text-destructive" />}
+
+                {/* Visible Custom Radio Indicator */}
+                <div className="flex-shrink-0">
+                  {showFeedback && idx === currentQuestion.correctAnswer ? (
+                    <CheckCircle2 className="h-5 w-5 text-brand-green" />
+                  ) : showFeedback && isSelected && idx !== currentQuestion.correctAnswer ? (
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  ) : isSelected ? (
+                    <div className="h-5 w-5 rounded-full border-2 border-brand-blue bg-brand-blue flex items-center justify-center shadow-sm">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                    </div>
+                  ) : (
+                    <div className="h-5 w-5 rounded-full border-2 border-slate-300 bg-white" />
+                  )}
+                </div>
+
+                <span className="flex-1 text-base leading-snug">{option}</span>
               </Label>
             );
           })}

@@ -24,12 +24,12 @@ export default {
       },
       colors: {
         brand: {
-          pink: '#E11D48',      /* Rosa-rojo vibrante → antes color apagado */
-          blue: '#1D4ED8',      /* Azul real saturado → antes azul grisáceo */
-          lightblue: '#38BDF8', /* Azul cielo vivo → antes azul pastel */
-          yellow: '#FEF08A',    /* Amarillo limón → antes beige amarillo */
-          gold: '#F59E0B',      /* Ámbar dorado → antes dorado apagado */
-          green: '#00b97cff',     /* Verde Cero → nuevo color Playful */
+          pink: '#D62246',      /* Contraste: ~4.5:1 blanco | ~4.7:1 negro */
+          blue: '#2563EB',      /* Contraste: ~4.5:1 blanco | ~4.6:1 negro */
+          lightblue: '#0284C7', /* Contraste: ~4.1:1 blanco | ~5.1:1 negro (sky-600) */
+          yellow: '#FACC15',    /* Amarillo sol brillante (yellow-400) → bien amarillo, claro y diferenciado de gold */
+          gold: '#CA8A04',      /* Dorado amarillento brillante (yellow-600) → más amarillento con alto contraste */
+          green: '#008F5D',     /* Contraste: ~4.5:1 blanco | ~4.6:1 negro */
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

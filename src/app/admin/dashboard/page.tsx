@@ -10,11 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, TrendingUp, Award, ArrowLeft, Search, PlusCircle, Book, Link as LinkIcon, Loader2, Edit3, Image as ImageIcon, Video, Save, ListChecks } from "lucide-react";
+import { Users, TrendingUp, Award, ArrowLeft, Search, PlusCircle, Book, Link as LinkIcon, Loader2, Edit3, Image as ImageIcon, Video, Save, ListChecks, ExternalLink } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
+import { generateCertId } from '@/lib/cert-hash';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -114,6 +115,7 @@ export default function AdminDashboard() {
             if (finalPerc >= 100) fullyCompleted++;
             
             moduleBreakdown.push({
+               id: prog.module_id,
                title: courseMod?.title || "Módulo Eliminado/Desconocido",
                percentage: finalPerc
             });
@@ -649,6 +651,19 @@ export default function AdminDashboard() {
                              <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-brand-green/10 text-brand-green' : 'text-brand-blue bg-brand-lightblue/20'}`}>{mb.percentage}%</span>
                           </div>
                           <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-brand-green bg-brand-green/20' : 'bg-slate-100'}`} />
+                          
+                          {mb.percentage >= 100 && mb.id && selectedUserStats?.id && (
+                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                               <span className="text-xs font-bold text-brand-green flex items-center gap-1">
+                                 <Award className="h-4 w-4 text-brand-gold" /> Módulo Aprobado
+                               </span>
+                               <Link href={`/verify/${generateCertId(selectedUserStats.id, mb.id)}`} target="_blank">
+                                 <Button size="sm" className="h-8 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-lg shadow-md shadow-brand-green/20 transition-all">
+                                   <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Ver Certificado
+                                 </Button>
+                               </Link>
+                             </div>
+                           )}
                         </div>
                      ))
                   ) : (

@@ -342,7 +342,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
               if (contentEl) contentEl.classList.remove('anti-cheat-content-blurred');
               setIsWindowBlurred(false); 
             }}
-            className="bg-brand-green hover:bg-[#06c283] text-white font-black text-sm px-8 h-12 rounded-xl shadow-xl shadow-brand-green/30 tracking-wide uppercase active:scale-95 transition-all"
+            className="bg-brand-green hover:bg-[#007048] text-white font-black text-sm px-8 h-12 rounded-xl shadow-xl shadow-brand-green/30 tracking-wide uppercase active:scale-95 transition-all"
           >
             Continuar Estudiando
           </Button>
@@ -486,7 +486,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                             <p className="text-sm font-medium opacity-90">Has dominado satisfactoriamente todo el contenido de este currículum.</p>
                           </div>
                           <Link href="/dashboard" className="mt-2 w-full">
-                            <Button variant="secondary" className="w-full font-bold h-11 bg-white text-[#08dd96] hover:bg-white/90 border-none shadow-lg active:scale-95">
+                            <Button variant="secondary" className="w-full font-bold h-11 bg-white text-[#008f5d] hover:bg-white/90 border-none shadow-lg active:scale-95">
                               Volver al Dashboard
                             </Button>
                           </Link>

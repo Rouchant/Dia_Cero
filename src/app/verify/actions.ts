@@ -56,6 +56,7 @@ export async function verifyCertificateAction(certId: string, fallbackStudent?: 
             moduleTitle: moduleData.title || 'Capacitación en Seguridad Laboral',
             score: scorePerc > 100 ? 100 : scorePerc,
             date: new Date(matchingProgress.updated_at || new Date()).toLocaleDateString('es-ES', {
+              timeZone: 'America/Santiago',
               year: 'numeric',
               month: 'long',
               day: 'numeric'

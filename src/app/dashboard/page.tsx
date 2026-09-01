@@ -197,8 +197,8 @@ export default function Dashboard() {
                 
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
-                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-black bg-brand-yellow hover:bg-[#fde047] text-amber-900 transition-all rounded-xl shadow-sm active:scale-95 border border-amber-200/50">
-                      <LayoutDashboard className="h-5 w-5 mr-3 text-amber-900" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-50 text-amber-900"/>
+                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-black bg-brand-yellow hover:bg-[#fde047] text-slate-900 transition-all rounded-xl shadow-sm active:scale-95 border border-yellow-400/50">
+                      <LayoutDashboard className="h-5 w-5 mr-3 text-slate-900" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-70 text-slate-900"/>
                     </Button>
                   </Link>
                 )}
