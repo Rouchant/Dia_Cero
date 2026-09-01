@@ -188,8 +188,12 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       }
     };
 
-    // 5. Multi-event window loss detection (blur, focusout, visibilitychange)
+    // 5. Multi-event window loss detection (blur, visibilitychange)
     const handleWindowBlur = () => {
+      // Ignore if document still has focus or if user interacted with an internal iframe (e.g. YouTube player)
+      if (document.hasFocus() || (document.activeElement && document.activeElement.tagName === 'IFRAME')) {
+        return;
+      }
       triggerInstantBlur();
     };
 
@@ -220,7 +224,6 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     document.addEventListener('keydown', handleKeySecurity, true);
     document.addEventListener('keyup', handleKeySecurity, true);
     window.addEventListener('blur', handleWindowBlur);
-    window.addEventListener('focusout', handleWindowBlur);
     window.addEventListener('focus', handleWindowFocus);
     window.addEventListener('click', handleUserInteractionRestores);
     window.addEventListener('pointerdown', handleUserInteractionRestores);
@@ -236,7 +239,6 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       document.removeEventListener('keydown', handleKeySecurity, true);
       document.removeEventListener('keyup', handleKeySecurity, true);
       window.removeEventListener('blur', handleWindowBlur);
-      window.removeEventListener('focusout', handleWindowBlur);
       window.removeEventListener('focus', handleWindowFocus);
       window.removeEventListener('click', handleUserInteractionRestores);
       window.removeEventListener('pointerdown', handleUserInteractionRestores);
