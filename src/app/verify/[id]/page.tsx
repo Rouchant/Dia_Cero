@@ -7,14 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ShieldCheck, CheckCircle2, ShieldAlert, Award, Calendar, User, BookOpen, ArrowLeft, Loader2 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
-import { createClient } from '@/utils/supabase/client';
-import { matchesCertId } from '@/lib/cert-hash';
+import { verifyCertificateAction } from '../actions';
 
 export default function VerifyPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const certId = resolvedParams.id || "VALIDATED";
-  const supabase = createClient();
 
   const [loading, setLoading] = useState(true);
   const [certData, setCertData] = useState<{
@@ -29,63 +27,20 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
     async function verifyCertificate() {
       setLoading(true);
 
-      // Fetch all progress records to match against deterministic hash
-      const { data: allProgress } = await supabase.from('user_progress').select('*');
-      const { data: profiles } = await supabase.from('profiles').select('*');
-      const { data: modules } = await supabase.from('modules').select('*, module_sections(*)');
+      const result = await verifyCertificateAction(
+        certId,
+        searchParams.get('student'),
+        searchParams.get('module'),
+        searchParams.get('score'),
+        searchParams.get('date')
+      );
 
-      if (allProgress && profiles && modules) {
-        // Find matching progress by certId hash
-        const matchingProgress = allProgress.find(p => matchesCertId(certId, p.user_id, p.module_id));
-
-        if (matchingProgress) {
-          const profile = profiles.find(pr => pr.id === matchingProgress.user_id);
-          const moduleData = modules.find(m => m.id === matchingProgress.module_id);
-
-          if (profile && moduleData) {
-            const totalSections = Math.max(1, moduleData.module_sections?.length || 1);
-            const completedLen = Array.isArray(matchingProgress.completed_sections) ? matchingProgress.completed_sections.length : 0;
-            const scorePerc = Math.round((completedLen / totalSections) * 100);
-
-            setCertData({
-              isValid: true,
-              student: profile.name || 'Colaborador Registrado',
-              moduleTitle: moduleData.title || 'Capacitación en Seguridad Laboral',
-              score: scorePerc > 100 ? 100 : scorePerc,
-              date: new Date(matchingProgress.updated_at || new Date()).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            });
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
-      // Legacy fallback for initial mock records if present
-      const fallbackStudent = searchParams.get('student');
-      const fallbackModule = searchParams.get('module');
-      if (fallbackStudent && fallbackModule && (certId === 'VALIDATED' || certId === 'FHUJK2')) {
-        setCertData({
-          isValid: true,
-          student: fallbackStudent,
-          moduleTitle: fallbackModule,
-          score: parseInt(searchParams.get('score') || '100', 10),
-          date: searchParams.get('date') || '26 de Agosto de 2026'
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Invalid certificate
-      setCertData({ isValid: false });
+      setCertData(result);
       setLoading(false);
     }
 
     verifyCertificate();
-  }, [certId, searchParams, supabase]);
+  }, [certId, searchParams]);
 
   if (loading) {
     return (
