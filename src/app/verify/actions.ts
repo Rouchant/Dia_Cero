@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-import { matchesCertId } from '@/lib/cert-hash';
+import { matchesCertId, verifySignedCertId } from '@/lib/cert-hash';
 
 export interface PublicVerifyResult {
   isValid: boolean;
@@ -13,6 +13,18 @@ export interface PublicVerifyResult {
 
 export async function verifyCertificateAction(certId: string, fallbackStudent?: string | null, fallbackModule?: string | null, fallbackScore?: string | null, fallbackDate?: string | null): Promise<PublicVerifyResult> {
   if (!certId) return { isValid: false };
+
+  // 1. Check signed certificate token (tamper-proof, instant, and works for anonymous visitors)
+  const signedCheck = verifySignedCertId(certId);
+  if (signedCheck.isValid && signedCheck.data) {
+    return {
+      isValid: true,
+      student: signedCheck.data.student,
+      moduleTitle: signedCheck.data.moduleTitle,
+      score: signedCheck.data.score,
+      date: signedCheck.data.date
+    };
+  }
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
