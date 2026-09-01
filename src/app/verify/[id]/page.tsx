@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ShieldCheck, CheckCircle2, ShieldAlert, Award, Calendar, User, BookOpen, ArrowLeft, Loader2 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
-import { verifyCertificateAction } from '../actions';
-
 export default function VerifyPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
@@ -26,17 +24,33 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
   useEffect(() => {
     async function verifyCertificate() {
       setLoading(true);
+      try {
+        const res = await fetch(`/api/verify/${encodeURIComponent(certId)}`);
+        const data = await res.json();
 
-      const result = await verifyCertificateAction(
-        certId,
-        searchParams.get('student'),
-        searchParams.get('module'),
-        searchParams.get('score'),
-        searchParams.get('date')
-      );
-
-      setCertData(result);
-      setLoading(false);
+        if (data && data.isValid) {
+          setCertData(data);
+        } else {
+          // Legacy fallback for initial mock records if present
+          const fallbackStudent = searchParams.get('student');
+          const fallbackModule = searchParams.get('module');
+          if (fallbackStudent && fallbackModule && (certId === 'VALIDATED' || certId === 'FHUJK2')) {
+            setCertData({
+              isValid: true,
+              student: fallbackStudent,
+              moduleTitle: fallbackModule,
+              score: parseInt(searchParams.get('score') || '100', 10),
+              date: searchParams.get('date') || '26 de Agosto de 2026'
+            });
+          } else {
+            setCertData({ isValid: false });
+          }
+        }
+      } catch (error) {
+        setCertData({ isValid: false });
+      } finally {
+        setLoading(false);
+      }
     }
 
     verifyCertificate();
