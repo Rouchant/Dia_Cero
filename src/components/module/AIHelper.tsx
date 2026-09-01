@@ -34,9 +34,9 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
       } else {
         setErrorMsg('No se pudo generar el resumen.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating AI summary:', error);
-      setErrorMsg('No se pudo conectar con el servicio de IA. Verifica tu GOOGLE_GENAI_API_KEY.');
+      setErrorMsg(`Error de IA: ${error?.message || 'Verifica GOOGLE_GENAI_API_KEY y reinicia el servidor (npm run dev).'}`);
     } finally {
       setLoading(false);
     }
@@ -60,9 +60,9 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
       } else {
         setErrorMsg('No se pudo generar la explicación.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating AI explanation:', error);
-      setErrorMsg('No se pudo conectar con el servicio de IA. Verifica tu GOOGLE_GENAI_API_KEY.');
+      setErrorMsg(`Error de IA: ${error?.message || 'Verifica GOOGLE_GENAI_API_KEY y reinicia el servidor (npm run dev).'}`);
     } finally {
       setLoading(false);
     }
