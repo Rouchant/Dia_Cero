@@ -7,13 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Award, Printer, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 
+import { generateCertId } from '@/lib/cert-hash';
+
 export default function CertificateClient({ moduleId }: { moduleId: string }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [origin, setOrigin] = useState('');
+  const [userId, setUserId] = useState<string>('');
   const router = useRouter();
   const supabase = createClient();
-  const certId = React.useMemo(() => Math.random().toString(36).substring(2, 8).toUpperCase(), []);
+
+  const certId = React.useMemo(() => {
+    return userId ? generateCertId(userId, moduleId) : 'DC-VALIDATED';
+  }, [userId, moduleId]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -21,7 +27,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
     }
   }, []);
 
-  const verifyUrl = `${origin || 'http://localhost:9002'}/verify/${certId}?student=${encodeURIComponent(data?.userName || '')}&module=${encodeURIComponent(data?.moduleTitle || '')}&score=${data?.score || 100}&date=${encodeURIComponent(data?.date || '')}`;
+  const verifyUrl = `${origin || 'http://localhost:9002'}/verify/${certId}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&ecc=L&data=${encodeURIComponent(verifyUrl)}&color=0F1F4B&bgcolor=FFFFFF`;
 
   useEffect(() => {
@@ -33,6 +39,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
       }
 
       const uid = authData.user.id;
+      setUserId(uid);
       
       const { data: profile } = await supabase.from('profiles').select('name').eq('id', uid).single();
       const { data: moduleData } = await supabase.from('modules').select('title, module_sections(*)').eq('id', moduleId).single();
