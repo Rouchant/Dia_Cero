@@ -192,16 +192,29 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                </div>
 
                <div className="text-center w-1/3 flex flex-col items-center justify-end">
-                 <div className="inline-block mb-2">
+                 <a 
+                   href={verifyUrl} 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   title="Verificar Sello Electrónico Oficial"
+                   className="inline-block mb-2 group cursor-pointer"
+                 >
                    <img 
                      src={qrCodeUrl} 
                      alt="QR Sello Electrónico Formal" 
-                     className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 print:h-20 print:w-20 object-contain mx-auto border-0 rounded-none shadow-none pointer-events-none select-none" 
+                     className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 print:h-20 print:w-20 object-contain mx-auto border-0 rounded-none shadow-none group-hover:scale-105 transition-all duration-200" 
                    />
-                 </div>
+                 </a>
                  <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
                  <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Otorgado el {data.date}</p>
-                 <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal (ID-{certId})</p>
+                 <a 
+                   href={verifyUrl} 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="hover:underline cursor-pointer"
+                 >
+                   <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal (ID-{certId})</p>
+                 </a>
                </div>
             </div>
 
