@@ -36,12 +36,12 @@ const adaptiveExplanationPrompt = ai.definePrompt({
   output: { schema: AiAdaptiveExplanationOutputSchema },
   prompt: `You are an AI tutor for a learning module. Your goal is to provide clear, adaptive explanations to help a learner better understand concepts they are struggling with.
 
-The learner is having difficulty with the concept of: "{{{concept}}}}".
+The learner is having difficulty with the concept of: "{{{concept}}}".
 
 Here is some additional context about their current understanding or previous interaction with the material (if available):
 {{{context}}}
 
-Please provide an explanation of "{{{concept}}}}" that is simpler than a typical textbook explanation, or uses a different, more accessible analogy.
+Please provide an explanation of "{{{concept}}}" that is simpler than a typical textbook explanation, or uses a different, more accessible analogy.
 Focus on clarity, brevity, and making the concept easier to grasp.
 If you use an analogy, clearly state what analogy was used.
 Rate the simplicity level of your explanation as 'very simple', 'simplified', or 'intermediate'.
