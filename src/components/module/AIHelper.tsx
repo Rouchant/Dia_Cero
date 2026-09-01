@@ -21,15 +21,22 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
     analogy?: string;
     level?: string;
   } | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSummarize = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const result = await summarizeModuleSection({ sectionContent });
-      setSummary(result.summary);
-      setExplanation(null);
+      if (result?.summary) {
+        setSummary(result.summary);
+        setExplanation(null);
+      } else {
+        setErrorMsg('No se pudo generar el resumen.');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error generating AI summary:', error);
+      setErrorMsg('No se pudo conectar con el servicio de IA. Verifica tu GOOGLE_GENAI_API_KEY.');
     } finally {
       setLoading(false);
     }
@@ -37,19 +44,25 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
 
   const handleSimplify = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const result = await explainConceptAdaptively({ 
         concept: sectionTitle,
         context: sectionContent.substring(0, 300) 
       });
-      setExplanation({
-        text: result.explanation,
-        analogy: result.analogyUsed,
-        level: result.simplicityLevel
-      });
-      setSummary(null);
+      if (result?.explanation) {
+        setExplanation({
+          text: result.explanation,
+          analogy: result.analogyUsed,
+          level: result.simplicityLevel
+        });
+        setSummary(null);
+      } else {
+        setErrorMsg('No se pudo generar la explicación.');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error generating AI explanation:', error);
+      setErrorMsg('No se pudo conectar con el servicio de IA. Verifica tu GOOGLE_GENAI_API_KEY.');
     } finally {
       setLoading(false);
     }
@@ -79,6 +92,20 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           Explicar de Forma Sencilla
         </Button>
       </div>
+
+      {errorMsg && (
+        <div className="p-3 text-xs bg-red-50 text-red-600 border border-red-200 rounded-xl flex items-center justify-between animate-in fade-in">
+          <span>{errorMsg}</span>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-6 text-[10px] text-red-700 hover:bg-red-100 px-2"
+            onClick={() => setErrorMsg(null)}
+          >
+            Cerrar
+          </Button>
+        </div>
+      )}
 
       {(summary || explanation) && (
         <Card className="border-none shadow-md bg-white/80 backdrop-blur-sm animate-in fade-in slide-in-from-top-4">
