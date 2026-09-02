@@ -185,6 +185,32 @@ export function useAdminUsers() {
     }
   };
 
+  const handleResetUserPassword = async (targetUserId: string, newPass: string) => {
+    if (!targetUserId || !newPass || newPass.length < 6) {
+      alert("La nueva contraseña debe contener al menos 6 caracteres.");
+      return false;
+    }
+
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: targetUserId, newPassword: newPass })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Error restableciendo contraseña: " + (data.error || "Error de servidor"));
+        return false;
+      } else {
+        alert("¡Contraseña del estudiante restablecida con éxito!");
+        return true;
+      }
+    } catch (err: any) {
+      alert("Error de conexión: " + err.message);
+      return false;
+    }
+  };
+
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -224,6 +250,7 @@ export function useAdminUsers() {
     setAssignModuleId,
     isAssigning,
     handleAssignModule,
-    handleRenameModule
+    handleRenameModule,
+    handleResetUserPassword
   };
 }

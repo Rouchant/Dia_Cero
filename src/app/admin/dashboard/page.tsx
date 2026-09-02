@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Book, Users } from "lucide-react";
+import { ArrowLeft, Loader2, Book, Users, UserCheck, Settings2 } from "lucide-react";
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 
@@ -15,7 +15,7 @@ import { useQuizManager } from '@/hooks/useQuizManager';
 
 import { AdminStatsCards } from '@/components/admin/AdminStatsCards';
 import { UserManagementTab } from '@/components/admin/UserManagementTab';
-import { ModuleAssignmentCard } from '@/components/admin/ModuleAssignmentCard';
+import { UserAccountControlTab } from '@/components/admin/UserAccountControlTab';
 import { TheoryContentBuilderTab } from '@/components/admin/TheoryContentBuilderTab';
 
 export default function AdminDashboard() {
@@ -75,11 +75,11 @@ export default function AdminDashboard() {
           <TabsList className="bg-white p-1.5 border border-slate-200 shadow-sm rounded-2xl flex flex-wrap h-auto gap-1">
             <TabsTrigger value="users" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-brand-blue data-[state=active]:text-white transition-all flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Alumnos & Certificados
+              Nómina & Progreso Académico
             </TabsTrigger>
-            <TabsTrigger value="assign" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all flex items-center gap-2">
-              <Book className="h-4 w-4" />
-              Asignación de Módulos
+            <TabsTrigger value="control" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Control de Cuentas & Asignaciones
             </TabsTrigger>
             <TabsTrigger value="content" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all flex items-center gap-2">
               <Book className="h-4 w-4" />
@@ -87,14 +87,23 @@ export default function AdminDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          {/* TAB 1: User Management */}
+          {/* TAB 1: Pure Academic Progress Monitoring */}
           <TabsContent value="users">
             <UserManagementTab
-              users={adminUsers.users}
               filteredUsers={adminUsers.filteredUsers}
               searchQuery={adminUsers.searchQuery}
               setSearchQuery={adminUsers.setSearchQuery}
               onSelectUser={adminUsers.setSelectedUserStats}
+              selectedUserStats={adminUsers.selectedUserStats}
+              setSelectedUserStats={adminUsers.setSelectedUserStats}
+            />
+          </TabsContent>
+
+          {/* TAB 2: User Account & Assignment Control */}
+          <TabsContent value="control">
+            <UserAccountControlTab
+              students={adminUsers.students}
+              dbModules={adminUsers.dbModules}
               newUserName={adminUsers.newUserName}
               setNewUserName={adminUsers.setNewUserName}
               newUserEmail={adminUsers.newUserEmail}
@@ -103,16 +112,7 @@ export default function AdminDashboard() {
               setNewUserPassword={adminUsers.setNewUserPassword}
               isCreatingUser={adminUsers.isCreatingUser}
               onCreateUser={adminUsers.handleCreateUser}
-              selectedUserStats={adminUsers.selectedUserStats}
-              setSelectedUserStats={adminUsers.setSelectedUserStats}
-            />
-          </TabsContent>
-
-          {/* TAB 2: Module Assignment */}
-          <TabsContent value="assign">
-            <ModuleAssignmentCard
-              dbModules={adminUsers.dbModules}
-              students={adminUsers.students}
+              onResetPassword={adminUsers.handleResetUserPassword}
               assignUserId={adminUsers.assignUserId}
               setAssignUserId={adminUsers.setAssignUserId}
               assignModuleId={adminUsers.assignModuleId}

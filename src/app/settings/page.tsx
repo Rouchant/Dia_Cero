@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, User, ShieldCheck, Loader2, Save } from "lucide-react";
+import { ArrowLeft, User, ShieldCheck, Loader2, Save, KeyRound } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
@@ -23,6 +23,7 @@ export default function SettingsPage() {
   const [isSavingName, setIsSavingName] = useState(false);
   
   // Password form
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
@@ -64,18 +65,39 @@ export default function SettingsPage() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword || newPassword.length < 6) {
-      alert("La fortaleza requerida es de al menos 6 caracteres.");
+
+    if (!currentPassword) {
+      alert("Por favor ingresa tu contraseña actual para confirmar la operación de seguridad.");
       return;
     }
+
+    if (!newPassword || newPassword.length < 6) {
+      alert("La fortaleza requerida para la nueva contraseña es de al menos 6 caracteres.");
+      return;
+    }
+
     setIsSavingPassword(true);
     
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    // 1. Verify current password by signing in
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: userEmail,
+      password: currentPassword
+    });
+
+    if (authError) {
+      alert("La contraseña actual ingresada es incorrecta. Por favor verifícala e intenta nuevamente.");
+      setIsSavingPassword(false);
+      return;
+    }
+
+    // 2. Update to new password
+    const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
     
-    if (error) {
-      alert("Falla configurando encriptación: " + error.message);
+    if (updateError) {
+      alert("Falla configurando encriptación: " + updateError.message);
     } else {
       alert("¡Contraseña maestra actualizada con éxito en la plataforma! Tus accesos futuros están asegurados.");
+      setCurrentPassword("");
       setNewPassword("");
     }
     setIsSavingPassword(false);
@@ -115,6 +137,7 @@ export default function SettingsPage() {
            <p className="text-slate-500 mt-2 text-base font-medium">Edita tu identificación oficial o cambia las credenciales de seguridad de tu cuenta.</p>
          </div>
 
+         {/* Card 1: Identidad Oficial */}
          <Card className="shadow-xl shadow-brand-blue/5 border-brand-blue/10 rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
            <CardHeader className="bg-brand-lightblue/10 border-b border-brand-blue/5 pb-5">
              <CardTitle className="flex items-center gap-2 font-headline text-xl text-brand-blue">
@@ -131,7 +154,7 @@ export default function SettingsPage() {
                  <Input id="u-name" value={name} onChange={e=>setName(e.target.value)} required className="h-12 bg-slate-50 border-brand-blue/10 focus:bg-white focus:border-brand-green focus:ring-brand-green/30 text-lg font-bold text-brand-blue rounded-xl" />
                </div>
                <div className="flex justify-end pt-2">
-                 <Button type="submit" disabled={isSavingName} className="hover-lift w-full sm:w-auto bg-brand-blue hover:hover:bg-opacity-90 h-12 px-8 shadow-lg shadow-brand-blue/20 font-bold rounded-xl text-white active:scale-95">
+                 <Button type="submit" disabled={isSavingName} className="hover-lift w-full sm:w-auto bg-brand-blue hover:bg-opacity-90 h-12 px-8 shadow-lg shadow-brand-blue/20 font-bold rounded-xl text-white active:scale-95">
                    {isSavingName ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
                    Sellar Identidad
                  </Button>
@@ -140,23 +163,56 @@ export default function SettingsPage() {
            </CardContent>
          </Card>
 
+         {/* Card 2: Seguridad de Acceso con Validación de Contraseña Actual */}
          <Card className="shadow-xl shadow-brand-yellow/5 border-brand-yellow/30 bg-white/90 backdrop-blur-sm border-t-[6px] border-t-brand-gold rounded-3xl overflow-hidden">
            <CardHeader className="bg-brand-yellow/10 border-b border-brand-gold/10 pb-5">
              <CardTitle className="flex items-center gap-2 font-headline text-xl text-brand-blue">
                <ShieldCheck className="h-5 w-5 text-brand-gold fill-brand-gold/20"/> Seguridad de Acceso
              </CardTitle>
              <CardDescription className="text-slate-500 font-medium pt-1">
-               Cambia tu contraseña si sientes que tu dispositivo ha sido comprometido. Se cerrará la sesión automáticamente en el resto de dispositivos vinculados.
+               Ingresa tu contraseña actual y la nueva contraseña requerida para asegurar tus accesos futuros.
              </CardDescription>
            </CardHeader>
            <CardContent className="pt-6">
              <form onSubmit={handleUpdatePassword} className="space-y-5">
+               
                <div className="space-y-2">
-                 <Label htmlFor="u-pwd" className="text-brand-blue font-bold uppercase tracking-wider text-xs">Inyectar Nueva Contraseña</Label>
-                 <Input id="u-pwd" type="password" placeholder="Inserte nueva contraseña" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required minLength={6} className="h-12 bg-slate-50 border-brand-gold/20 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-lg rounded-xl text-brand-blue pl-4" />
+                 <Label htmlFor="curr-pwd" className="text-brand-blue font-bold uppercase tracking-wider text-xs flex items-center gap-1.5">
+                   <KeyRound className="h-3.5 w-3.5 text-brand-gold" /> Contraseña Actual
+                 </Label>
+                 <Input 
+                   id="curr-pwd" 
+                   type="password" 
+                   placeholder="Ingresa tu contraseña actual" 
+                   value={currentPassword} 
+                   onChange={e => setCurrentPassword(e.target.value)} 
+                   required 
+                   className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-base font-bold text-brand-blue rounded-xl pl-4" 
+                 />
                </div>
+
+               <div className="space-y-2">
+                 <Label htmlFor="new-pwd" className="text-brand-blue font-bold uppercase tracking-wider text-xs">
+                   Nueva Contraseña (mínimo 6 caracteres)
+                 </Label>
+                 <Input 
+                   id="new-pwd" 
+                   type="password" 
+                   placeholder="Ingresa la nueva contraseña requerida" 
+                   value={newPassword} 
+                   onChange={e => setNewPassword(e.target.value)} 
+                   required 
+                   minLength={6} 
+                   className="h-12 bg-slate-50 border-brand-gold/20 focus:bg-white focus:border-brand-gold focus:ring-brand-gold/30 text-base font-bold text-brand-blue rounded-xl pl-4" 
+                 />
+               </div>
+
                <div className="flex justify-end pt-2">
-                 <Button type="submit" disabled={isSavingPassword || newPassword.length < 6} className="hover-lift w-full sm:w-auto bg-brand-gold hover:bg-[#c2933d] text-white h-12 px-8 shadow-lg shadow-brand-gold/20 font-bold tracking-wide rounded-xl active:scale-95">
+                 <Button 
+                   type="submit" 
+                   disabled={isSavingPassword || !currentPassword || newPassword.length < 6} 
+                   className="hover-lift w-full sm:w-auto bg-brand-gold hover:bg-[#c2933d] text-white h-12 px-8 shadow-lg shadow-brand-gold/20 font-bold tracking-wide rounded-xl active:scale-95"
+                 >
                    {isSavingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Reforzar Contraseña"}
                  </Button>
                </div>
