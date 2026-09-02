@@ -16,6 +16,8 @@ import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
 import { generateCertId } from '@/lib/cert-hash';
+import { summarizeModuleSection } from '@/ai/flows/ai-module-summary';
+import { explainConceptAdaptively } from '@/ai/flows/ai-adaptive-explanation';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -350,6 +352,9 @@ export default function AdminDashboard() {
       alert("Error guardando sección: " + error.message);
     } else {
       alert("¡Diapositiva sincronizada exitosamente con la base de datos! Los estudiantes verán el cambio de inmediato.");
+      // Trigger background AI pre-filling for instant zero-latency student experience
+      summarizeModuleSection({ sectionId: selectedSectionId, sectionContent: editSecContent }).catch(() => {});
+      explainConceptAdaptively({ sectionId: selectedSectionId, concept: editSecTitle, context: editSecContent.substring(0, 300) }).catch(() => {});
       // update local
       setContentSections(contentSections.map(s => s.id === selectedSectionId ? { ...s, ...updates } : s));
     }

@@ -543,8 +543,11 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
 
                     <div className="pt-4 border-t border-border/50 shrink-0">
                       <AIHelper 
+                        sectionId={currentSection.id}
                         sectionContent={currentSection.content || ""} 
                         sectionTitle={currentSection.title} 
+                        initialSummary={currentSection.ai_summary}
+                        initialExplanation={currentSection.ai_explanation}
                       />
                     </div>
                   </div>

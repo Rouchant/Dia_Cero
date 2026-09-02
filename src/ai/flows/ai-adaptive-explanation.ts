@@ -1,13 +1,15 @@
 'use server';
 /**
  * @fileOverview Provides AI-generated adaptive explanations for learning module concepts.
- * Uses direct ai.generate to avoid Next.js HMR registry overwrite warnings.
+ * Reads from Supabase DB first; generates with AI if empty and updates DB automatically.
  */
 
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
+import { createClient } from '@supabase/supabase-js';
 
 const AiAdaptiveExplanationInputSchema = z.object({
+  sectionId: z.string().optional(),
   concept: z.string().describe('The specific concept the learner is struggling with.'),
   context: z.string().optional().describe('Optional context from the learning module.'),
 });
@@ -20,24 +22,48 @@ const AiAdaptiveExplanationOutputSchema = z.object({
 });
 export type AiAdaptiveExplanationOutput = z.infer<typeof AiAdaptiveExplanationOutputSchema>;
 
-// Server-side cache Map
-const explanationCache = new Map<string, AiAdaptiveExplanationOutput>();
-
 export async function explainConceptAdaptively(input: AiAdaptiveExplanationInput): Promise<AiAdaptiveExplanationOutput> {
-  const cacheKey = `${input.concept.trim()}_${(input.context || '').trim()}`;
-  
-  if (explanationCache.has(cacheKey)) {
-    return explanationCache.get(cacheKey)!;
+  const { sectionId, concept, context } = input;
+
+  // 1. Query Supabase DB first if sectionId is available
+  if (sectionId) {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      const supabase = createClient(supabaseUrl, serviceKey);
+
+      const { data: sec } = await supabase
+        .from('module_sections')
+        .select('ai_explanation')
+        .eq('id', sectionId)
+        .maybeSingle();
+
+      if (sec?.ai_explanation) {
+        const raw = sec.ai_explanation;
+        const exp = typeof raw === 'string' ? (raw.startsWith('{') ? JSON.parse(raw) : { explanation: raw }) : raw;
+        if (exp?.explanation && exp.explanation.trim().length > 0) {
+          return {
+            explanation: exp.explanation,
+            analogyUsed: exp.analogyUsed || exp.analogy,
+            simplicityLevel: exp.simplicityLevel || exp.level || 'simplificada'
+          };
+        }
+      }
+    } catch (dbErr) {
+      console.warn('DB explanation check warning:', dbErr);
+    }
   }
 
+  // 2. Generate with Genkit AI if empty in DB
+  let result: AiAdaptiveExplanationOutput | null = null;
   try {
     const { output } = await ai.generate({
       prompt: `Eres un tutor de IA para un módulo de capacitación en seguridad laboral DíaCero. Tu objetivo es entregar explicaciones sencillas y adaptativas en español.
 
-El estudiante tiene dudas sobre el concepto: "${input.concept}".
+El estudiante tiene dudas sobre el concepto: "${concept}".
 
 Contexto adicional del módulo:
-${input.context || 'N/A'}
+${context || 'N/A'}
 
 Por favor entrega una explicación sencilla, clara y accesible en español con un lenguaje cercano.
 Si utilizas una analogía del mundo real, indícala claramente.
@@ -46,20 +72,35 @@ Clasifica la simplicidad como 'muy simple', 'simplificada' o 'intermedia'.`,
     });
 
     if (output?.explanation) {
-      explanationCache.set(cacheKey, output);
-      return output;
+      result = output;
     }
   } catch (error: any) {
     console.warn('AI adaptive explanation fallback triggered:', error?.message);
   }
 
-  // Fast fallback explanation
-  const fallbackResult: AiAdaptiveExplanationOutput = {
-    explanation: `En términos sencillos: "${input.concept}" se refiere a identificar los riesgos clave antes de actuar y aplicar los procedimientos preventivos para proteger tu integridad física en todo momento.`,
-    analogyUsed: 'Como verificar los espejos y abrochar el cinturón antes de conducir un vehículo.',
-    simplicityLevel: 'simplificada'
-  };
+  if (!result) {
+    result = {
+      explanation: `En términos sencillos: "${concept}" se refiere a identificar los riesgos clave antes de actuar y aplicar los procedimientos preventivos para proteger tu integridad física en todo momento.`,
+      analogyUsed: 'Como verificar los espejos y abrochar el cinturón antes de conducir un vehículo.',
+      simplicityLevel: 'simplificada'
+    };
+  }
 
-  explanationCache.set(cacheKey, fallbackResult);
-  return fallbackResult;
+  // 3. Save back to Supabase DB for instant future access across all users
+  if (sectionId && result) {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      const supabase = createClient(supabaseUrl, serviceKey);
+
+      await supabase
+        .from('module_sections')
+        .update({ ai_explanation: JSON.stringify(result) })
+        .eq('id', sectionId);
+    } catch (saveErr) {
+      console.warn('DB explanation update error:', saveErr);
+    }
+  }
+
+  return result;
 }

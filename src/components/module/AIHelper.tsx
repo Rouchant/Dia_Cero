@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, Sparkles, Loader2, BookOpen } from "lucide-react";
@@ -9,22 +9,69 @@ import { explainConceptAdaptively } from '@/ai/flows/ai-adaptive-explanation';
 import { Badge } from "@/components/ui/badge";
 
 interface AIHelperProps {
+  sectionId?: string;
   sectionContent: string;
   sectionTitle: string;
+  initialSummary?: string | null;
+  initialExplanation?: string | any | null;
 }
 
-export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
-  const [summary, setSummary] = useState<string | null>(null);
+export function AIHelper({ 
+  sectionId, 
+  sectionContent, 
+  sectionTitle, 
+  initialSummary, 
+  initialExplanation 
+}: AIHelperProps) {
+  const [summary, setSummary] = useState<string | null>(initialSummary || null);
   const [loading, setLoading] = useState(false);
   const [explanation, setExplanation] = useState<{
     text: string;
     analogy?: string;
     level?: string;
-  } | null>(null);
+  } | null>(() => {
+    if (!initialExplanation) return null;
+    try {
+      const exp = typeof initialExplanation === 'string' 
+        ? (initialExplanation.startsWith('{') ? JSON.parse(initialExplanation) : { text: initialExplanation }) 
+        : initialExplanation;
+      return {
+        text: exp.explanation || exp.text || '',
+        analogy: exp.analogyUsed || exp.analogy,
+        level: exp.simplicityLevel || exp.level || 'simplificada'
+      };
+    } catch {
+      return null;
+    }
+  });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Client-side cache to instantly reuse generated content without re-querying
-  const localCache = useRef<{ summary?: string; explanation?: { text: string; analogy?: string; level?: string } }>({});
+  // Client-side local cache to instantly reuse generated content during switching
+  const localCache = useRef<{ summary?: string; explanation?: { text: string; analogy?: string; level?: string } }>({
+    summary: initialSummary || undefined
+  });
+
+  // Reset states when section changes
+  useEffect(() => {
+    setSummary(initialSummary || null);
+    setExplanation(() => {
+      if (!initialExplanation) return null;
+      try {
+        const exp = typeof initialExplanation === 'string' 
+          ? (initialExplanation.startsWith('{') ? JSON.parse(initialExplanation) : { text: initialExplanation }) 
+          : initialExplanation;
+        return {
+          text: exp.explanation || exp.text || '',
+          analogy: exp.analogyUsed || exp.analogy,
+          level: exp.simplicityLevel || exp.level || 'simplificada'
+        };
+      } catch {
+        return null;
+      }
+    });
+    localCache.current = { summary: initialSummary || undefined };
+    setErrorMsg(null);
+  }, [sectionId, initialSummary, initialExplanation]);
 
   const handleSummarize = async () => {
     if (localCache.current.summary) {
@@ -33,10 +80,15 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
       return;
     }
 
+    if (summary) {
+      setExplanation(null);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
-      const result = await summarizeModuleSection({ sectionContent });
+      const result = await summarizeModuleSection({ sectionId, sectionContent });
       if (result?.summary) {
         localCache.current.summary = result.summary;
         setSummary(result.summary);
@@ -59,10 +111,16 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
       return;
     }
 
+    if (explanation) {
+      setSummary(null);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
       const result = await explainConceptAdaptively({ 
+        sectionId,
         concept: sectionTitle,
         context: sectionContent.substring(0, 300) 
       });
