@@ -16,6 +16,22 @@ interface AIHelperProps {
   initialExplanation?: string | any | null;
 }
 
+function parseInitialExplanation(raw: any) {
+  if (!raw) return null;
+  try {
+    const exp = typeof raw === 'string' 
+      ? (raw.startsWith('{') ? JSON.parse(raw) : { text: raw }) 
+      : raw;
+    return {
+      text: exp.explanation || exp.text || '',
+      analogy: exp.analogyUsed || exp.analogy,
+      level: exp.simplicityLevel || exp.level || 'simplificada'
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function AIHelper({ 
   sectionId, 
   sectionContent, 
@@ -23,64 +39,43 @@ export function AIHelper({
   initialSummary, 
   initialExplanation 
 }: AIHelperProps) {
-  const [summary, setSummary] = useState<string | null>(initialSummary || null);
-  const [loading, setLoading] = useState(false);
+  // Start collapsed by default so answers are not open until the user clicks
+  const [summary, setSummary] = useState<string | null>(null);
   const [explanation, setExplanation] = useState<{
     text: string;
     analogy?: string;
     level?: string;
-  } | null>(() => {
-    if (!initialExplanation) return null;
-    try {
-      const exp = typeof initialExplanation === 'string' 
-        ? (initialExplanation.startsWith('{') ? JSON.parse(initialExplanation) : { text: initialExplanation }) 
-        : initialExplanation;
-      return {
-        text: exp.explanation || exp.text || '',
-        analogy: exp.analogyUsed || exp.analogy,
-        level: exp.simplicityLevel || exp.level || 'simplificada'
-      };
-    } catch {
-      return null;
-    }
-  });
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Client-side local cache to instantly reuse generated content during switching
+  // Client-side local cache to instantly reuse pre-loaded or generated content
   const localCache = useRef<{ summary?: string; explanation?: { text: string; analogy?: string; level?: string } }>({
-    summary: initialSummary || undefined
+    summary: initialSummary || undefined,
+    explanation: parseInitialExplanation(initialExplanation) || undefined
   });
 
-  // Reset states when section changes
+  // Reset open states to collapsed when switching sections
   useEffect(() => {
-    setSummary(initialSummary || null);
-    setExplanation(() => {
-      if (!initialExplanation) return null;
-      try {
-        const exp = typeof initialExplanation === 'string' 
-          ? (initialExplanation.startsWith('{') ? JSON.parse(initialExplanation) : { text: initialExplanation }) 
-          : initialExplanation;
-        return {
-          text: exp.explanation || exp.text || '',
-          analogy: exp.analogyUsed || exp.analogy,
-          level: exp.simplicityLevel || exp.level || 'simplificada'
-        };
-      } catch {
-        return null;
-      }
-    });
-    localCache.current = { summary: initialSummary || undefined };
+    setSummary(null);
+    setExplanation(null);
+    localCache.current = { 
+      summary: initialSummary || undefined,
+      explanation: parseInitialExplanation(initialExplanation) || undefined
+    };
     setErrorMsg(null);
   }, [sectionId, initialSummary, initialExplanation]);
 
   const handleSummarize = async () => {
-    if (localCache.current.summary) {
-      setSummary(localCache.current.summary);
-      setExplanation(null);
+    // Toggle off if already showing summary
+    if (summary) {
+      setSummary(null);
       return;
     }
 
-    if (summary) {
+    const cachedSummary = localCache.current.summary || initialSummary;
+    if (cachedSummary) {
+      setSummary(cachedSummary);
       setExplanation(null);
       return;
     }
@@ -105,13 +100,15 @@ export function AIHelper({
   };
 
   const handleSimplify = async () => {
-    if (localCache.current.explanation) {
-      setExplanation(localCache.current.explanation);
-      setSummary(null);
+    // Toggle off if already showing explanation
+    if (explanation) {
+      setExplanation(null);
       return;
     }
 
-    if (explanation) {
+    const cachedExp = localCache.current.explanation || parseInitialExplanation(initialExplanation);
+    if (cachedExp) {
+      setExplanation(cachedExp);
       setSummary(null);
       return;
     }
@@ -146,27 +143,35 @@ export function AIHelper({
 
   return (
     <div className={`space-y-4 transition-all duration-500 ${loading ? 'opacity-80 scale-[0.98]' : 'opacity-100 scale-100'}`}>
-      {/* Mobile side-by-side layout (grid grid-cols-2) with generous 48px touch height & Duolingo 3D tactile buttons */}
+      {/* Mobile side-by-side layout (grid grid-cols-2) with generous touch height & Duolingo 3D tactile buttons */}
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3 w-full">
         <Button 
           type="button"
           variant="default" 
           onClick={handleSummarize} 
           disabled={loading}
-          className="w-full h-12 sm:h-11 bg-brand-blue hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md border-b-4 border-[#153bb3] active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3"
+          className={`w-full h-12 sm:h-11 font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3 ${
+            summary
+              ? 'bg-[#153bb3] text-white border-b-0 translate-y-1 ring-2 ring-brand-blue'
+              : 'bg-brand-blue hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white border-b-4 border-[#153bb3] active:border-b-0 active:translate-y-1'
+          }`}
         >
           {loading ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0 text-white animate-bounce-subtle" />}
-          <span className="truncate leading-tight">Resumen Rápido</span>
+          <span className="truncate leading-tight">{summary ? 'Ocultar Resumen' : 'Resumen Rápido'}</span>
         </Button>
         <Button 
           type="button"
           variant="default" 
           onClick={handleSimplify} 
           disabled={loading}
-          className="w-full h-12 sm:h-11 bg-brand-lightblue hover:bg-[#0369a1] active:bg-[#075985] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md border-b-4 border-[#075985] active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3"
+          className={`w-full h-12 sm:h-11 font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3 ${
+            explanation
+              ? 'bg-[#075985] text-white border-b-0 translate-y-1 ring-2 ring-brand-lightblue'
+              : 'bg-brand-lightblue hover:bg-[#0369a1] active:bg-[#075985] text-white border-b-4 border-[#075985] active:border-b-0 active:translate-y-1'
+          }`}
         >
           {loading ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Brain className="h-4 w-4 shrink-0 text-white animate-pulse" />}
-          <span className="truncate leading-tight">Explicar Sencillo</span>
+          <span className="truncate leading-tight">{explanation ? 'Ocultar Explicación' : 'Explicar Sencillo'}</span>
         </Button>
       </div>
 
@@ -184,37 +189,47 @@ export function AIHelper({
         </div>
       )}
 
-      {(summary || explanation) && (
-        <Card className="border-none shadow-md bg-white/80 backdrop-blur-sm animate-in fade-in slide-in-from-top-4">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                {summary ? <BookOpen className="h-4 w-4 text-accent" /> : <Brain className="h-4 w-4 text-primary" />}
-                {summary ? 'Punto Clave' : 'Explicación Adaptativa'}
-              </CardTitle>
-              {explanation?.level && (
-                <Badge variant="secondary" className="capitalize text-[10px] py-0">{explanation.level}</Badge>
-              )}
-            </div>
+      {/* Summary View Container */}
+      {summary && (
+        <Card className="border-brand-blue/30 bg-gradient-to-br from-brand-blue/5 to-white shadow-xl animate-in fade-in slide-in-from-top-3 duration-300 rounded-2xl overflow-hidden">
+          <CardHeader className="py-3 px-4 bg-brand-blue/10 border-b border-brand-blue/10 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-headline font-black text-brand-blue flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-brand-blue" />
+              Resumen Rápido de la Lección
+            </CardTitle>
+            <Badge variant="outline" className="bg-white text-[10px] font-bold text-brand-blue border-brand-blue/30">
+              Sintetizado con IA
+            </Badge>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm leading-relaxed text-foreground/80 italic">
-              "{summary || explanation?.text}"
-            </p>
-            {explanation?.analogy && (
-              <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-                <p className="text-[11px] font-bold uppercase text-primary mb-1">Analogía Utilizada</p>
-                <p className="text-xs text-primary/80 font-medium">{explanation.analogy}</p>
+          <CardContent className="p-4 text-xs sm:text-sm text-foreground/90 leading-relaxed font-body">
+            {summary}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Adaptive Explanation View Container */}
+      {explanation && (
+        <Card className="border-brand-lightblue/30 bg-gradient-to-br from-brand-lightblue/5 to-white shadow-xl animate-in fade-in slide-in-from-top-3 duration-300 rounded-2xl overflow-hidden">
+          <CardHeader className="py-3 px-4 bg-brand-lightblue/10 border-b border-brand-lightblue/10 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-headline font-black text-brand-lightblue flex items-center gap-2">
+              <Brain className="h-4 w-4 text-brand-lightblue" />
+              Explicación Adaptativa Sencilla
+            </CardTitle>
+            <Badge variant="outline" className="bg-white text-[10px] font-bold text-brand-lightblue border-brand-lightblue/30 uppercase">
+              {explanation.level || 'Simplificado'}
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-4 space-y-3 text-xs sm:text-sm text-foreground/90 font-body">
+            <p className="leading-relaxed">{explanation.text}</p>
+            {explanation.analogy && (
+              <div className="p-3 bg-amber-50/80 border border-amber-200/80 rounded-xl text-amber-900 text-xs flex items-start gap-2">
+                <span className="text-base leading-none">💡</span>
+                <div>
+                  <span className="font-bold block mb-0.5">Analogía de la Vida Real:</span>
+                  <span>{explanation.analogy}</span>
+                </div>
               </div>
             )}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="p-0 h-auto text-[10px] text-muted-foreground hover:bg-transparent"
-              onClick={() => { setSummary(null); setExplanation(null); }}
-            >
-              Borrar información de IA
-            </Button>
           </CardContent>
         </Card>
       )}

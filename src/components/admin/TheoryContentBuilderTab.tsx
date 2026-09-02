@@ -44,6 +44,7 @@ interface TheoryContentBuilderTabProps {
   insertBullet: () => void;
   updateDraftField: (field: string, val: any) => void;
   quizManager: any;
+  onRenameModule?: (modId: string, newTitle: string) => Promise<void>;
 }
 
 export function TheoryContentBuilderTab({
@@ -78,9 +79,30 @@ export function TheoryContentBuilderTab({
   insertBold,
   insertBullet,
   updateDraftField,
-  quizManager
+  quizManager,
+  onRenameModule
 }: TheoryContentBuilderTabProps) {
   const [activeMode, setActiveMode] = useState<'theory' | 'quiz'>('theory');
+
+  // Rename Module Modal State
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [renameTitleInput, setRenameTitleInput] = useState("");
+  const [isRenamingModule, setIsRenamingModule] = useState(false);
+
+  const handleOpenRename = () => {
+    const currentMod = dbModules.find(m => m.id === editContentModuleId);
+    setRenameTitleInput(currentMod?.title || "");
+    setIsRenameModalOpen(true);
+  };
+
+  const handleSaveRename = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renameTitleInput.trim() || !editContentModuleId || !onRenameModule) return;
+    setIsRenamingModule(true);
+    await onRenameModule(editContentModuleId, renameTitleInput.trim());
+    setIsRenamingModule(false);
+    setIsRenameModalOpen(false);
+  };
 
   return (
     <Card className="border-sky-100 shadow-xl border-t-[5px] border-t-sky-500 overflow-hidden">
@@ -95,13 +117,24 @@ export function TheoryContentBuilderTab({
           <Label htmlFor="c-mod" className="text-xs font-bold uppercase text-slate-500 whitespace-nowrap">Módulo:</Label>
           <select 
             id="c-mod" 
-            className="h-10 px-3 border border-slate-300 rounded-md bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500"
+            className="h-10 px-3 border border-slate-300 rounded-md bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500 max-w-[220px] sm:max-w-xs"
             value={editContentModuleId}
             onChange={e => setEditContentModuleId(e.target.value)}
           >
             {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
             {dbModules.length === 0 && <option value="">Sin módulos...</option>}
           </select>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleOpenRename}
+            disabled={!editContentModuleId}
+            className="h-10 px-3 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-lg flex items-center gap-1.5 shrink-0"
+          >
+            <Edit3 className="h-3.5 w-3.5 text-sky-600" /> Renombrar
+          </Button>
         </div>
       </CardHeader>
       
@@ -665,6 +698,44 @@ export function TheoryContentBuilderTab({
           </div>
         </div>
       </CardContent>
+
+      {/* Modal Renombrar Módulo */}
+      <Dialog open={isRenameModalOpen} onOpenChange={setIsRenameModalOpen}>
+        <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-headline font-black text-slate-800 flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-sky-600" />
+              Renombrar Módulo de Capacitación
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Escribe el nuevo nombre oficial que verán los estudiantes en la plataforma y certificados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveRename} className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-700">Título Oficial del Módulo</Label>
+              <Input
+                className="h-11 text-xs bg-slate-50 font-bold text-slate-900 rounded-xl"
+                placeholder="Ej: Módulo 01: Conceptos Básicos de Ciberseguridad"
+                value={renameTitleInput}
+                onChange={e => setRenameTitleInput(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsRenameModalOpen(false)} className="h-10 text-xs font-bold rounded-xl">
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isRenamingModule} className="h-10 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-6 rounded-xl">
+                {isRenamingModule ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
+                Guardar Título
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

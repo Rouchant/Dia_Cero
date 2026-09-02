@@ -157,6 +157,7 @@ export default function AdminDashboard() {
               insertBullet={theoryBuilder.insertBullet}
               updateDraftField={theoryBuilder.updateDraftField}
               quizManager={quizManager}
+              onRenameModule={adminUsers.handleRenameModule}
             />
           </TabsContent>
         </Tabs>

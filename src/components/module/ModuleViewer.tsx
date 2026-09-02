@@ -17,15 +17,29 @@ import { Card } from "@/components/ui/card";
 import { Trophy } from "lucide-react";
 import Link from 'next/link';
 
-function renderBoldText(text: string) {
+function renderFormattedLineText(text: string) {
   const parts = text.split(/(\*\*.*?\*\*|<b>.*?<\/b>)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-black text-brand-blue dark:text-sky-300">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-extrabold text-brand-blue dark:text-sky-300">{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith('<b>') && part.endsWith('</b>')) {
-      return <strong key={i} className="font-black text-brand-blue dark:text-sky-300">{part.slice(3, -4)}</strong>;
+      return <strong key={i} className="font-extrabold text-brand-blue dark:text-sky-300">{part.slice(3, -4)}</strong>;
     }
+    
+    // Auto-bold prefixes before colons (e.g. "Ransomware: Cifra los...")
+    if (part.includes(':') && !part.startsWith('http://') && !part.startsWith('https://')) {
+      const colonIndex = part.indexOf(':');
+      const prefix = part.slice(0, colonIndex + 1);
+      const rest = part.slice(colonIndex + 1);
+      return (
+        <React.Fragment key={i}>
+          <strong className="font-bold text-slate-900 dark:text-slate-100">{prefix}</strong>
+          {rest}
+        </React.Fragment>
+      );
+    }
+
     return part;
   });
 }
@@ -35,28 +49,49 @@ function FormattedTheoryContent({ content }: { content: string }) {
   const lines = content.split('\n');
 
   return (
-    <div className="space-y-3 text-base md:text-lg leading-relaxed text-foreground/90 font-body">
+    <div className="space-y-2.5 text-base md:text-lg leading-relaxed text-foreground/90 font-body">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
 
-        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
-          const bulletText = trimmed.replace(/^[-*•]\s*/, '');
+        // 1. Sub-bullet level: starting with '*'
+        if (trimmed.startsWith('* ')) {
+          const bulletText = trimmed.replace(/^\*\s*/, '');
           return (
-            <div key={idx} className="flex items-start gap-3 pl-2 sm:pl-4 my-1.5">
-              <span className="h-2 w-2 rounded-full bg-brand-blue shrink-0 mt-2.5 shadow-sm" />
-              <p className="flex-1 text-foreground/90">{renderBoldText(bulletText)}</p>
+            <div key={idx} className="flex items-start gap-2.5 pl-6 sm:pl-9 my-1">
+              <span className="h-2 w-2 rounded-full border-2 border-emerald-500 bg-white shrink-0 mt-2.5 shadow-xs" />
+              <p className="flex-1 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                {renderFormattedLineText(bulletText)}
+              </p>
             </div>
           );
         }
 
+        // 2. Main-bullet level: starting with '-' or '•'
+        if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+          const bulletText = trimmed.replace(/^[-•]\s*/, '');
+          return (
+            <div key={idx} className="flex items-start gap-3 pl-2 sm:pl-3 mt-3 mb-1">
+              <span className="h-2.5 w-2.5 rounded-full bg-brand-blue shrink-0 mt-2 shadow-xs" />
+              <p className="flex-1 text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 leading-snug">
+                {renderFormattedLineText(bulletText)}
+              </p>
+            </div>
+          );
+        }
+
+        // 3. Empty line separator
         if (trimmed === '') {
           return <div key={idx} className="h-2" />;
         }
 
+        // 4. Indented paragraph under a main bullet (starts with leading whitespace)
+        const isIndented = line.startsWith('  ') || line.startsWith('\t');
         return (
-          <p key={idx} className="leading-relaxed">
-            {renderBoldText(line)}
-          </p>
+          <div key={idx} className={isIndented ? "pl-6 sm:pl-9 my-1" : "my-1.5"}>
+            <p className="text-base sm:text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+              {renderFormattedLineText(line.trim())}
+            </p>
+          </div>
         );
       })}
     </div>

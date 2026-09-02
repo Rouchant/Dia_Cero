@@ -19,14 +19,35 @@ interface QuizProps {
   onComplete: (score: number) => void;
 }
 
-export function Quiz({ questions, onComplete }: QuizProps) {
+export function Quiz({ questions = [], onComplete }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  const currentQuestion = questions[currentQuestionIndex];
+  const safeQuestions = Array.isArray(questions) ? questions : [];
+  const currentQuestion = safeQuestions[currentQuestionIndex];
+
+  if (!safeQuestions || safeQuestions.length === 0 || !currentQuestion) {
+    return (
+      <Card className="max-w-xl mx-auto border-2 border-dashed border-amber-200 bg-amber-50/50 p-8 text-center rounded-2xl">
+        <CardContent className="space-y-4 pt-4">
+          <span className="text-4xl block">📝</span>
+          <h3 className="text-lg font-headline font-bold text-amber-900">Evaluación sin Preguntas Cargadas</h3>
+          <p className="text-xs text-amber-800 max-w-md mx-auto leading-relaxed font-medium">
+            Este módulo de examen aún no contiene preguntas registradas en la base de datos.
+          </p>
+          <Button 
+            onClick={() => onComplete(100)} 
+            className="mt-2 bg-brand-green hover:bg-emerald-600 text-white font-bold text-xs h-11 px-6 rounded-xl shadow-md"
+          >
+            Dar Módulo por Aprobado
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleNext = () => {
     if (selectedAnswer === null) return;
@@ -43,7 +64,7 @@ export function Quiz({ questions, onComplete }: QuizProps) {
     setShowFeedback(false);
     setSelectedAnswer(null);
     
-    if (currentQuestionIndex + 1 < questions.length) {
+    if (currentQuestionIndex + 1 < safeQuestions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       setIsFinished(true);
@@ -51,7 +72,8 @@ export function Quiz({ questions, onComplete }: QuizProps) {
   };
 
   if (isFinished) {
-    const finalScore = Math.round((score / questions.length) * 100);
+    const totalQCount = Math.max(1, safeQuestions.length);
+    const finalScore = Math.round((score / totalQCount) * 100);
     return (
       <Card className="max-w-2xl mx-auto border-accent/20 bg-white/50 backdrop-blur-sm">
         <CardContent className="pt-12 text-center space-y-6">
@@ -84,12 +106,12 @@ export function Quiz({ questions, onComplete }: QuizProps) {
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-center mb-4">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Pregunta {currentQuestionIndex + 1} de {questions.length}
+            Pregunta {currentQuestionIndex + 1} de {safeQuestions.length}
           </span>
           <div className="h-1 w-24 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-accent transition-all duration-500" 
-              style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+              style={{ width: `${((currentQuestionIndex + 1) / safeQuestions.length) * 100}%` }}
             />
           </div>
         </div>

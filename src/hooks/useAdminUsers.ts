@@ -170,6 +170,21 @@ export function useAdminUsers() {
     setIsAssigning(false);
   };
 
+  const handleRenameModule = async (moduleId: string, newTitle: string) => {
+    if (!moduleId || !newTitle.trim()) return;
+    const { error } = await supabase
+      .from('modules')
+      .update({ title: newTitle.trim() })
+      .eq('id', moduleId);
+
+    if (error) {
+      alert("Error renombrando el módulo: " + error.message);
+    } else {
+      setDbModules(prev => prev.map(m => m.id === moduleId ? { ...m, title: newTitle.trim() } : m));
+      fetchData();
+    }
+  };
+
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -208,6 +223,7 @@ export function useAdminUsers() {
     assignModuleId,
     setAssignModuleId,
     isAssigning,
-    handleAssignModule
+    handleAssignModule,
+    handleRenameModule
   };
 }
