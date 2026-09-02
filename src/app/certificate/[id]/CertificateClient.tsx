@@ -66,6 +66,17 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]);
 
+  const handlePrint = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      try {
+        window.print();
+      } catch (err) {
+        console.error('Error invoking print dialog:', err);
+      }
+    }
+  };
+
   if (loading) return (
      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 text-brand-blue/70">
         <Loader2 className="h-8 w-8 animate-spin text-brand-green" />
@@ -119,11 +130,19 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
       {/* Action Bar - Hidden in Print */}
       <div className="w-full max-w-[8.5in] flex flex-col sm:flex-row justify-between items-center mb-8 px-4 gap-4 print:hidden">
-        <Button onClick={() => router.push('/dashboard')} className="hover-lift bg-brand-lightblue hover:bg-[#0ea5e9] text-white border-brand-lightblue font-black shadow-lg shadow-brand-lightblue/20 rounded-xl px-6 active:scale-95">
+        <Button 
+          type="button"
+          onClick={() => router.push('/dashboard')} 
+          className="w-full sm:w-auto hover-lift bg-brand-lightblue hover:bg-[#0ea5e9] text-white font-black shadow-lg shadow-brand-lightblue/20 rounded-xl px-6 h-12 active:scale-95 transition-all"
+        >
            <ArrowLeft className="mr-2 h-4 w-4"/> Volver al Panel
         </Button>
-        <Button onClick={() => window.print()} className="bg-brand-blue hover:bg-brand-blue/90 text-white font-black shadow-lg shadow-brand-blue/20 border border-brand-blue">
-           <Printer className="mr-2 h-5 w-5"/> Imprimir Diploma Oficial
+        <Button 
+          type="button"
+          onClick={handlePrint} 
+          className="w-full sm:w-auto bg-brand-blue hover:bg-brand-blue/90 text-white font-black shadow-lg shadow-brand-blue/20 border border-brand-blue rounded-xl px-6 h-12 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+           <Printer className="h-5 w-5"/> Imprimir o Guardar PDF
         </Button>
       </div>
 

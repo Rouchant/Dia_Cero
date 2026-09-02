@@ -101,7 +101,7 @@
   }
 
   .bg-gradient-success {
-    @apply bg-gradient-to-br from-[#008f5d] to-[#007048];
+    @apply bg-gradient-to-br from-brand-green to-[#22c55e];
   }
 
   .font-signature {

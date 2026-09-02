@@ -24,20 +24,20 @@ export default {
       },
       colors: {
         brand: {
-          /* Verde base (ancla del sistema visual) */
-          green: '#21C480',      /* Verde menta/esmeralda vivo; contraste ~10:1 sobre negro, ideal para badges y botones */
+          /* Verde vibrante neón/menta */
+          green: '#41E884',      /* #41E884: Verde vibrante de alta energía */
 
-          /* Complementario armónico (Gama roja/frambuesa energética) */
-          pink: '#D91B5C',       /* Rosa frambuesa vivo. Contraste ~4.6:1 sobre blanco (pasa WCAG AA) */
+          /* Rosa magenta energético */
+          pink: '#E841A5',       /* #E841A5: Magenta/rosa vivo */
 
-          /* Tríada complementaria del verde (Azul real saturado) */
-          blue: '#3B36E6',       /* Azul índigo intenso estilo Duolingo. Contraste ~5.8:1 sobre blanco */
+          /* Azul eléctrico vibrante */
+          blue: '#5505F5',       /* #5505F5: Azul eléctrico / violeta profundo */
 
-          /* Análogo cian/cielo */
-          lightblue: '#0EA5E9',  /* Turquesa cerúleo limpio. Contraste ~5.5:1 sobre negro, vibrante para acentos */
+          /* Azul celeste / cian brillante */
+          lightblue: '#05A5F5',  /* #05A5F5: Azul cielo brillante */
 
-          /* Amarillo sol puro (con densidad para no perderse en blanco) */
-          yellow: '#F59E0B',     /* Ámbar/amarillo sol denso (amber-500). Pasa contraste de elementos gráficos y texto negro */
+          /* Amarillo sol neón */
+          yellow: '#F5CD05',     /* #F5CD05: Amarillo brillante sol */
 
           /* Oro bandera alemana (Bundesflagge Gold: #FFCE00 calibrado para interfaz) */
           gold: '#d3ab0aff',       /* Oro alemán brillante */

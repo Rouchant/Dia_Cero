@@ -104,7 +104,7 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
           size="sm" 
           onClick={handleSimplify} 
           disabled={loading}
-          className="hover-lift bg-brand-green hover:bg-[#007048] text-white font-bold rounded-xl shadow-md px-4 h-10 flex-1 sm:flex-initial active:scale-95 transition-all"
+          className="hover-lift bg-brand-green hover:bg-[#34ce70] text-slate-950 font-black rounded-xl shadow-md px-4 h-10 flex-1 sm:flex-initial active:scale-95 transition-all"
         >
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2 animate-pulse" />}
           Explicar de Forma Sencilla
