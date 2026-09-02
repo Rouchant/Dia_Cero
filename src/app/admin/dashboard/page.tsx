@@ -1,622 +1,40 @@
-"use client"
+"use client";
 
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Users, TrendingUp, Award, ArrowLeft, Search, PlusCircle, Book, Link as LinkIcon, Loader2, Edit3, Image as ImageIcon, Video, Save, ListChecks, ExternalLink, Bold, List, Sparkles, Brain, BookOpen, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Loader2, Book, Users } from "lucide-react";
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
-import { createClient } from '@/utils/supabase/client';
-import { generateCertId } from '@/lib/cert-hash';
-import { summarizeModuleSection } from '@/ai/flows/ai-module-summary';
-import { explainConceptAdaptively } from '@/ai/flows/ai-adaptive-explanation';
+
+import { useAdminUsers } from '@/hooks/useAdminUsers';
+import { useTheoryContentBuilder } from '@/hooks/useTheoryContentBuilder';
+import { useQuizManager } from '@/hooks/useQuizManager';
+
+import { AdminStatsCards } from '@/components/admin/AdminStatsCards';
+import { UserManagementTab } from '@/components/admin/UserManagementTab';
+import { ModuleAssignmentCard } from '@/components/admin/ModuleAssignmentCard';
+import { TheoryContentBuilderTab } from '@/components/admin/TheoryContentBuilderTab';
 
 export default function AdminDashboard() {
-  const router = useRouter();
-  const supabase = createClient();
+  // 1. Users & General Admin Hook
+  const adminUsers = useAdminUsers();
 
-  // Basic State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [users, setUsers] = useState<any[]>([]);
-  const [dbModules, setDbModules] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedUserStats, setSelectedUserStats] = useState<any>(null);
+  // 2. Theory Content Builder Hook
+  const theoryBuilder = useTheoryContentBuilder(adminUsers.dbModules);
 
-  // User Creation State
-  const [newUserName, setNewUserName] = useState("");
-  const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserPassword, setNewUserPassword] = useState("Cambiar123!");
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  // 3. Quiz Manager Hook (Synchronized with selected theory module)
+  const quizManager = useQuizManager(adminUsers.dbModules, theoryBuilder.editContentModuleId);
 
-  // Module Creation State
-  const [newModuleTitle, setNewModuleTitle] = useState("");
-  const [newModuleDesc, setNewModuleDesc] = useState("");
-  const [isCreatingModule, setIsCreatingModule] = useState(false);
-
-  // Assignment State
-  const [assignUserId, setAssignUserId] = useState("");
-  const [assignModuleId, setAssignModuleId] = useState("");
-  const [isAssigning, setIsAssigning] = useState(false);
-
-  // --- Content Editor State ---
-  const [editContentModuleId, setEditContentModuleId] = useState("");
-  const [contentSections, setContentSections] = useState<any[]>([]);
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
-  const [isLoadingContent, setIsLoadingContent] = useState(false);
-  const [isSavingContent, setIsSavingContent] = useState(false);
-  
-  // Content Form fields
-  const [editSecTitle, setEditSecTitle] = useState("");
-  const [editSecContent, setEditSecContent] = useState("");
-  const [editSecVideo, setEditSecVideo] = useState("");
-  const [editSecImage, setEditSecImage] = useState("");
-  const [editSecAiSummary, setEditSecAiSummary] = useState("");
-  const [editSecAiExplanation, setEditSecAiExplanation] = useState("");
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-
-  // In-memory draft dictionary for multi-section batch editing across slides
-  const [draftSections, setDraftSections] = useState<Record<string, any>>({});
-  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  // --- Quiz Editor State ---
-  const [quizModuleId, setQuizModuleId] = useState("");
-  const [quizSectionId, setQuizSectionId] = useState<string | null>(null);
-  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
-  const [newQuizQuestion, setNewQuizQuestion] = useState("");
-  const [newQuizOptions, setNewQuizOptions] = useState("");
-  const [newQuizAnswerIdx, setNewQuizAnswerIdx] = useState<number | ''>(1);
-  const [isCreatingQuizQuestion, setIsCreatingQuizQuestion] = useState(false);
-  const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
-  const [isCreatingQuizSection, setIsCreatingQuizSection] = useState(false);
-
-  const fetchData = async () => {
-    // 1. Secure route
-    const { data: authData } = await supabase.auth.getUser();
-    if (!authData.user) {
-      router.push('/auth/login');
-      return;
-    }
-    const userRole = authData.user.user_metadata?.role;
-    if (userRole !== 'admin') {
-      router.push('/dashboard');
-      return;
-    }
-
-    // 2. Fetch basic data
-    const { data: mData } = await supabase.from('modules').select('*, module_sections(*)');
-    if (mData) {
-      setDbModules(mData);
-      if (mData.length > 0) {
-        if (!assignModuleId) setAssignModuleId(mData[0].id);
-        if (!quizModuleId) setQuizModuleId(mData[0].id);
-        if (!editContentModuleId) setEditContentModuleId(mData[0].id);
-      }
-    }
-
-    const { data: profiles } = await supabase.from('profiles').select('*');
-    const { data: progressData } = await supabase.from('user_progress').select('*');
-
-    if (profiles && mData) {
-      const enhancedUsers = profiles.map(profile => {
-        const userProgs = progressData?.filter(p => p.user_id === profile.id) || [];
-        
-        let totalComputed = 0;
-        let fullyCompleted = 0;
-        let moduleBreakdown: any[] = [];
-
-        if (userProgs.length > 0) {
-          userProgs.forEach(prog => {
-            const courseMod = mData.find(m => m.id === prog.module_id);
-            const totalSections = Math.max(1, courseMod?.module_sections?.length || 1);
-            const completedLen = Array.isArray(prog.completed_sections) ? prog.completed_sections.length : 0;
-            const modPercentage = Math.round((completedLen / totalSections) * 100);
-            
-            const finalPerc = modPercentage > 100 ? 100 : modPercentage;
-            totalComputed += finalPerc;
-            if (finalPerc >= 100) fullyCompleted++;
-            
-            moduleBreakdown.push({
-               id: prog.module_id,
-               title: courseMod?.title || "Módulo Eliminado/Desconocido",
-               percentage: finalPerc
-            });
-          });
-        }
-        
-        const progPercentage = userProgs.length > 0 ? Math.round(totalComputed / userProgs.length) : 0;
-        
-        return {
-          ...profile,
-          progress_percentage: progPercentage,
-          assigned_courses: userProgs.length,
-          completed_courses: fullyCompleted,
-          last_active: userProgs[0]?.updated_at ? new Date(userProgs[0].updated_at).toLocaleDateString() : 'N/A',
-          moduleBreakdown
-        };
-      });
-      
-      setUsers(enhancedUsers);
-      const firstStudent = enhancedUsers.find(u => u.role !== 'admin');
-      if (firstStudent && !assignUserId) setAssignUserId(firstStudent.id);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Fetch active Quiz context
-  useEffect(() => {
-    async function fetchQuizData() {
-      if (!quizModuleId) return;
-      setIsLoadingQuiz(true);
-      const { data: qSection } = await supabase
-        .from('module_sections')
-        .select('*')
-        .eq('module_id', quizModuleId)
-        .eq('type', 'quiz')
-        .maybeSingle();
-
-      if (qSection) {
-        setQuizSectionId(qSection.id);
-        const { data: qData } = await supabase
-          .from('quiz_questions')
-          .select('*')
-          .eq('section_id', qSection.id)
-          .order('created_at', { ascending: true });
-        setQuizQuestions(qData || []);
-      } else {
-        setQuizSectionId(null);
-        setQuizQuestions([]);
-      }
-      setIsLoadingQuiz(false);
-    }
-    fetchQuizData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizModuleId]);
-
-  // Helper to preserve active section edits in draft map before switching
-  const saveCurrentToDraft = () => {
-    if (!selectedSectionId) return;
-    setDraftSections(prev => {
-      if (!prev[selectedSectionId]) return prev;
-      return {
-        ...prev,
-        [selectedSectionId]: {
-          ...prev[selectedSectionId],
-          title: editSecTitle,
-          content: editSecContent,
-          video_url: editSecVideo,
-          image_url: editSecImage,
-          ai_summary: editSecAiSummary,
-          ai_explanation: editSecAiExplanation
-        }
-      };
-    });
-  };
-
-  const updateDraftField = (field: string, value: any) => {
-    if (!selectedSectionId) return;
-    setDraftSections(prev => {
-      const current = prev[selectedSectionId] || { id: selectedSectionId };
-      return {
-        ...prev,
-        [selectedSectionId]: {
-          ...current,
-          [field]: value,
-          isModified: true
-        }
-      };
-    });
-  };
-
-  const loadSectionFromDraft = (secId: string, customDrafts?: Record<string, any>) => {
-    saveCurrentToDraft();
-    setSelectedSectionId(secId);
-    const map = customDrafts || draftSections;
-    const target = map[secId] || contentSections.find(s => s.id === secId);
-    if (target) {
-      setEditSecTitle(target.title || "");
-      setEditSecContent(target.content || "");
-      setEditSecVideo(target.video_url || "");
-      setEditSecImage(target.image_url || "");
-      setEditSecAiSummary(target.ai_summary || "");
-      setEditSecAiExplanation(typeof target.ai_explanation === 'object' ? JSON.stringify(target.ai_explanation, null, 2) : (target.ai_explanation || ""));
-    }
-  };
-
-  // Fetch active Content Editor context
-  useEffect(() => {
-    async function fetchContentData() {
-      if (!editContentModuleId) return;
-      setIsLoadingContent(true);
-      const { data: sections } = await supabase
-        .from('module_sections')
-        .select('*')
-        .eq('module_id', editContentModuleId)
-        .eq('type', 'content')
-        .order('sort_order', { ascending: true });
-
-      if (sections) {
-        setContentSections(sections);
-        const drafts: Record<string, any> = {};
-        sections.forEach((s: any) => {
-          drafts[s.id] = {
-            id: s.id,
-            module_id: s.module_id,
-            title: s.title || '',
-            content: s.content || '',
-            video_url: s.video_url || '',
-            image_url: s.image_url || '',
-            ai_summary: s.ai_summary || '',
-            ai_explanation: typeof s.ai_explanation === 'object' ? JSON.stringify(s.ai_explanation, null, 2) : (s.ai_explanation || ''),
-            isModified: false
-          };
-        });
-        setDraftSections(drafts);
-        if (sections.length > 0) {
-          loadSectionFromDraft(sections[0].id, drafts);
-        } else {
-          clearContentForm();
-        }
-      } else {
-        setContentSections([]);
-        setDraftSections({});
-        clearContentForm();
-      }
-      setIsLoadingContent(false);
-    }
-    fetchContentData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editContentModuleId]);
-
-  const clearContentForm = () => {
-    setSelectedSectionId(null);
-    setEditSecTitle("");
-    setEditSecContent("");
-    setEditSecVideo("");
-    setEditSecImage("");
-    setEditSecAiSummary("");
-    setEditSecAiExplanation("");
-  };
-
-  const insertBold = () => {
-    const textarea = contentTextareaRef.current;
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = editSecContent;
-    const selectedText = text.substring(start, end);
-    
-    let replacement = '';
-    if (selectedText.length > 0) {
-      replacement = `**${selectedText}**`;
-    } else {
-      replacement = `**texto en negrita**`;
-    }
-    
-    const newContent = text.substring(0, start) + replacement + text.substring(end);
-    setEditSecContent(newContent);
-    updateDraftField('content', newContent);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + 2, start + 2 + (selectedText.length || 15));
-    }, 50);
-  };
-
-  const insertBullet = () => {
-    const textarea = contentTextareaRef.current;
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const text = editSecContent;
-    
-    const prefix = (start > 0 && text[start - 1] !== '\n') ? '\n• ' : '• ';
-    const newContent = text.substring(0, start) + prefix + text.substring(start);
-    setEditSecContent(newContent);
-    updateDraftField('content', newContent);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + prefix.length, start + prefix.length);
-    }, 50);
-  };
-
-  const handleGenerateAiForCurrentSection = async () => {
-    if (!selectedSectionId || !editSecContent.trim()) {
-      alert("Por favor escribe contenido en la lección antes de solicitar respuestas a la IA.");
-      return;
-    }
-    setIsGeneratingAi(true);
-    try {
-      const sumRes = await summarizeModuleSection({ sectionId: selectedSectionId, sectionContent: editSecContent });
-      const expRes = await explainConceptAdaptively({ sectionId: selectedSectionId, concept: editSecTitle, context: editSecContent.substring(0, 300) });
-      
-      if (sumRes?.summary) {
-        setEditSecAiSummary(sumRes.summary);
-        updateDraftField('ai_summary', sumRes.summary);
-      }
-      
-      if (expRes?.explanation) {
-        const expStr = JSON.stringify(expRes, null, 2);
-        setEditSecAiExplanation(expStr);
-        updateDraftField('ai_explanation', expStr);
-      }
-    } catch (err: any) {
-      alert("Error generando respuestas de IA: " + (err?.message || "Verifique conexión"));
-    } finally {
-      setIsGeneratingAi(false);
-    }
-  };
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsCreatingUser(true);
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newUserEmail, password: newUserPassword, name: newUserName })
-      });
-      if (res.ok) {
-        alert("¡Estudiante creado exitosamente en Auth de Supabase y Perfiles!");
-        setNewUserName(""); setNewUserEmail("");
-        fetchData();
-      } else {
-        const data = await res.json();
-        alert("Error de Creación: " + data.error);
-      }
-    } catch {
-      alert("Error crítico ejecutando el servidor.");
-    } finally {
-      setIsCreatingUser(false);
-    }
-  };
-
-  const handleCreateModule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsCreatingModule(true);
-    const mId = newModuleTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    
-    const { error: mError } = await supabase.from('modules').insert({
-      id: mId,
-      title: newModuleTitle,
-      description: newModuleDesc
-    });
-    
-    if (mError) { 
-      alert("Falla insertando módulo principal: " + mError.message); 
-      setIsCreatingModule(false); 
-      return; 
-    }
-
-    await supabase.from('module_sections').insert({
-      id: mId + '-intro',
-      module_id: mId,
-      title: 'Introducción Inédita',
-      type: 'content',
-      content: 'El Autor pronto editará y agregará el contenido oficial del módulo aquí.',
-      sort_order: 0
-    });
-
-    alert("Módulo creado e indexado estructuralmente.");
-    setNewModuleTitle(""); setNewModuleDesc("");
-    fetchData();
-    setIsCreatingModule(false);
-  };
-
-  const handleAssignModule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!assignUserId || !assignModuleId) return;
-    setIsAssigning(true);
-
-    const { error } = await supabase.from('user_progress').insert({
-      user_id: assignUserId,
-      module_id: assignModuleId,
-      completed_sections: [],
-      quiz_scores: {},
-      current_section_index: 0
-    });
-
-    if (error) {
-      if (error.message.includes('duplicate')) {
-        alert("Aviso: El estudiante seleccionado ya tenía asignado este módulo.");
-      } else {
-        alert("Falla de Base de Datos: " + error.message);
-      }
-    } else {
-      alert("¡Módulo inyectado exitosamente al alumno! Se reflejará en su panel privado instantáneamente.");
-      fetchData();
-    }
-    setIsAssigning(false);
-  };
-
-  // --- Content Handlers ---
-  const handleAddNewContentSection = async () => {
-    if (!editContentModuleId) return;
-    setIsSavingContent(true);
-    const newId = crypto.randomUUID();
-    const newSortOrder = contentSections.length > 0 ? contentSections[contentSections.length - 1].sort_order + 1 : 0;
-    
-    const newSec = {
-      id: newId,
-      module_id: editContentModuleId,
-      title: 'Nueva Diapositiva',
-      type: 'content',
-      content: 'Escribe tu teoría aquí...',
-      sort_order: newSortOrder
-    };
-
-    const { error } = await supabase.from('module_sections').insert(newSec);
-    if (error) {
-      alert("Error insertando sección de contenido vacía: " + error.message);
-    } else {
-      setContentSections([...contentSections, newSec]);
-      const updatedDrafts = {
-        ...draftSections,
-        [newSec.id]: {
-          id: newSec.id,
-          module_id: newSec.module_id,
-          title: newSec.title,
-          content: newSec.content,
-          video_url: '',
-          image_url: '',
-          ai_summary: '',
-          ai_explanation: '',
-          isModified: false
-        }
-      };
-      setDraftSections(updatedDrafts);
-      loadSectionFromDraft(newSec.id, updatedDrafts);
-    }
-    setIsSavingContent(false);
-  };
-
-  const handleSaveAllContentSections = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!editContentModuleId) return;
-
-    setIsSavingContent(true);
-    try {
-      // Flush current form state into draftSections map
-      const currentDrafts = { ...draftSections };
-      if (selectedSectionId) {
-        currentDrafts[selectedSectionId] = {
-          ...(currentDrafts[selectedSectionId] || {}),
-          title: editSecTitle,
-          content: editSecContent,
-          video_url: editSecVideo,
-          image_url: editSecImage,
-          ai_summary: editSecAiSummary,
-          ai_explanation: editSecAiExplanation
-        };
-      }
-
-      const allDraftList = Object.values(currentDrafts).map((s: any) => ({
-        id: s.id,
-        module_id: editContentModuleId,
-        title: s.title,
-        content: s.content,
-        video_url: s.video_url || null,
-        image_url: s.image_url || null,
-        ai_summary: s.ai_summary || null,
-        ai_explanation: s.ai_explanation || null
-      }));
-
-      if (allDraftList.length > 0) {
-        const { error } = await supabase.from('module_sections').upsert(allDraftList);
-        if (error) {
-          alert("Error guardando lecciones: " + error.message);
-        } else {
-          alert("¡Todas las lecciones del módulo fueron sincronizadas y guardadas exitosamente en Supabase!");
-          
-          // Reset modified flags
-          const resetDrafts: Record<string, any> = {};
-          Object.keys(currentDrafts).forEach(k => {
-            resetDrafts[k] = { ...currentDrafts[k], isModified: false };
-          });
-          setDraftSections(resetDrafts);
-
-          // Refresh content sections list
-          const updatedContentSections = contentSections.map(sec => {
-            const d = currentDrafts[sec.id];
-            return d ? { ...sec, ...d } : sec;
-          });
-          setContentSections(updatedContentSections);
-        }
-      }
-    } catch (err: any) {
-      alert("Error en el servidor: " + err.message);
-    } finally {
-      setIsSavingContent(false);
-    }
-  };
-
-
-  // --- Quiz Handlers ---
-  const handleCreateQuizSection = async () => {
-    if (!quizModuleId) return;
-    setIsCreatingQuizSection(true);
-    const newSecId = quizModuleId + '-eval-final';
-    const { error } = await supabase.from('module_sections').insert({
-      id: newSecId,
-      module_id: quizModuleId,
-      title: 'Evaluación Final',
-      type: 'quiz',
-      content: 'Responda las siguientes preguntas para validar la absorción de los conocimientos del módulo crítico.',
-      sort_order: 99
-    });
-    
-    if (error) {
-      alert("Error estableciendo la infraestructura del Quiz: " + error.message);
-    } else {
-      setQuizSectionId(newSecId);
-      setQuizQuestions([]);
-    }
-    setIsCreatingQuizSection(false);
-  };
-
-  const handleAddQuestion = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quizSectionId) return;
-
-    if (newQuizAnswerIdx === '' || newQuizAnswerIdx === null) {
-      alert("Por favor provea un número de respuesta válido.");
-      return;
-    }
-
-    const optionsArray = newQuizOptions.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
-    if (optionsArray.length < 2) {
-      alert("Por favor provea al menos 2 posibles respuestas, separándolas mediante comas.");
-      return;
-    }
-    
-    const finalIndex = (newQuizAnswerIdx as number) - 1;
-    if (finalIndex < 0 || finalIndex >= optionsArray.length) {
-      alert(`El número de respuesta correcta debe ubicarse estrictamente entre 1 y ${optionsArray.length}`);
-      return;
-    }
-
-    setIsCreatingQuizQuestion(true);
-    const { data: newQ, error } = await supabase.from('quiz_questions').insert({
-      id: crypto.randomUUID(),
-      section_id: quizSectionId,
-      question: newQuizQuestion,
-      options: optionsArray,
-      correct_answer: finalIndex
-    }).select().single();
-
-    if (error) {
-      alert("Error empaquetando pregunta en el servidor: " + error.message);
-    } else if (newQ) {
-      setQuizQuestions([...quizQuestions, newQ]);
-      setNewQuizQuestion("");
-      setNewQuizOptions("");
-      setNewQuizAnswerIdx(1);
-    }
-    setIsCreatingQuizQuestion(false);
-  };
-
-  const filteredUsers = users.filter(user => 
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const students = users.filter(u => u.role !== 'admin');
-  const totalStudents = students.length;
-  const completedStudents = students.filter(u => u.progress_percentage === 100).length;
-  const totalProgress = students.reduce((sum, u) => sum + (u.progress_percentage || 0), 0);
-  const averageProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
+  if (adminUsers.loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <Loader2 className="h-10 w-10 animate-spin text-brand-blue" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -636,689 +54,111 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-brand-blue">Director de Currículum</p>
-              <p className="text-xs text-slate-500 font-medium">Panel de Supervisión</p>
-            </div>
-            <div className="h-11 w-11 rounded-full bg-brand-lightblue/30 border border-brand-blue/20 flex items-center justify-center shadow-sm">
-              <Users className="h-5 w-5 text-brand-blue fill-brand-blue/20" />
+              <p className="text-sm font-bold text-slate-800">Director de Capacitación</p>
+              <p className="text-xs text-slate-500 font-medium">Panel de Seguridad Día Cero</p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12 space-y-8 animate-in fade-in duration-500">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">Centro Táctico DiaCero</h1>
-          <p className="text-slate-500 font-medium text-base sm:text-lg mt-2">Gestiona estudiantes, diseña módulos y vigila la analítica en un solo lugar.</p>
-        </div>
+      {/* Main Content Container */}
+      <main className="max-w-7xl mx-auto p-6 md:p-8">
+        {/* Top Metric Cards Component */}
+        <AdminStatsCards 
+          totalStudents={adminUsers.totalStudents}
+          averageProgress={adminUsers.averageProgress}
+          completedStudents={adminUsers.completedStudents}
+        />
 
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="mb-6 bg-slate-100 p-1.5 rounded-lg flex flex-wrap h-auto w-full max-w-[600px] border border-slate-200">
-            <TabsTrigger value="overview" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
-              <TrendingUp className="h-4 w-4" /> <span className="hidden xs:inline">Estadísticas</span>
+        {/* Tabbed Navigation */}
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="bg-white p-1.5 border border-slate-200 shadow-sm rounded-2xl flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="users" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-brand-blue data-[state=active]:text-white transition-all flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Alumnos & Certificados
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
-              <Users className="h-4 w-4" /> <span className="hidden xs:inline">Usuarios</span>
+            <TabsTrigger value="assign" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Asignación de Módulos
             </TabsTrigger>
-            <TabsTrigger value="modules" className="flex-1 py-2 rounded-md font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:scale-[1.02] flex items-center gap-1.5 justify-center">
-              <Book className="h-4 w-4" /> <span className="hidden xs:inline">Módulos</span>
+            <TabsTrigger value="content" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Constructor Teórico & Quizzes
             </TabsTrigger>
           </TabsList>
 
-          {/* TAB 1: OVERVIEW / ESTADISTICAS */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid sm:grid-cols-3 gap-6">
-              <Card className="shadow-md border-primary/5 hover:border-primary/20 transition-colors">
-                <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-base font-bold text-muted-foreground">Estudiantes Operativos</CardTitle>
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-4xl font-black">{loading ? "-" : totalStudents}</p>
-                </CardContent>
-              </Card>
-              <Card className="shadow-md border-accent/5 hover:border-accent/20 transition-colors">
-                <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-base font-bold text-muted-foreground">Avance Promedio Global</CardTitle>
-                  <div className="p-2 bg-accent/10 rounded-full">
-                    <TrendingUp className="h-5 w-5 text-accent" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-4xl font-black text-brand-green">{averageProgress}%</p>
-                  </div>
-                  <Progress value={averageProgress} className="h-2 mt-3 bg-brand-green/20 [&>div]:bg-brand-green" />
-                </CardContent>
-              </Card>
-              <Card className="shadow-lg shadow-brand-blue/5 border-brand-green/20 hover:border-brand-green/50 transition-colors bg-white/90 backdrop-blur-sm rounded-2xl">
-                <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-base font-bold text-slate-500">Completados Perfectos</CardTitle>
-                  <div className="p-2.5 bg-brand-green/10 rounded-xl border border-brand-green/20">
-                    <Award className="h-5 w-5 text-brand-green" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-4xl font-black text-brand-blue">{completedStudents}</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="shadow-xl border-primary/10 overflow-hidden">
-              <CardHeader className="border-b bg-muted/20 pb-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div>
-                    <CardTitle className="text-xl font-headline font-bold">Lista de Cursantes</CardTitle>
-                    <CardDescription>Detalles individuales cruzando todos los cursos asignados.</CardDescription>
-                  </div>
-                  <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input 
-                      type="text" 
-                      placeholder="Buscar por nombre o correo..." 
-                      className="w-full h-10 pl-9 pr-4 rounded-md border border-input bg-background/80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-md"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {/* Mobile card list */}
-                <div className="md:hidden divide-y">
-                  {loading ? (
-                    <div className="text-center py-12 text-muted-foreground">Cargando datos...</div>
-                  ) : filteredUsers.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">No hay cuentas en base de datos.</div>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <button
-                        key={user.id}
-                        onClick={() => setSelectedUserStats(user)}
-                        className="w-full text-left p-4 hover:bg-brand-blue/5 transition-all active:scale-[0.98] border-l-4 border-transparent hover:border-brand-blue"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="font-bold text-sm text-foreground uppercase">
-                              {user.name}
-                              {user.role === 'admin' && <span className="ml-2 px-1.5 py-0.5 rounded bg-brand-yellow/30 text-brand-gold font-black text-[10px] tracking-widest border border-brand-gold/30">ADMIN</span>}
-                            </p>
-                            <p className="text-xs text-muted-foreground">{user.email}</p>
-                          </div>
-                          <span className="font-black text-brand-green text-lg">{user.progress_percentage || 0}%</span>
-                        </div>
-                        <Progress value={user.progress_percentage || 0} className="h-1.5 bg-brand-green/10 [&>div]:bg-brand-green" />
-                      </button>
-                    ))
-                  )}
-                </div>
-                {/* Desktop table */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-muted-foreground uppercase bg-muted/40 border-b">
-                      <tr>
-                        <th className="px-6 py-4 font-bold">Estudiante</th>
-                        <th className="px-6 py-4 font-bold text-center">Cursos</th>
-                        <th className="px-6 py-4 font-bold min-w-[200px]">Progreso Promedio</th>
-                        <th className="px-6 py-4 font-bold">Última Actividad</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y border-t-0">
-                      {loading ? (
-                        <tr>
-                          <td colSpan={4} className="text-center py-16 text-muted-foreground">
-                            Cargando cruces relacionales desde Supabase... 📡
-                          </td>
-                        </tr>
-                      ) : filteredUsers.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="text-center py-16 text-muted-foreground">
-                            No hay cuentas en base de datos.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredUsers.map((user) => (
-                          <tr key={user.id} onClick={() => setSelectedUserStats(user)} className="hover:bg-muted/70 cursor-pointer transition-colors group">
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <div>
-                                  <p className="font-bold text-foreground text-sm uppercase group-hover:text-primary transition-colors">
-                                    {user.name} {user.role === 'admin' && <span className="ml-2 px-1.5 py-0.5 rounded bg-brand-yellow/30 text-brand-gold font-black text-[10px] tracking-widest border border-brand-gold/30">ADMIN</span>}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-center font-bold text-slate-700">
-                              {user.assigned_courses || 0}
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <span className="font-bold text-xs w-8 text-right text-slate-700">{user.progress_percentage || 0}%</span>
-                                <Progress 
-                                  value={user.progress_percentage || 0} 
-                                  className={`h-2 flex-1 bg-brand-green/10 [&>div]:bg-brand-green`} 
-                                />
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-muted-foreground text-xs font-medium">
-                              {user.last_active || '-'}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-
-            {/* Drilldown User Dialog Overlay */}
-            <Dialog open={!!selectedUserStats} onOpenChange={(open) => !open && setSelectedUserStats(null)}>
-              <DialogContent className="sm:max-w-md border-primary/20 shadow-2xl">
-                <DialogHeader className="border-b pb-4 mb-2">
-                  <DialogTitle className="font-headline text-xl flex items-center gap-2">
-                    <ListChecks className="h-5 w-5 text-primary"/> Expediente Académico
-                  </DialogTitle>
-                  <DialogDescription>
-                    Desglose del avance asignado al operario <strong>{selectedUserStats?.name}</strong>.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
-                  {selectedUserStats?.moduleBreakdown && selectedUserStats.moduleBreakdown.length > 0 ? (
-                     selectedUserStats.moduleBreakdown.map((mb: any, idx: number) => (
-                        <div key={idx} className="bg-white p-4 rounded-xl border border-brand-blue/10 hover:border-brand-blue/30 transition-colors shadow-sm relative overflow-hidden">
-                          {mb.percentage >= 100 && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-green/10 rounded-bl-[100px] pointer-events-none"></div>}
-                          <div className="flex justify-between items-start mb-3 gap-4">
-                             <span className="font-bold text-brand-blue text-sm leading-tight">{mb.title}</span>
-                             <span className={`font-black text-sm px-2 py-0.5 rounded flex-shrink-0 ${mb.percentage >= 100 ? 'bg-brand-green/10 text-brand-green' : 'text-brand-blue bg-brand-lightblue/20'}`}>{mb.percentage}%</span>
-                          </div>
-                          <Progress value={mb.percentage} className={`h-2 ${mb.percentage >= 100 ? '[&>div]:bg-brand-green bg-brand-green/20' : 'bg-slate-100'}`} />
-                          
-                          {mb.percentage >= 100 && mb.id && selectedUserStats?.id && (
-                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                               <span className="text-xs font-bold text-brand-green flex items-center gap-1">
-                                 <Award className="h-4 w-4 text-brand-gold" /> Módulo Aprobado
-                               </span>
-                               <Link href={`/verify/${generateCertId(selectedUserStats.id, mb.id)}`} target="_blank">
-                                 <Button size="sm" className="h-8 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-lg shadow-md shadow-brand-green/20 transition-all">
-                                   <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Ver Certificado
-                                 </Button>
-                               </Link>
-                             </div>
-                           )}
-                        </div>
-                     ))
-                  ) : (
-                     <div className="text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                        <ListChecks className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                        <p className="text-slate-500 text-sm font-medium">Este operario no tiene módulos en curso.</p>
-                     </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-            
-          </TabsContent>
-
-          {/* TAB 2: USUARIOS TÁCTICOS */}
+          {/* TAB 1: User Management */}
           <TabsContent value="users">
-            <Card className="max-w-2xl border-primary/10 shadow-lg mt-6">
-              <CardHeader className="bg-slate-50 border-b">
-                <CardTitle className="flex items-center gap-2 text-xl font-headline"><PlusCircle className="h-5 w-5 text-primary" /> Crear y Matricular Estudiante</CardTitle>
-                <CardDescription>
-                  Un proceso oficial que inyectará una cuenta asegurada de Supabase Auth sin afectar tu conexión de entorno administrativo.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <form onSubmit={handleCreateUser} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="c-name" className="text-slate-800 font-bold">Nombre del Operador (Estudiante)</Label>
-                    <Input id="c-name" placeholder="Inserte nombre completo" value={newUserName} onChange={e=>setNewUserName(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="c-email" className="text-slate-800 font-bold">Correo Acceso Oficial</Label>
-                    <Input id="c-email" type="email" placeholder="Inserte correo electrónico" value={newUserEmail} onChange={e=>setNewUserEmail(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="c-pwd" className="text-slate-800 font-bold">Contraseña Preasignada (Temporal)</Label>
-                    <Input id="c-pwd" type="text" value={newUserPassword} onChange={e=>setNewUserPassword(e.target.value)} required />
-                  </div>
-                  <Button type="submit" disabled={isCreatingUser} className="w-full sm:w-auto h-12 bg-primary px-8 mt-2 shadow-lg hover:bg-primary/90 font-bold">
-                    {isCreatingUser ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Generando Tokens en Backend...</> : "Dar de Alta Estudiante de Inmediato"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <UserManagementTab
+              users={adminUsers.users}
+              filteredUsers={adminUsers.filteredUsers}
+              searchQuery={adminUsers.searchQuery}
+              setSearchQuery={adminUsers.setSearchQuery}
+              onSelectUser={adminUsers.setSelectedUserStats}
+              newUserName={adminUsers.newUserName}
+              setNewUserName={adminUsers.setNewUserName}
+              newUserEmail={adminUsers.newUserEmail}
+              setNewUserEmail={adminUsers.setNewUserEmail}
+              newUserPassword={adminUsers.newUserPassword}
+              setNewUserPassword={adminUsers.setNewUserPassword}
+              isCreatingUser={adminUsers.isCreatingUser}
+              onCreateUser={adminUsers.handleCreateUser}
+              selectedUserStats={adminUsers.selectedUserStats}
+              setSelectedUserStats={adminUsers.setSelectedUserStats}
+            />
           </TabsContent>
 
-          {/* TAB 3: CURRÍCULUMS Y ASIGNACIONES */}
-          <TabsContent value="modules" className="pb-8">
-            <div className="grid lg:grid-cols-2 gap-8 mt-6">
-              
-              {/* Form: Nuevo Modulo */}
-              <Card className="border-accent/10 shadow-lg h-full">
-                <CardHeader className="bg-slate-50 border-b">
-                  <CardTitle className="flex items-center gap-2 text-xl font-headline"><Book className="h-5 w-5 text-accent" /> Forjar Nuevo Módulo</CardTitle>
-                  <CardDescription>
-                    Construir y listar una nueva experiencia empaquetada. Se creará con 1 sección de contenido base.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <form onSubmit={handleCreateModule} className="space-y-5 flex flex-col h-full">
-                    <div className="space-y-2">
-                      <Label htmlFor="m-title" className="text-slate-800 font-bold">Concepto Matriz (Título)</Label>
-                      <Input id="m-title" placeholder="Inserte título" value={newModuleTitle} onChange={e=>setNewModuleTitle(e.target.value)} required />
-                    </div>
-                    <div className="space-y-2 flex-1">
-                      <Label htmlFor="m-desc" className="text-slate-800 font-bold">Descripción Orientativa</Label>
-                      <textarea 
-                        id="m-desc"
-                        required
-                        className="flex min-h-[140px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Inserte descripción orientativa para el módulo"
-                        value={newModuleDesc}
-                        onChange={e=>setNewModuleDesc(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" disabled={isCreatingModule} className="w-full h-12 bg-brand-blue hover:bg-[#163BB5] px-8 text-white mt-4 hover:shadow-lg shadow-brand-blue/20 font-bold">
-                      {isCreatingModule ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Ensamblando Base de Datos...</> : "Ensamblar Módulo Cero"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              {/* Form: Asignar Modulo */}
-              <Card className="border-brand-blue/10 shadow-lg h-full border-t-[5px] border-t-brand-gold bg-white/90 backdrop-blur-sm rounded-2xl">
-                <CardHeader className="bg-white/50 border-b border-brand-blue/5">
-                  <CardTitle className="flex items-center gap-2 text-xl font-headline text-brand-blue"><LinkIcon className="h-5 w-5 text-brand-gold" /> Matricular Alumno a Módulo</CardTitle>
-                  <CardDescription>
-                    Otorga acceso visual al curso para que el estudiante pueda interactuar con el módulo y someterse a evaluación.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <form onSubmit={handleAssignModule} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="a-user" className="text-slate-800 font-bold">Seleccionar Estudiante Objetivo</Label>
-                      <select 
-                        id="a-user" 
-                        required 
-                        className="w-full h-11 px-3 border border-slate-300 rounded-md bg-white text-sm"
-                        value={assignUserId}
-                        onChange={e=>setAssignUserId(e.target.value)}
-                      >
-                        {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.email})</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="a-mod" className="text-slate-800 font-bold">Seleccionar Curriculum Módulo</Label>
-                      <select 
-                        id="a-mod" 
-                        required 
-                        className="w-full h-11 px-3 border border-slate-300 rounded-md bg-white text-sm"
-                        value={assignModuleId}
-                        onChange={e=>setAssignModuleId(e.target.value)}
-                      >
-                        {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
-                      </select>
-                    </div>
-                    <div className="pt-4 border-t border-brand-blue/5">
-                       <Button type="submit" disabled={isAssigning || dbModules.length === 0} className="w-full h-12 bg-brand-gold hover:bg-[#c2933d] text-white shadow-lg shadow-brand-gold/30 font-bold font-headline tracking-wide rounded-xl">
-                        {isAssigning ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Empalmando en Tiempo Real...</> : "Dictar Mandato de Asignación Exclusiva"}
-                      </Button>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-
-            </div>
-
-            {/* ---> Form: Constructor de Contenido Teórico <--- */}
-            <Card className="mt-8 border-brand-blue/10 shadow-lg border-t-[5px] border-t-brand-lightblue overflow-hidden bg-white/80 backdrop-blur-md rounded-2xl">
-               <CardHeader className="bg-white/60 border-b border-brand-blue/5">
-                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-headline text-brand-blue">
-                      <Edit3 className="h-5 w-5 text-brand-lightblue" /> Constructor de Contenido Teórico
-                    </CardTitle>
-                    <CardDescription className="text-slate-500 font-medium pt-1">Modifica los textos, imágenes e incrusta videos en las "Diapositivas" de los módulos en tiempo real.</CardDescription>
-                  </div>
-                  <div className="min-w-64">
-                    <select 
-                      className="w-full h-11 px-3 border border-brand-blue/20 shadow-sm rounded-xl bg-white text-sm font-bold text-brand-blue focus:ring-brand-blue focus:border-brand-blue"
-                      value={editContentModuleId}
-                      onChange={e => setEditContentModuleId(e.target.value)}
-                    >
-                      {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
-                      {dbModules.length === 0 && <option value="">Sin módulos en la base de datos...</option>}
-                    </select>
-                  </div>
-                 </div>
-               </CardHeader>
-               <CardContent className="p-0">
-                  <div className="flex flex-col md:flex-row">
-                    {/* Lateral Sidebar con lista de diapositivas */}
-                    <div className="md:w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-col min-h-[400px]">
-                      <h4 className="font-bold text-slate-700 text-sm mb-4 uppercase tracking-wider">Lecciones / Slides</h4>
-                      
-                      {isLoadingContent ? (
-                        <div className="py-8 flex justify-center text-slate-400">
-                          <Loader2 className="h-6 w-6 animate-spin" />
-                        </div>
-                      ) : contentSections.length === 0 ? (
-                        <p className="text-sm text-slate-500 italic p-3 text-center bg-white rounded-md border border-dashed">El módulo no tiene contenido.</p>
-                      ) : (
-                        <nav className="space-y-2 flex-1 overflow-y-auto">
-                           {contentSections.map((sec, idx) => {
-                              const isModified = draftSections[sec.id]?.isModified;
-                              const isSelected = selectedSectionId === sec.id;
-                              return (
-                                <button 
-                                  key={sec.id}
-                                  type="button"
-                                  onClick={() => loadSectionFromDraft(sec.id)}
-                                  className={`w-full text-left px-3 py-3 rounded-xl text-sm transition-all border shadow-xs flex items-center justify-between gap-2 ${isSelected ? 'bg-sky-100 font-bold border-sky-300 text-sky-900 border-l-4 border-l-sky-600' : 'bg-white opacity-85 hover:opacity-100 border-slate-200 text-slate-600'}`}
-                                >
-                                  <div className="min-w-0 flex-1">
-                                    <span className="block text-[10px] uppercase font-bold text-slate-400 mb-0.5">Sección {idx + 1}</span>
-                                    <span className="line-clamp-2 leading-tight">{sec.title}</span>
-                                  </div>
-                                  {isModified && (
-                                    <span className="shrink-0 text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                      Edición
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                           })}
-                        </nav>
-                      )}
-
-                      <div className="mt-4 pt-4 border-t border-slate-200">
-                        <Button 
-                          onClick={handleAddNewContentSection} 
-                          disabled={isSavingContent || !editContentModuleId} 
-                          variant="outline" 
-                          className="w-full bg-sky-100 border-2 border-sky-300 text-sky-700 hover:bg-brand-blue hover:text-white hover:border-brand-blue font-bold transition-colors"
-                        >
-                          + Inyectar Nueva Lección
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Area Principal Edit */}
-                    <div className="flex-1 p-6 md:p-8 bg-white relative">
-                      {selectedSectionId ? (
-                        <form onSubmit={handleSaveAllContentSections} className="space-y-6 max-w-2xl mx-auto">
-                          
-                          <div className="space-y-2">
-                             <Label className="text-slate-800 font-black text-lg">Título de la Diapositiva</Label>
-                              <Input 
-                                className="h-14 bg-sky-50 border-sky-100 text-lg font-headline font-bold" 
-                                placeholder="Inserte título"
-                                value={editSecTitle} 
-                                onChange={e => {
-                                  setEditSecTitle(e.target.value);
-                                  updateDraftField('title', e.target.value);
-                                }} 
-                                required 
-                              />
-                          </div>
-
-                          <div className="space-y-2">
-                             <div className="flex items-center justify-between">
-                               <Label className="text-slate-800 font-bold">Contenido Teórico / Explicación Escrita</Label>
-                               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                                 <Button
-                                   type="button"
-                                   variant="ghost"
-                                   size="sm"
-                                   onClick={insertBold}
-                                   title="Añadir Negrita (**texto**)"
-                                   className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
-                                 >
-                                   <Bold className="h-4 w-4 mr-1 text-slate-900" /> Negrita
-                                 </Button>
-                                 <div className="h-4 w-px bg-slate-300" />
-                                 <Button
-                                   type="button"
-                                   variant="ghost"
-                                   size="sm"
-                                   onClick={insertBullet}
-                                   title="Añadir Lista con Puntos (• punto)"
-                                   className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
-                                 >
-                                   <List className="h-4 w-4 mr-1 text-slate-900" /> Punteo
-                                 </Button>
-                               </div>
-                             </div>
-
-                             <textarea 
-                                ref={contentTextareaRef}
-                                required
-                                className="flex min-h-[220px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-4 py-3 text-base leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
-                                placeholder="Inserte contenido (puedes usar **negrita** y • viñetas)..."
-                                value={editSecContent}
-                                onChange={e => {
-                                  setEditSecContent(e.target.value);
-                                  updateDraftField('content', e.target.value);
-                                }}
-                             />
-                          </div>
-
-                          <div className="grid sm:grid-cols-2 gap-6">
-                            <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                               <Label className="text-slate-700 font-bold flex items-center gap-1.5"><Video className="w-4 h-4 text-rose-500"/> URL Video YouTube (Opcional)</Label>
-                               <Input 
-                                 className="h-10 text-xs bg-white" 
-                                 placeholder="Inserte URL de YouTube" 
-                                 value={editSecVideo} 
-                                 onChange={e => {
-                                   setEditSecVideo(e.target.value);
-                                   updateDraftField('video_url', e.target.value);
-                                 }} 
-                               />
-                               <p className="text-[10px] text-slate-500">Pega tu link nativo de YouTube aquí sin problemas.</p>
-                            </div>
-                            <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                               <Label className="text-slate-700 font-bold flex items-center gap-1.5"><ImageIcon className="w-4 h-4 text-indigo-500"/> URL Imagen Contextual (Opcional)</Label>
-                               <Input 
-                                 className="h-10 text-xs bg-white" 
-                                 type="url"
-                                 placeholder="Inserte URL de imagen" 
-                                 value={editSecImage} 
-                                 onChange={e => {
-                                   setEditSecImage(e.target.value);
-                                   updateDraftField('image_url', e.target.value);
-                                 }} 
-                               />
-                               <p className="text-[10px] text-slate-500">Apunta a imagen web (.jpg, .png)</p>
-                            </div>
-                          </div>
-
-                          {/* Panel Previsualizador y Generador de Respuestas del Agente de IA */}
-                          <div className="bg-gradient-to-br from-sky-50 to-blue-50/50 border border-sky-200/80 p-5 rounded-2xl space-y-4 shadow-xs">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-200/50 pb-3">
-                              <div>
-                                <h4 className="font-headline font-black text-brand-blue text-sm flex items-center gap-2">
-                                  <Sparkles className="h-4 w-4 text-brand-yellow fill-brand-yellow animate-bounce-subtle" />
-                                  Agente de IA (Resumen & Explicación Adaptativa)
-                                </h4>
-                                <p className="text-[11px] text-slate-500 font-medium">Previsualiza y edita las respuestas pre-cargadas que verán los alumnos.</p>
-                              </div>
-                              <Button
-                                type="button"
-                                onClick={handleGenerateAiForCurrentSection}
-                                disabled={isGeneratingAi}
-                                variant="default"
-                                size="sm"
-                                className="h-10 px-4 bg-brand-blue hover:bg-[#1d4ed8] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
-                              >
-                                {isGeneratingAi ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-brand-yellow" />}
-                                {isGeneratingAi ? "Generando..." : "✨ Generar / Actualizar Respuestas de IA"}
-                              </Button>
-                            </div>
-
-                            <div className="grid sm:grid-cols-2 gap-4">
-                              <div className="space-y-1.5">
-                                <Label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                                  <BookOpen className="h-3.5 w-3.5 text-brand-blue" /> Resumen Rápido (Guardado)
-                                </Label>
-                                <textarea
-                                  className="w-full min-h-[90px] p-3 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 font-medium"
-                                  placeholder="Sin resumen pre-generado. Toca 'Generar con IA' o escribe uno..."
-                                  value={editSecAiSummary}
-                                  onChange={e => {
-                                    setEditSecAiSummary(e.target.value);
-                                    updateDraftField('ai_summary', e.target.value);
-                                  }}
-                                />
-                              </div>
-
-                              <div className="space-y-1.5">
-                                <Label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                                  <Brain className="h-3.5 w-3.5 text-brand-lightblue" /> Explicación Sencilla (JSON / Texto)
-                                </Label>
-                                <textarea
-                                  className="w-full min-h-[90px] p-3 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 font-medium font-mono"
-                                  placeholder="Sin explicación pre-generada. Toca 'Generar con IA' o escribe una..."
-                                  value={editSecAiExplanation}
-                                  onChange={e => {
-                                    setEditSecAiExplanation(e.target.value);
-                                    updateDraftField('ai_explanation', e.target.value);
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-500">
-                              {Object.values(draftSections).filter((s: any) => s.isModified).length > 0 ? (
-                                <span className="text-amber-600 font-black flex items-center gap-1">
-                                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                                  {Object.values(draftSections).filter((s: any) => s.isModified).length} lección(es) modificada(s) pendientes de guardar
-                                </span>
-                              ) : (
-                                <span className="text-emerald-600 flex items-center gap-1">
-                                  <CheckCircle2 className="h-4 w-4" /> Todas las lecciones al día
-                                </span>
-                              )}
-                            </span>
-
-                            <Button 
-                              type="submit" 
-                              disabled={isSavingContent} 
-                              className="h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-black shadow-lg shadow-sky-200 rounded-xl"
-                            >
-                               {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sincronizando Nube...</> : <><Save className="mr-2 h-4 w-4" /> Guardar Cambios del Módulo</>}
-                            </Button>
-                          </div>
-                        </form>
-                      ) : (
-                        <div className="h-full flex flex-col items-center justify-center min-h-[400px] text-center opacity-50">
-                          <Edit3 className="h-16 w-16 text-slate-300 mb-4" />
-                          <h3 className="text-xl font-bold text-slate-600">Ninguna Lección Activa</h3>
-                          <p className="text-slate-500 max-w-xs mt-2">Selecciona un panel a la izquierda o crea una lección para comenzar la edición arquitectónica.</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-               </CardContent>
-            </Card>
-
-
-             {/* ---> Form: Editor de Quiz Avanzado <--- */}
-             <Card className="mt-8 border-rose-100 shadow-lg border-t-[5px] border-t-rose-500">
-              <CardHeader className="bg-slate-50 border-b">
-                <CardTitle className="flex items-center gap-2 text-xl font-headline">
-                  <span className="text-xl">📝</span> Central de Evaluaciones (Quizzes)
-                </CardTitle>
-                <CardDescription>Edita los cuestionarios finales inyectando preguntas exclusivas que medirán la pericia del alumno al final del módulo seleccionado.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="space-y-2 max-w-sm">
-                    <Label htmlFor="q-mod" className="text-slate-800 font-bold">Seleccionar Módulo a Editar</Label>
-                    <select 
-                      id="q-mod" 
-                      className="w-full h-11 px-3 border border-slate-300 rounded-md bg-rose-50/50 text-sm font-medium"
-                      value={quizModuleId}
-                      onChange={e => setQuizModuleId(e.target.value)}
-                    >
-                      {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
-                      {dbModules.length === 0 && <option value="">Sin módulos en la base de datos...</option>}
-                    </select>
-                  </div>
-
-                  {isLoadingQuiz ? (
-                    <div className="py-12 flex justify-center text-slate-400">
-                       <Loader2 className="h-8 w-8 animate-spin" />
-                    </div>
-                  ) : !quizSectionId ? (
-                    <div className="mt-6 p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center text-center">
-                      <p className="text-slate-600 mb-6 max-w-md font-medium">Este módulo actualmente no tiene ninguna Evaluación Final insertada en su malla curricular. Debes generar el contenedor físico en Supabase antes de inyectar preguntas.</p>
-                      <Button onClick={handleCreateQuizSection} disabled={isCreatingQuizSection || !quizModuleId} className="bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200 text-white font-bold h-12 px-6">
-                        {isCreatingQuizSection ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Generando Segmento Base...</> : "Activar Motor de Examen para el Módulo"}
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="mt-6 pt-4 border-t border-slate-100">
-                       <div className="mb-8 space-y-3">
-                         <h4 className="font-bold text-slate-800 text-lg">Banco de Preguntas Vigentes ({quizQuestions.length})</h4>
-                         {quizQuestions.length === 0 ? (
-                           <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-lg">El banco de datos del examen se encuentra vacío.</p>
-                         ) : (
-                           <ul className="space-y-4">
-                             {quizQuestions.map((q, i) => (
-                               <li key={q.id} className="p-4 bg-white shadow-sm rounded-xl border border-slate-200 group transition-all hover:border-rose-200 hover:shadow-md">
-                                  <p className="font-bold text-slate-800 text-base mb-3"><span className="text-rose-500 mr-1">Q{i + 1}:</span> {q.question}</p>
-                                  <div className="flex gap-2 flex-wrap">
-                                    {q.options.map((opt: string, optIdx: number) => (
-                                      <span key={optIdx} className={`px-3 py-1.5 rounded-md text-xs font-medium shadow-sm transition-all ${q.correct_answer === optIdx ? 'bg-emerald-100 text-emerald-800 border-emerald-300 ring-2 ring-emerald-400 ring-offset-1' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
-                                        {optIdx + 1}. {opt}
-                                      </span>
-                                    ))}
-                                  </div>
-                               </li>
-                             ))}
-                           </ul>
-                         )}
-                       </div>
-
-                       {/* Formulario inyector */}
-                       <form onSubmit={handleAddQuestion} className="bg-rose-50/70 p-6 rounded-2xl border border-rose-200 space-y-5 relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-rose-100/50 rounded-bl-full -z-10" />
-                          <h4 className="font-black text-rose-900 font-headline text-lg">Inyectar Nuevo Paradigma de Pregunta</h4>
-                          <div className="space-y-2">
-                             <Label className="text-slate-800 font-bold">Enunciado / Condición</Label>
-                             <Input className="h-11 bg-white" placeholder="Inserte el enunciado o condición de la pregunta" value={newQuizQuestion} onChange={e=>setNewQuizQuestion(e.target.value)} required />
-                          </div>
-                          <div className="grid sm:grid-cols-4 gap-6">
-                            <div className="sm:col-span-3 space-y-2">
-                               <Label className="text-slate-800 font-bold">Posibles Respuestas (Separar estrictamente por comas ",")</Label>
-                               <Input className="h-11 bg-white border-rose-200" placeholder="Inserte opciones separadas por comas" value={newQuizOptions} onChange={e=>setNewQuizOptions(e.target.value)} required />
-                            </div>
-                            <div className="space-y-2">
-                               <Label className="text-slate-800 font-bold">El Nº Correcto Es</Label>
-                               <Input className="h-11 bg-white border-emerald-200 font-bold text-center text-lg" type="number" min={1} placeholder="Inserte el número" value={newQuizAnswerIdx} onChange={e=>setNewQuizAnswerIdx(parseInt(e.target.value))} required />
-                            </div>
-                          </div>
-                          <Button type="submit" disabled={isCreatingQuizQuestion} className="w-full h-14 bg-rose-900 hover:bg-rose-950 mt-4 text-white font-bold hover:shadow-xl transition-all font-headline text-lg shadow-rose-900/20">
-                             {isCreatingQuizQuestion ? <><Loader2 className="mr-2 h-5 w-5 animate-spin"/> Transmitiendo Nodo Server-Side...</> : "Ensamblar e Inyectar Pregunta Oficial"}
-                          </Button>
-                       </form>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
+          {/* TAB 2: Module Assignment */}
+          <TabsContent value="assign">
+            <ModuleAssignmentCard
+              dbModules={adminUsers.dbModules}
+              students={adminUsers.students}
+              assignUserId={adminUsers.assignUserId}
+              setAssignUserId={adminUsers.setAssignUserId}
+              assignModuleId={adminUsers.assignModuleId}
+              setAssignModuleId={adminUsers.setAssignModuleId}
+              isAssigning={adminUsers.isAssigning}
+              onAssignModule={adminUsers.handleAssignModule}
+            />
           </TabsContent>
 
+          {/* TAB 3: Theory Content Builder & Quiz Manager */}
+          <TabsContent value="content">
+            <TheoryContentBuilderTab
+              dbModules={adminUsers.dbModules}
+              editContentModuleId={theoryBuilder.editContentModuleId}
+              setEditContentModuleId={theoryBuilder.setEditContentModuleId}
+              contentSections={theoryBuilder.contentSections}
+              draftSections={theoryBuilder.draftSections}
+              selectedSectionId={theoryBuilder.selectedSectionId}
+              isLoadingContent={theoryBuilder.isLoadingContent}
+              isSavingContent={theoryBuilder.isSavingContent}
+              isGeneratingAi={theoryBuilder.isGeneratingAi}
+              editSecTitle={theoryBuilder.editSecTitle}
+              setEditSecTitle={theoryBuilder.setEditSecTitle}
+              editSecContent={theoryBuilder.editSecContent}
+              setEditSecContent={theoryBuilder.setEditSecContent}
+              editSecVideo={theoryBuilder.editSecVideo}
+              setEditSecVideo={theoryBuilder.setEditSecVideo}
+              editSecImage={theoryBuilder.editSecImage}
+              setEditSecImage={theoryBuilder.setEditSecImage}
+              editSecAiSummary={theoryBuilder.editSecAiSummary}
+              setEditSecAiSummary={theoryBuilder.setEditSecAiSummary}
+              editSecAiExplanationText={theoryBuilder.editSecAiExplanationText}
+              setEditSecAiExplanationText={theoryBuilder.setEditSecAiExplanationText}
+              editSecAiAnalogy={theoryBuilder.editSecAiAnalogy}
+              setEditSecAiAnalogy={theoryBuilder.setEditSecAiAnalogy}
+              onSelectSection={theoryBuilder.loadSectionFromDraft}
+              onAddSection={theoryBuilder.handleAddNewContentSection}
+              onSaveAllSections={theoryBuilder.handleSaveAllContentSections}
+              onGenerateAi={theoryBuilder.handleGenerateAiForCurrentSection}
+              contentTextareaRef={theoryBuilder.contentTextareaRef}
+              insertBold={theoryBuilder.insertBold}
+              insertBullet={theoryBuilder.insertBullet}
+              updateDraftField={theoryBuilder.updateDraftField}
+              quizManager={quizManager}
+            />
+          </TabsContent>
         </Tabs>
       </main>
     </div>

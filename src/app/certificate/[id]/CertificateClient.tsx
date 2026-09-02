@@ -18,11 +18,17 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   const supabase = createClient();
 
   const certId = React.useMemo(() => {
+    if (data?.certId) {
+      return data.certId;
+    }
     if (userId && moduleId) {
       return generateCertId(userId, moduleId);
     }
+    if (moduleId && moduleId.startsWith('DC-')) {
+      return moduleId;
+    }
     return 'DC-VALIDATED';
-  }, [userId, moduleId]);
+  }, [userId, moduleId, data?.certId]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -35,30 +41,50 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
 
   useEffect(() => {
     async function loadCert() {
-      const { data: authData } = await supabase.auth.getUser();
-      if (!authData.user) {
-        router.push('/auth/login');
-        return;
+      // 1. Try to fetch verified certificate metadata via API endpoint
+      try {
+        const res = await fetch(`/api/verify/${moduleId}`);
+        if (res.ok) {
+          const verifyData = await res.json();
+          if (verifyData.isValid) {
+            setData({
+              userName: verifyData.student,
+              moduleTitle: verifyData.moduleTitle,
+              score: verifyData.score,
+              date: verifyData.date,
+              certId: verifyData.certId
+            });
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("API verification lookup error:", err);
       }
 
-      const uid = authData.user.id;
-      setUserId(uid);
-      
-      const { data: profile } = await supabase.from('profiles').select('name').eq('id', uid).single();
-      const { data: moduleData } = await supabase.from('modules').select('title, module_sections(*)').eq('id', moduleId).single();
-      const { data: progress } = await supabase.from('user_progress').select('*').eq('user_id', uid).eq('module_id', moduleId).single();
+      // 2. Direct student lookup fallback (when moduleId is a direct module ID like 'mod-1')
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData?.user) {
+        const uid = authData.user.id;
+        setUserId(uid);
+        
+        const { data: profile } = await supabase.from('profiles').select('name').eq('id', uid).maybeSingle();
+        const { data: moduleData } = await supabase.from('modules').select('title, module_sections(*)').eq('id', moduleId).maybeSingle();
+        const { data: progress } = await supabase.from('user_progress').select('*').eq('user_id', uid).eq('module_id', moduleId).maybeSingle();
 
-      if (profile && moduleData && progress) {
-        const totalSections = Math.max(1, moduleData.module_sections?.length || 1);
-        const completedLen = Array.isArray(progress.completed_sections) ? progress.completed_sections.length : 0;
-        const modPercentage = Math.round((completedLen / totalSections) * 100);
+        if (profile && moduleData && progress) {
+          const totalSections = Math.max(1, moduleData.module_sections?.length || 1);
+          const completedLen = Array.isArray(progress.completed_sections) ? progress.completed_sections.length : 0;
+          const modPercentage = Math.round((completedLen / totalSections) * 100);
 
-        setData({
-          userName: profile.name,
-          moduleTitle: moduleData.title,
-          score: modPercentage > 100 ? 100 : modPercentage,
-          date: new Date(progress.updated_at || new Date()).toLocaleDateString('es-ES', { timeZone: 'America/Santiago', year: 'numeric', month: 'long', day: 'numeric' })
-        });
+          setData({
+            userName: profile.name,
+            moduleTitle: moduleData.title,
+            score: modPercentage > 100 ? 100 : modPercentage,
+            date: new Date(progress.updated_at || new Date()).toLocaleDateString('es-ES', { timeZone: 'America/Santiago', year: 'numeric', month: 'long', day: 'numeric' }),
+            certId: generateCertId(uid, moduleId)
+          });
+        }
       }
       setLoading(false);
     }

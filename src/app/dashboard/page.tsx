@@ -10,12 +10,14 @@ import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRig
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
+import { generateCertId } from '@/lib/cert-hash';
 import { MotivationalCarousel } from '@/components/dashboard/MotivationalCarousel';
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [assignedModules, setAssignedModules] = useState<any[]>([]);
   const [userEmail, setUserEmail] = useState("Usuario Alumno");
+  const [currentUserId, setCurrentUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -25,7 +27,8 @@ export default function Dashboard() {
 
     async function fetchModules() {
       const { data: authData } = await supabase.auth.getUser();
-      const currentUserId = authData.user?.id;
+      const uid = authData.user?.id || "";
+      setCurrentUserId(uid);
       
       if (authData.user?.email) {
         setUserEmail(authData.user.email);
@@ -34,12 +37,15 @@ export default function Dashboard() {
         setIsAdmin(true);
       }
 
-      if (!currentUserId) return;
+      if (!uid) {
+        setLoading(false);
+        return;
+      }
 
       const { data: upData } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', currentUserId);
+        .eq('user_id', uid);
 
       if (!upData || upData.length === 0) {
         setLoading(false);
@@ -169,7 +175,7 @@ export default function Dashboard() {
                           </Button>
                         </Link>
                         {mod.progress_percentage >= 100 && (
-                          <Link href={`/certificate/${mod.id}`} className="flex-1">
+                          <Link href={`/certificate/${generateCertId(currentUserId, mod.id)}`} className="flex-1">
                               <Button className="w-full h-12 text-base font-bold shadow-lg shadow-brand-gold/30 hover:shadow-brand-gold/50 transition-all bg-brand-gold hover:bg-[#d98a00] text-white" size="lg">
                               <Award className="mr-2 h-5 w-5"/> Ir al Certificado
                             </Button>
