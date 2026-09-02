@@ -203,17 +203,29 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       triggerInstantFocus();
     };
 
+    let focusRestoreTimeout: any = null;
+
+    const triggerDelayedFocus = () => {
+      if (focusRestoreTimeout) clearTimeout(focusRestoreTimeout);
+      focusRestoreTimeout = setTimeout(() => {
+        if (document.hasFocus() && document.visibilityState === 'visible') {
+          triggerInstantFocus();
+        }
+      }, 300);
+    };
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
+        if (focusRestoreTimeout) clearTimeout(focusRestoreTimeout);
         triggerInstantBlur();
       } else {
-        triggerInstantFocus();
+        triggerDelayedFocus();
       }
     };
 
     const handleUserInteractionRestores = () => {
       if (document.hasFocus() && document.visibilityState === 'visible') {
-        triggerInstantFocus();
+        triggerDelayedFocus();
       }
     };
 
@@ -344,12 +356,12 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
 
   return (
     <div id="module-protected-area" className="flex h-dvh bg-background overflow-hidden select-none protect-print protect-mobile-touch relative">
-      {/* Dynamic Anti-Cheat Security Watermark Layer (Prevents anonymous screenshot leaks on Mobile & Web) */}
+      {/* Dynamic Anti-Cheat Security Watermark Layer (Prevents anonymous screenshot leaks on iPhone & Web) */}
       <div 
-        className="pointer-events-none fixed inset-0 z-[35] select-none opacity-[0.07] dark:opacity-[0.10] overflow-hidden"
+        className="pointer-events-none fixed inset-0 z-[35] select-none opacity-[0.12] dark:opacity-[0.15] mix-blend-multiply dark:mix-blend-screen overflow-hidden"
         aria-hidden="true"
         style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='340' height='160' viewBox='0 0 340 160'><text x='50%' y='50%' fill='%23000000' font-size='12' font-family='sans-serif' font-weight='900' text-anchor='middle' transform='rotate(-20 170 80)'>${encodeURIComponent(watermarkText + ' • NO COPIAR')}</text></svg>")`,
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='160' viewBox='0 0 320 160'><text x='50%' y='50%' fill='%231D4ED8' font-size='11' font-family='sans-serif' font-weight='900' text-anchor='middle' transform='rotate(-22 160 80)'>${encodeURIComponent(watermarkText + ' • DÍA CERO')}</text></svg>")`,
           backgroundRepeat: 'repeat'
         }}
       />
