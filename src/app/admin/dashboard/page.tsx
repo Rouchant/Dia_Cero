@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, TrendingUp, Award, ArrowLeft, Search, PlusCircle, Book, Link as LinkIcon, Loader2, Edit3, Image as ImageIcon, Video, Save, ListChecks, ExternalLink } from "lucide-react";
+import { Users, TrendingUp, Award, ArrowLeft, Search, PlusCircle, Book, Link as LinkIcon, Loader2, Edit3, Image as ImageIcon, Video, Save, ListChecks, ExternalLink, Bold, List, Sparkles, Brain, BookOpen, CheckCircle2 } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/ui/logo";
@@ -58,6 +58,13 @@ export default function AdminDashboard() {
   const [editSecContent, setEditSecContent] = useState("");
   const [editSecVideo, setEditSecVideo] = useState("");
   const [editSecImage, setEditSecImage] = useState("");
+  const [editSecAiSummary, setEditSecAiSummary] = useState("");
+  const [editSecAiExplanation, setEditSecAiExplanation] = useState("");
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+
+  // In-memory draft dictionary for multi-section batch editing across slides
+  const [draftSections, setDraftSections] = useState<Record<string, any>>({});
+  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // --- Quiz Editor State ---
   const [quizModuleId, setQuizModuleId] = useState("");
@@ -178,6 +185,56 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizModuleId]);
 
+  // Helper to preserve active section edits in draft map before switching
+  const saveCurrentToDraft = () => {
+    if (!selectedSectionId) return;
+    setDraftSections(prev => {
+      if (!prev[selectedSectionId]) return prev;
+      return {
+        ...prev,
+        [selectedSectionId]: {
+          ...prev[selectedSectionId],
+          title: editSecTitle,
+          content: editSecContent,
+          video_url: editSecVideo,
+          image_url: editSecImage,
+          ai_summary: editSecAiSummary,
+          ai_explanation: editSecAiExplanation
+        }
+      };
+    });
+  };
+
+  const updateDraftField = (field: string, value: any) => {
+    if (!selectedSectionId) return;
+    setDraftSections(prev => {
+      const current = prev[selectedSectionId] || { id: selectedSectionId };
+      return {
+        ...prev,
+        [selectedSectionId]: {
+          ...current,
+          [field]: value,
+          isModified: true
+        }
+      };
+    });
+  };
+
+  const loadSectionFromDraft = (secId: string, customDrafts?: Record<string, any>) => {
+    saveCurrentToDraft();
+    setSelectedSectionId(secId);
+    const map = customDrafts || draftSections;
+    const target = map[secId] || contentSections.find(s => s.id === secId);
+    if (target) {
+      setEditSecTitle(target.title || "");
+      setEditSecContent(target.content || "");
+      setEditSecVideo(target.video_url || "");
+      setEditSecImage(target.image_url || "");
+      setEditSecAiSummary(target.ai_summary || "");
+      setEditSecAiExplanation(typeof target.ai_explanation === 'object' ? JSON.stringify(target.ai_explanation, null, 2) : (target.ai_explanation || ""));
+    }
+  };
+
   // Fetch active Content Editor context
   useEffect(() => {
     async function fetchContentData() {
@@ -192,13 +249,29 @@ export default function AdminDashboard() {
 
       if (sections) {
         setContentSections(sections);
+        const drafts: Record<string, any> = {};
+        sections.forEach((s: any) => {
+          drafts[s.id] = {
+            id: s.id,
+            module_id: s.module_id,
+            title: s.title || '',
+            content: s.content || '',
+            video_url: s.video_url || '',
+            image_url: s.image_url || '',
+            ai_summary: s.ai_summary || '',
+            ai_explanation: typeof s.ai_explanation === 'object' ? JSON.stringify(s.ai_explanation, null, 2) : (s.ai_explanation || ''),
+            isModified: false
+          };
+        });
+        setDraftSections(drafts);
         if (sections.length > 0) {
-          fillContentForm(sections[0]);
+          loadSectionFromDraft(sections[0].id, drafts);
         } else {
           clearContentForm();
         }
       } else {
         setContentSections([]);
+        setDraftSections({});
         clearContentForm();
       }
       setIsLoadingContent(false);
@@ -207,20 +280,83 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editContentModuleId]);
 
-  const fillContentForm = (section: any) => {
-    setSelectedSectionId(section.id);
-    setEditSecTitle(section.title || "");
-    setEditSecContent(section.content || "");
-    setEditSecVideo(section.video_url || "");
-    setEditSecImage(section.image_url || "");
-  };
-
   const clearContentForm = () => {
     setSelectedSectionId(null);
     setEditSecTitle("");
     setEditSecContent("");
     setEditSecVideo("");
     setEditSecImage("");
+    setEditSecAiSummary("");
+    setEditSecAiExplanation("");
+  };
+
+  const insertBold = () => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = editSecContent;
+    const selectedText = text.substring(start, end);
+    
+    let replacement = '';
+    if (selectedText.length > 0) {
+      replacement = `**${selectedText}**`;
+    } else {
+      replacement = `**texto en negrita**`;
+    }
+    
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setEditSecContent(newContent);
+    updateDraftField('content', newContent);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + 2, start + 2 + (selectedText.length || 15));
+    }, 50);
+  };
+
+  const insertBullet = () => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const text = editSecContent;
+    
+    const prefix = (start > 0 && text[start - 1] !== '\n') ? '\n• ' : '• ';
+    const newContent = text.substring(0, start) + prefix + text.substring(start);
+    setEditSecContent(newContent);
+    updateDraftField('content', newContent);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length);
+    }, 50);
+  };
+
+  const handleGenerateAiForCurrentSection = async () => {
+    if (!selectedSectionId || !editSecContent.trim()) {
+      alert("Por favor escribe contenido en la lección antes de solicitar respuestas a la IA.");
+      return;
+    }
+    setIsGeneratingAi(true);
+    try {
+      const sumRes = await summarizeModuleSection({ sectionId: selectedSectionId, sectionContent: editSecContent });
+      const expRes = await explainConceptAdaptively({ sectionId: selectedSectionId, concept: editSecTitle, context: editSecContent.substring(0, 300) });
+      
+      if (sumRes?.summary) {
+        setEditSecAiSummary(sumRes.summary);
+        updateDraftField('ai_summary', sumRes.summary);
+      }
+      
+      if (expRes?.explanation) {
+        const expStr = JSON.stringify(expRes, null, 2);
+        setEditSecAiExplanation(expStr);
+        updateDraftField('ai_explanation', expStr);
+      }
+    } catch (err: any) {
+      alert("Error generando respuestas de IA: " + (err?.message || "Verifique conexión"));
+    } finally {
+      setIsGeneratingAi(false);
+    }
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
@@ -326,39 +462,84 @@ export default function AdminDashboard() {
       alert("Error insertando sección de contenido vacía: " + error.message);
     } else {
       setContentSections([...contentSections, newSec]);
-      fillContentForm(newSec);
+      const updatedDrafts = {
+        ...draftSections,
+        [newSec.id]: {
+          id: newSec.id,
+          module_id: newSec.module_id,
+          title: newSec.title,
+          content: newSec.content,
+          video_url: '',
+          image_url: '',
+          ai_summary: '',
+          ai_explanation: '',
+          isModified: false
+        }
+      };
+      setDraftSections(updatedDrafts);
+      loadSectionFromDraft(newSec.id, updatedDrafts);
     }
     setIsSavingContent(false);
   };
 
-  const handleSaveContentSection = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSectionId) return;
+  const handleSaveAllContentSections = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editContentModuleId) return;
+
     setIsSavingContent(true);
+    try {
+      // Flush current form state into draftSections map
+      const currentDrafts = { ...draftSections };
+      if (selectedSectionId) {
+        currentDrafts[selectedSectionId] = {
+          ...(currentDrafts[selectedSectionId] || {}),
+          title: editSecTitle,
+          content: editSecContent,
+          video_url: editSecVideo,
+          image_url: editSecImage,
+          ai_summary: editSecAiSummary,
+          ai_explanation: editSecAiExplanation
+        };
+      }
 
-    const updates = {
-      title: editSecTitle,
-      content: editSecContent,
-      video_url: editSecVideo || null,
-      image_url: editSecImage || null
-    };
+      const allDraftList = Object.values(currentDrafts).map((s: any) => ({
+        id: s.id,
+        module_id: editContentModuleId,
+        title: s.title,
+        content: s.content,
+        video_url: s.video_url || null,
+        image_url: s.image_url || null,
+        ai_summary: s.ai_summary || null,
+        ai_explanation: s.ai_explanation || null
+      }));
 
-    const { error } = await supabase
-      .from('module_sections')
-      .update(updates)
-      .eq('id', selectedSectionId);
+      if (allDraftList.length > 0) {
+        const { error } = await supabase.from('module_sections').upsert(allDraftList);
+        if (error) {
+          alert("Error guardando lecciones: " + error.message);
+        } else {
+          alert("¡Todas las lecciones del módulo fueron sincronizadas y guardadas exitosamente en Supabase!");
+          
+          // Reset modified flags
+          const resetDrafts: Record<string, any> = {};
+          Object.keys(currentDrafts).forEach(k => {
+            resetDrafts[k] = { ...currentDrafts[k], isModified: false };
+          });
+          setDraftSections(resetDrafts);
 
-    if (error) {
-      alert("Error guardando sección: " + error.message);
-    } else {
-      alert("¡Diapositiva sincronizada exitosamente con la base de datos! Los estudiantes verán el cambio de inmediato.");
-      // Trigger background AI pre-filling for instant zero-latency student experience
-      summarizeModuleSection({ sectionId: selectedSectionId, sectionContent: editSecContent }).catch(() => {});
-      explainConceptAdaptively({ sectionId: selectedSectionId, concept: editSecTitle, context: editSecContent.substring(0, 300) }).catch(() => {});
-      // update local
-      setContentSections(contentSections.map(s => s.id === selectedSectionId ? { ...s, ...updates } : s));
+          // Refresh content sections list
+          const updatedContentSections = contentSections.map(sec => {
+            const d = currentDrafts[sec.id];
+            return d ? { ...sec, ...d } : sec;
+          });
+          setContentSections(updatedContentSections);
+        }
+      }
+    } catch (err: any) {
+      alert("Error en el servidor: " + err.message);
+    } finally {
+      setIsSavingContent(false);
     }
-    setIsSavingContent(false);
   };
 
 
@@ -831,16 +1012,28 @@ export default function AdminDashboard() {
                         <p className="text-sm text-slate-500 italic p-3 text-center bg-white rounded-md border border-dashed">El módulo no tiene contenido.</p>
                       ) : (
                         <nav className="space-y-2 flex-1 overflow-y-auto">
-                           {contentSections.map((sec, idx) => (
-                              <button 
-                                key={sec.id}
-                                onClick={() => fillContentForm(sec)}
-                                className={`w-full text-left px-3 py-3 rounded-md text-sm transition-all border shadow-sm ${selectedSectionId === sec.id ? 'bg-sky-100 font-bold border-sky-300 text-sky-900 border-l-4 border-l-sky-600' : 'bg-white opacity-80 hover:opacity-100 border-slate-200 text-slate-600'}`}
-                              >
-                                <span className="block text-xs text-slate-400 mb-1">Sección {idx + 1}</span>
-                                <span className="line-clamp-2">{sec.title}</span>
-                              </button>
-                           ))}
+                           {contentSections.map((sec, idx) => {
+                              const isModified = draftSections[sec.id]?.isModified;
+                              const isSelected = selectedSectionId === sec.id;
+                              return (
+                                <button 
+                                  key={sec.id}
+                                  type="button"
+                                  onClick={() => loadSectionFromDraft(sec.id)}
+                                  className={`w-full text-left px-3 py-3 rounded-xl text-sm transition-all border shadow-xs flex items-center justify-between gap-2 ${isSelected ? 'bg-sky-100 font-bold border-sky-300 text-sky-900 border-l-4 border-l-sky-600' : 'bg-white opacity-85 hover:opacity-100 border-slate-200 text-slate-600'}`}
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <span className="block text-[10px] uppercase font-bold text-slate-400 mb-0.5">Sección {idx + 1}</span>
+                                    <span className="line-clamp-2 leading-tight">{sec.title}</span>
+                                  </div>
+                                  {isModified && (
+                                    <span className="shrink-0 text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                                      Edición
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                           })}
                         </nav>
                       )}
 
@@ -859,7 +1052,7 @@ export default function AdminDashboard() {
                     {/* Area Principal Edit */}
                     <div className="flex-1 p-6 md:p-8 bg-white relative">
                       {selectedSectionId ? (
-                        <form onSubmit={handleSaveContentSection} className="space-y-6 max-w-2xl mx-auto">
+                        <form onSubmit={handleSaveAllContentSections} className="space-y-6 max-w-2xl mx-auto">
                           
                           <div className="space-y-2">
                              <Label className="text-slate-800 font-black text-lg">Título de la Diapositiva</Label>
@@ -867,19 +1060,52 @@ export default function AdminDashboard() {
                                 className="h-14 bg-sky-50 border-sky-100 text-lg font-headline font-bold" 
                                 placeholder="Inserte título"
                                 value={editSecTitle} 
-                                onChange={e=>setEditSecTitle(e.target.value)} 
+                                onChange={e => {
+                                  setEditSecTitle(e.target.value);
+                                  updateDraftField('title', e.target.value);
+                                }} 
                                 required 
                               />
                           </div>
 
                           <div className="space-y-2">
-                             <Label className="text-slate-800 font-bold">Contenido Teórico / Explicación Escrita</Label>
+                             <div className="flex items-center justify-between">
+                               <Label className="text-slate-800 font-bold">Contenido Teórico / Explicación Escrita</Label>
+                               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                                 <Button
+                                   type="button"
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={insertBold}
+                                   title="Añadir Negrita (**texto**)"
+                                   className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
+                                 >
+                                   <Bold className="h-4 w-4 mr-1 text-slate-900" /> Negrita
+                                 </Button>
+                                 <div className="h-4 w-px bg-slate-300" />
+                                 <Button
+                                   type="button"
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={insertBullet}
+                                   title="Añadir Lista con Puntos (• punto)"
+                                   className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
+                                 >
+                                   <List className="h-4 w-4 mr-1 text-slate-900" /> Punteo
+                                 </Button>
+                               </div>
+                             </div>
+
                              <textarea 
+                                ref={contentTextareaRef}
                                 required
-                                className="flex min-h-[220px] w-full rounded-md border border-slate-200 shadow-inner bg-slate-50 px-4 py-3 text-base leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500"
-                                placeholder="Inserte contenido"
+                                className="flex min-h-[220px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-4 py-3 text-base leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
+                                placeholder="Inserte contenido (puedes usar **negrita** y • viñetas)..."
                                 value={editSecContent}
-                                onChange={e=>setEditSecContent(e.target.value)}
+                                onChange={e => {
+                                  setEditSecContent(e.target.value);
+                                  updateDraftField('content', e.target.value);
+                                }}
                              />
                           </div>
 
@@ -890,7 +1116,10 @@ export default function AdminDashboard() {
                                  className="h-10 text-xs bg-white" 
                                  placeholder="Inserte URL de YouTube" 
                                  value={editSecVideo} 
-                                 onChange={e=>setEditSecVideo(e.target.value)} 
+                                 onChange={e => {
+                                   setEditSecVideo(e.target.value);
+                                   updateDraftField('video_url', e.target.value);
+                                 }} 
                                />
                                <p className="text-[10px] text-slate-500">Pega tu link nativo de YouTube aquí sin problemas.</p>
                             </div>
@@ -901,15 +1130,91 @@ export default function AdminDashboard() {
                                  type="url"
                                  placeholder="Inserte URL de imagen" 
                                  value={editSecImage} 
-                                 onChange={e=>setEditSecImage(e.target.value)} 
+                                 onChange={e => {
+                                   setEditSecImage(e.target.value);
+                                   updateDraftField('image_url', e.target.value);
+                                 }} 
                                />
                                <p className="text-[10px] text-slate-500">Apunta a imagen web (.jpg, .png)</p>
                             </div>
                           </div>
 
-                          <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-end">
-                            <Button type="submit" disabled={isSavingContent} className="h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-bold shadow-lg shadow-sky-200">
-                               {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Empujando Nieve DB...</> : <><Save className="mr-2 h-4 w-4" /> Guardar y Reemplazar Nube</>}
+                          {/* Panel Previsualizador y Generador de Respuestas del Agente de IA */}
+                          <div className="bg-gradient-to-br from-sky-50 to-blue-50/50 border border-sky-200/80 p-5 rounded-2xl space-y-4 shadow-xs">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-200/50 pb-3">
+                              <div>
+                                <h4 className="font-headline font-black text-brand-blue text-sm flex items-center gap-2">
+                                  <Sparkles className="h-4 w-4 text-brand-yellow fill-brand-yellow animate-bounce-subtle" />
+                                  Agente de IA (Resumen & Explicación Adaptativa)
+                                </h4>
+                                <p className="text-[11px] text-slate-500 font-medium">Previsualiza y edita las respuestas pre-cargadas que verán los alumnos.</p>
+                              </div>
+                              <Button
+                                type="button"
+                                onClick={handleGenerateAiForCurrentSection}
+                                disabled={isGeneratingAi}
+                                variant="default"
+                                size="sm"
+                                className="h-10 px-4 bg-brand-blue hover:bg-[#1d4ed8] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
+                              >
+                                {isGeneratingAi ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-brand-yellow" />}
+                                {isGeneratingAi ? "Generando..." : "✨ Generar / Actualizar Respuestas de IA"}
+                              </Button>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                  <BookOpen className="h-3.5 w-3.5 text-brand-blue" /> Resumen Rápido (Guardado)
+                                </Label>
+                                <textarea
+                                  className="w-full min-h-[90px] p-3 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 font-medium"
+                                  placeholder="Sin resumen pre-generado. Toca 'Generar con IA' o escribe uno..."
+                                  value={editSecAiSummary}
+                                  onChange={e => {
+                                    setEditSecAiSummary(e.target.value);
+                                    updateDraftField('ai_summary', e.target.value);
+                                  }}
+                                />
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                  <Brain className="h-3.5 w-3.5 text-brand-lightblue" /> Explicación Sencilla (JSON / Texto)
+                                </Label>
+                                <textarea
+                                  className="w-full min-h-[90px] p-3 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 font-medium font-mono"
+                                  placeholder="Sin explicación pre-generada. Toca 'Generar con IA' o escribe una..."
+                                  value={editSecAiExplanation}
+                                  onChange={e => {
+                                    setEditSecAiExplanation(e.target.value);
+                                    updateDraftField('ai_explanation', e.target.value);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-500">
+                              {Object.values(draftSections).filter((s: any) => s.isModified).length > 0 ? (
+                                <span className="text-amber-600 font-black flex items-center gap-1">
+                                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                  {Object.values(draftSections).filter((s: any) => s.isModified).length} lección(es) modificada(s) pendientes de guardar
+                                </span>
+                              ) : (
+                                <span className="text-emerald-600 flex items-center gap-1">
+                                  <CheckCircle2 className="h-4 w-4" /> Todas las lecciones al día
+                                </span>
+                              )}
+                            </span>
+
+                            <Button 
+                              type="submit" 
+                              disabled={isSavingContent} 
+                              className="h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-black shadow-lg shadow-sky-200 rounded-xl"
+                            >
+                               {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sincronizando Nube...</> : <><Save className="mr-2 h-4 w-4" /> Guardar Cambios del Módulo</>}
                             </Button>
                           </div>
                         </form>

@@ -17,6 +17,52 @@ import { Card } from "@/components/ui/card";
 import { Trophy } from "lucide-react";
 import Link from 'next/link';
 
+function renderBoldText(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*|<b>.*?<\/b>)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-black text-brand-blue dark:text-sky-300">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('<b>') && part.endsWith('</b>')) {
+      return <strong key={i} className="font-black text-brand-blue dark:text-sky-300">{part.slice(3, -4)}</strong>;
+    }
+    return part;
+  });
+}
+
+function FormattedTheoryContent({ content }: { content: string }) {
+  if (!content) return null;
+  const lines = content.split('\n');
+
+  return (
+    <div className="space-y-3 text-base md:text-lg leading-relaxed text-foreground/90 font-body">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+          const bulletText = trimmed.replace(/^[-*•]\s*/, '');
+          return (
+            <div key={idx} className="flex items-start gap-3 pl-2 sm:pl-4 my-1.5">
+              <span className="h-2 w-2 rounded-full bg-brand-blue shrink-0 mt-2.5 shadow-sm" />
+              <p className="flex-1 text-foreground/90">{renderBoldText(bulletText)}</p>
+            </div>
+          );
+        }
+
+        if (trimmed === '') {
+          return <div key={idx} className="h-2" />;
+        }
+
+        return (
+          <p key={idx} className="leading-relaxed">
+            {renderBoldText(line)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ModuleViewer({ moduleId }: { moduleId: string }) {
   const router = useRouter();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -517,9 +563,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                   {/* Bottom: Text & AI */}
                   <div className="w-full max-w-3xl space-y-6 flex flex-col pb-6 mx-auto">
                     <div className="prose prose-lg max-w-none text-foreground/80 leading-relaxed font-body">
-                      <p className="whitespace-pre-wrap text-base md:text-lg">
-                        {currentSection.content}
-                      </p>
+                      <FormattedTheoryContent content={currentSection.content || ""} />
                     </div>
 
                     {/* Celebration Card for Final Section */}
