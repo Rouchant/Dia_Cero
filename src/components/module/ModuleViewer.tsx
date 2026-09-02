@@ -14,6 +14,7 @@ import { createClient } from '@/utils/supabase/client';
 import { Logo } from "@/components/ui/logo";
 import { useRouter } from 'next/navigation';
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Trophy } from "lucide-react";
 import Link from 'next/link';
 
@@ -546,19 +547,28 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative h-full overflow-hidden">
         {/* Header */}
-        <header className="h-16 border-b bg-white/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+        <header className="h-16 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 gap-4 sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+            <Button variant="ghost" size="icon" className="lg:hidden shrink-0" onClick={() => setSidebarOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-sm sm:text-lg font-headline font-bold text-foreground truncate flex-1 min-w-0">
-              {currentSection.title}
-            </h1>
+            <div className="min-w-0 flex-1">
+              <h1 
+                className="text-sm sm:text-base md:text-lg font-headline font-bold text-foreground truncate" 
+                title={currentSection.title}
+              >
+                {currentSection.title}
+              </h1>
+            </div>
           </div>
-          <div className="hidden sm:flex items-center gap-4">
-             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-               {moduleData.title}
-             </span>
+          <div className="hidden sm:flex items-center shrink-0">
+            <Badge 
+              variant="outline" 
+              className="px-3 py-1 text-xs font-semibold bg-brand-blue/5 text-brand-blue border-brand-blue/20 tracking-wider uppercase max-w-[260px] md:max-w-[340px] lg:max-w-[450px] truncate shadow-2xs select-none"
+              title={moduleData.title}
+            >
+              <span className="truncate">{moduleData.title}</span>
+            </Badge>
           </div>
         </header>
 
