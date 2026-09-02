@@ -10,6 +10,7 @@ import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRig
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
+import { MotivationalCarousel } from '@/components/dashboard/MotivationalCarousel';
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -213,15 +214,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-brand-lightblue/20 to-brand-yellow/20 border-brand-blue/10 shadow-inner rounded-3xl">
-               <CardContent className="p-6 flex flex-col items-center text-center">
-                  <div className="h-14 w-14 bg-white rounded-full shadow-md flex items-center justify-center mb-4 border border-brand-blue/5">
-                    <Clock className="h-7 w-7 text-brand-gold" />
-                  </div>
-                  <h4 className="font-headline font-black text-brand-blue mb-2 text-lg">Ritmo de Aprendizaje</h4>
-                  <p className="text-sm text-brand-blue/80 font-medium">Mantén una racha constante para absorber las normativas más eficientemente.</p>
-               </CardContent>
-            </Card>
+            <MotivationalCarousel />
           </div>
         </div>
       </main>

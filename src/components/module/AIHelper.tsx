@@ -88,26 +88,27 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
 
   return (
     <div className={`space-y-4 transition-all duration-500 ${loading ? 'opacity-80 scale-[0.98]' : 'opacity-100 scale-100'}`}>
-      <div className="flex flex-col sm:flex-row gap-2">
+      {/* Mobile side-by-side layout (grid grid-cols-2) with generous 48px touch height & Duolingo 3D tactile buttons */}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3 w-full">
         <Button 
+          type="button"
           variant="default" 
-          size="sm" 
           onClick={handleSummarize} 
           disabled={loading}
-          className="hover-lift bg-brand-blue hover:bg-[#1e40af] text-white font-bold rounded-xl shadow-md px-4 h-10 flex-1 sm:flex-initial active:scale-95 transition-all"
+          className="w-full h-12 sm:h-11 bg-brand-blue hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md border-b-4 border-[#153bb3] active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3"
         >
-          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2 animate-bounce-subtle" />}
-          Resumen Rápido
+          {loading ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0 text-white animate-bounce-subtle" />}
+          <span className="truncate leading-tight">Resumen Rápido</span>
         </Button>
         <Button 
+          type="button"
           variant="default" 
-          size="sm" 
           onClick={handleSimplify} 
           disabled={loading}
-          className="hover-lift bg-brand-green hover:bg-[#34ce70] text-slate-950 font-black rounded-xl shadow-md px-4 h-10 flex-1 sm:flex-initial active:scale-95 transition-all"
+          className="w-full h-12 sm:h-11 bg-brand-lightblue hover:bg-[#0369a1] active:bg-[#075985] text-white font-black text-xs sm:text-sm rounded-xl sm:rounded-2xl shadow-md border-b-4 border-[#075985] active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-1.5 px-2 sm:px-4 py-3"
         >
-          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2 animate-pulse" />}
-          Explicar de Forma Sencilla
+          {loading ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Brain className="h-4 w-4 shrink-0 text-white animate-pulse" />}
+          <span className="truncate leading-tight">Explicar Sencillo</span>
         </Button>
       </div>
 

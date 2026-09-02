@@ -346,10 +346,10 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     <div id="module-protected-area" className="flex h-dvh bg-background overflow-hidden select-none protect-print protect-mobile-touch relative">
       {/* Dynamic Anti-Cheat Security Watermark Layer (Prevents anonymous screenshot leaks on Mobile & Web) */}
       <div 
-        className="pointer-events-none fixed inset-0 z-[35] select-none opacity-[0.035] dark:opacity-[0.06] overflow-hidden"
+        className="pointer-events-none fixed inset-0 z-[35] select-none opacity-[0.07] dark:opacity-[0.10] overflow-hidden"
         aria-hidden="true"
         style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='180' viewBox='0 0 360 180'><text x='50%' y='50%' fill='%23000000' font-size='11' font-family='sans-serif' font-weight='800' text-anchor='middle' transform='rotate(-22 180 90)'>${encodeURIComponent(watermarkText + ' - DIACERO ANTI-LEAK')}</text></svg>")`,
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='340' height='160' viewBox='0 0 340 160'><text x='50%' y='50%' fill='%23000000' font-size='12' font-family='sans-serif' font-weight='900' text-anchor='middle' transform='rotate(-20 170 80)'>${encodeURIComponent(watermarkText + ' • NO COPIAR')}</text></svg>")`,
           backgroundRepeat: 'repeat'
         }}
       />

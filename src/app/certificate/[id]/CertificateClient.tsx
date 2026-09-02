@@ -92,28 +92,33 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
      </div>
   );
 
-  // Layout specifically engineered for Strict US LETTER PORTRAIT length
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
       
-      {/* Forzar tamaño Carta (Letter) Vertical en la impresora física + Prevenir Salto de Página */}
+      {/* Reglas CSS de Impresión Universales (Garantiza fondo blanco puro y proporciones perfectas en Carta y A4) */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
-          @page { size: letter portrait; margin: 0; }
-          html, body { 
-             width: 8.5in !important; 
-             height: 11in !important; 
+          @page { 
+            size: letter portrait; 
+            margin: 0; 
+          }
+          *, *:before, *:after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          html, body, #__next, body > div, .min-h-screen { 
+             width: 100% !important; 
+             height: 100% !important; 
              margin: 0 !important; 
              padding: 0 !important; 
              overflow: hidden !important;
-             -webkit-print-color-adjust: exact; 
-             print-color-adjust: exact; 
-             background-color: white !important;
+             background: #FFFFFF !important;
+             background-color: #FFFFFF !important;
           }
           .certificate-paper {
-             width: 8.5in !important;
-             height: 11in !important;
-             max-height: 11in !important;
+             width: 100% !important;
+             height: 100vh !important;
+             max-height: 100vh !important;
              page-break-after: avoid !important;
              page-break-before: avoid !important;
              page-break-inside: avoid !important;
@@ -124,6 +129,12 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
              left: 0 !important;
              padding: 0 !important;
              margin: 0 !important;
+             background: #FFFFFF !important;
+             background-color: #FFFFFF !important;
+          }
+          .certificate-paper-inner {
+             inset: 0.4in !important;
+             padding: 1.25rem !important;
           }
         }
       `}} />
@@ -146,14 +157,14 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
         </Button>
       </div>
 
-      {/* Actual Certificate Document Wrapper (Strict US Letter Format: 8.5 x 11 inches) */}
+      {/* Actual Certificate Document Wrapper */}
       <div className="certificate-paper w-full max-w-[8.5in] aspect-[8.5/11] bg-white text-brand-blue relative overflow-hidden shadow-2xl mx-auto flex flex-col items-center">
          
          {/* Internal Borders and Graphics */}
-         <div className="absolute inset-4 sm:inset-6 md:inset-8 border-[6px] border-double border-brand-blue/30 flex flex-col items-center p-6 sm:p-8 md:p-12 text-center bg-white z-10 before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] before:from-brand-lightblue/10 before:to-transparent before:-z-10 print:inset-6 print:p-8">
+         <div className="certificate-paper-inner absolute inset-4 sm:inset-6 md:inset-8 border-[6px] border-double border-brand-blue/30 flex flex-col items-center p-6 sm:p-8 md:p-10 text-center bg-white z-10 before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] before:from-brand-lightblue/10 before:to-transparent before:-z-10 print:inset-6 print:p-6">
             
             {/* Header: Auth Badges & Logo */}
-            <div className="w-full flex justify-between items-start mb-6 md:mb-12 print:mb-14">
+            <div className="w-full flex justify-between items-start mb-4 md:mb-8 print:mb-3">
                <div className="flex items-center gap-2 md:gap-3 bg-brand-lightblue/10 px-4 py-2 rounded-lg border border-brand-blue/10 shadow-sm print:shadow-none print:border-none print:bg-transparent print:px-0">
                  <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-brand-gold" />
                  <div className="text-left leading-tight">
@@ -164,52 +175,52 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                <Logo className="opacity-90" />
             </div>
 
-            <Award className="h-16 w-16 md:h-24 md:w-24 text-brand-blue/5 mb-6 md:mb-8 print:mb-10 block pointer-events-none" />
+            <Award className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 text-brand-blue/10 mb-3 md:mb-6 print:mb-3 print:h-12 print:w-12 block pointer-events-none" />
 
             {/* Core Typography Block */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-brand-blue mb-1 uppercase print:text-5xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-brand-blue mb-1 uppercase print:text-4xl">
                Certificado
             </h1>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-green tracking-widest mb-8 md:mb-12 uppercase print:text-3xl print:mb-16">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-green tracking-widest mb-6 md:mb-8 uppercase print:text-2xl print:mb-4">
                de Aprobación
             </h2>
             
-            <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-[0.2em] mb-4 md:mb-6 font-medium print:text-[11px]">
+            <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-[0.2em] mb-3 md:mb-4 font-medium print:text-[10px] print:mb-2">
                El presente documento formativo reconoce formalmente a
             </p>
 
-            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-brand-blue font-headline mb-8 md:mb-12 border-b-[3px] border-brand-lightblue/40 pb-2 md:pb-4 inline-block px-4 md:px-12 uppercase tracking-wide print:text-4xl print:mb-16">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-brand-blue font-headline mb-6 md:mb-8 border-b-[3px] border-brand-lightblue/40 pb-2 md:pb-3 inline-block px-4 md:px-12 uppercase tracking-wide print:text-3xl print:mb-4">
                {data.userName}
             </h3>
 
-            <p className="text-xs md:text-sm lg:text-base text-slate-600 font-medium mb-4 max-w-xl leading-relaxed mx-auto px-4 print:text-sm print:max-w-2xl">
+            <p className="text-xs md:text-sm text-slate-600 font-medium mb-3 max-w-xl leading-relaxed mx-auto px-4 print:text-xs print:max-w-xl print:mb-2">
               Por haber participado, asimilado y completado exitosamente con nivel de suficiencia, la examinación integral del programa de instrucción técnica:
             </p>
             
-            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-green max-w-xl mx-auto uppercase py-4 leading-snug print:text-lg">
+            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-green max-w-xl mx-auto uppercase py-2 leading-snug print:text-base print:py-1">
               "{data.moduleTitle}"
             </h4>
 
-            {/* Spacer against overflowing bounds */}
+            {/* Flexible Spacer */}
             <div className="flex-1"></div>
 
-            {/* Footer Signatures (Stacked or spaced differently for Vertical) */}
-            <div className="w-full flex justify-between items-end mt-12 md:mt-24 px-2 md:px-8 pb-4 print:mt-16">
+            {/* Footer Signatures & QR */}
+            <div className="w-full flex justify-between items-end mt-6 md:mt-12 px-2 md:px-8 pb-2 print:mt-auto print:pb-2">
                <div className="text-center w-1/3 flex flex-col items-center justify-end">
                  <div className="relative mb-1">
-                   <span className="font-signature text-3xl sm:text-4xl text-brand-blue font-bold tracking-wide transform -rotate-6 block select-none pointer-events-none drop-shadow-sm">
+                   <span className="font-signature text-2xl sm:text-3xl md:text-4xl text-brand-blue font-bold tracking-wide transform -rotate-6 block select-none pointer-events-none drop-shadow-sm print:text-2xl">
                      DiaCero
                    </span>
                  </div>
-                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
-                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Comité Evaluador</p>
-                 <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Plataforma Diacero</p>
+                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-2 print:bg-brand-blue/40"></div>
+                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[9px]">Comité Evaluador</p>
+                 <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-0.5 print:text-[7px]">Plataforma Diacero</p>
                </div>
                
                <div className="flex flex-col items-center justify-end w-1/3">
-                 <div className="bg-brand-yellow/10 text-brand-gold border-[3px] border-brand-gold/30 rounded-full h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 flex flex-col items-center justify-center p-2 shadow-lg relative -top-4 sm:-top-6 md:-top-8 print:h-28 print:w-28 print:shadow-none print:bg-white print:border-brand-gold">
-                    <span className="text-[7px] sm:text-[8px] md:text-[9px] font-black uppercase tracking-wider opacity-80 mb-0.5 print:text-[8px] print:tracking-wider">Rendimiento</span>
-                    <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight print:text-2xl">{data.score}%</span>
+                 <div className="bg-brand-yellow/10 text-brand-gold border-[3px] border-brand-gold/30 rounded-full h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 flex flex-col items-center justify-center p-2 shadow-lg relative -top-2 sm:-top-4 print:h-18 print:w-18 print:shadow-none print:bg-white print:border-brand-gold">
+                    <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-wider opacity-80 mb-0.5 print:text-[7px]">Rendimiento</span>
+                    <span className="text-base sm:text-xl md:text-2xl font-black tracking-tight print:text-lg">{data.score}%</span>
                  </div>
                </div>
 
@@ -219,23 +230,23 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                    target="_blank" 
                    rel="noopener noreferrer" 
                    title="Verificar Sello Electrónico Oficial"
-                   className="inline-block mb-2 group cursor-pointer"
+                   className="inline-block mb-1 group cursor-pointer"
                  >
                    <img 
                      src={qrCodeUrl} 
                      alt="QR Sello Electrónico Formal" 
-                     className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 print:h-20 print:w-20 object-contain mx-auto border-0 rounded-none shadow-none group-hover:scale-105 transition-all duration-200" 
+                     className="h-14 w-14 sm:h-18 sm:w-18 md:h-20 md:w-20 print:h-14 print:w-14 object-contain mx-auto border-0 rounded-none shadow-none group-hover:scale-105 transition-all duration-200" 
                    />
                  </a>
-                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-3 print:bg-brand-blue/40"></div>
-                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[10px]">Otorgado el {data.date}</p>
+                 <div className="h-px w-20 md:w-32 bg-brand-blue/30 mx-auto mb-2 print:bg-brand-blue/40"></div>
+                 <p className="text-[8px] md:text-[10px] font-black text-brand-blue uppercase tracking-wider print:text-[9px]">Otorgado el {data.date}</p>
                  <a 
                    href={verifyUrl} 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    className="hover:underline cursor-pointer"
                  >
-                   <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-1 print:text-[8px]">Sello Electrónico Formal (ID-{certId})</p>
+                   <p className="text-[6px] md:text-[8px] text-slate-500 font-medium uppercase mt-0.5 print:text-[7px]">Sello Electrónico Formal (ID-{certId})</p>
                  </a>
                </div>
             </div>
