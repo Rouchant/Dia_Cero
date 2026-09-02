@@ -24,23 +24,23 @@ export default {
       },
       colors: {
         brand: {
-          /* Verde vibrante neón/menta */
-          green: '#41E884',      /* #41E884: Verde vibrante de alta energía */
+          /* Verde vibrante esmeralda con excelente contraste sobre blanco */
+          green: '#16B364',      /* #16B364: Verde menta esmeralda vivo y legible */
 
           /* Rosa magenta energético */
-          pink: '#E841A5',       /* #E841A5: Magenta/rosa vivo */
+          pink: '#E0247D',       /* #E0247D: Magenta frambuesa vibrante */
 
-          /* Azul eléctrico vibrante */
-          blue: '#5505F5',       /* #5505F5: Azul eléctrico / violeta profundo */
+          /* Azul eléctrico puro (Azul real saturado, sin tonos púrpuras) */
+          blue: '#1D4ED8',       /* #1D4ED8: Azul eléctrico real de alto contraste */
 
-          /* Azul celeste / cian brillante */
-          lightblue: '#05A5F5',  /* #05A5F5: Azul cielo brillante */
+          /* Azul cian brillante definido */
+          lightblue: '#0284C7',  /* #0284C7: Azul cerúleo/cielo */
 
-          /* Amarillo sol neón */
-          yellow: '#F5CD05',     /* #F5CD05: Amarillo brillante sol */
+          /* Amarillo sol denso para legibilidad sobre blanco */
+          yellow: '#EAB308',     /* #EAB308: Amarillo ámbar cálido */
 
-          /* Oro bandera alemana (Bundesflagge Gold: #FFCE00 calibrado para interfaz) */
-          gold: '#d3ab0aff',       /* Oro alemán brillante */
+          /* Oro denso */
+          gold: '#D4A017',       /* #D4A017: Oro brillante */
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
