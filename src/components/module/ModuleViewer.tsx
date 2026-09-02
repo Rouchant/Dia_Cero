@@ -570,14 +570,14 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                 <div className="flex-1 flex flex-col gap-6 md:gap-8 items-center justify-start min-h-0 h-full overflow-y-auto py-4 px-2">
                   
                   {/* Top: Media */}
-                  <div className="w-full max-w-md md:max-w-lg lg:max-w-xl flex flex-col justify-center items-center shrink-0 mx-auto">
+                  <div className="w-full max-w-md flex flex-col justify-center items-center shrink-0 mx-auto">
                     {currentSection.image_url && (
-                      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
+                      <div className="relative w-full aspect-video max-h-[220px] sm:max-h-[250px] flex items-center justify-center">
                         <Image 
                           src={currentSection.image_url} 
                           alt={currentSection.title}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           priority
                           data-ai-hint={currentSection.image_hint}
                         />
@@ -585,7 +585,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
                     )}
                     
                     {currentSection.video_url && (
-                      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-xl bg-black">
+                      <div className="relative w-full aspect-video max-h-[220px] sm:max-h-[250px] rounded-xl overflow-hidden shadow-md bg-black">
                         <iframe 
                           src={parseVideoUrl(currentSection.video_url)} 
                           className="absolute inset-0 w-full h-full"

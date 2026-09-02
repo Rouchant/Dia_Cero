@@ -44,7 +44,8 @@ interface TheoryContentBuilderTabProps {
   insertBullet: () => void;
   updateDraftField: (field: string, val: any) => void;
   quizManager: any;
-  onRenameModule?: (modId: string, newTitle: string) => Promise<void>;
+  onRenameModule?: (modId: string, newTitle: string, newDescription?: string) => Promise<void>;
+  onCreateModule?: (title: string, description: string) => Promise<any>;
 }
 
 export function TheoryContentBuilderTab({
@@ -80,18 +81,27 @@ export function TheoryContentBuilderTab({
   insertBullet,
   updateDraftField,
   quizManager,
-  onRenameModule
+  onRenameModule,
+  onCreateModule
 }: TheoryContentBuilderTabProps) {
   const [activeMode, setActiveMode] = useState<'theory' | 'quiz'>('theory');
 
-  // Rename Module Modal State
+  // Rename & Edit Module Info Modal State
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [renameTitleInput, setRenameTitleInput] = useState("");
+  const [renameDescriptionInput, setRenameDescriptionInput] = useState("");
   const [isRenamingModule, setIsRenamingModule] = useState(false);
+
+  // Create Module Modal State
+  const [isCreateModuleModalOpen, setIsCreateModuleModalOpen] = useState(false);
+  const [newModTitle, setNewModTitle] = useState("");
+  const [newModDesc, setNewModDesc] = useState("");
+  const [isCreatingNewModule, setIsCreatingNewModule] = useState(false);
 
   const handleOpenRename = () => {
     const currentMod = dbModules.find(m => m.id === editContentModuleId);
     setRenameTitleInput(currentMod?.title || "");
+    setRenameDescriptionInput(currentMod?.description || "");
     setIsRenameModalOpen(true);
   };
 
@@ -99,42 +109,79 @@ export function TheoryContentBuilderTab({
     e.preventDefault();
     if (!renameTitleInput.trim() || !editContentModuleId || !onRenameModule) return;
     setIsRenamingModule(true);
-    await onRenameModule(editContentModuleId, renameTitleInput.trim());
+    await onRenameModule(editContentModuleId, renameTitleInput.trim(), renameDescriptionInput.trim());
     setIsRenamingModule(false);
     setIsRenameModalOpen(false);
   };
 
+  const handleSaveNewModule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newModTitle.trim() || !onCreateModule) return;
+    setIsCreatingNewModule(true);
+    const createdMod = await onCreateModule(newModTitle.trim(), newModDesc.trim());
+    setIsCreatingNewModule(false);
+    if (createdMod) {
+      setEditContentModuleId(createdMod.id);
+      setIsCreateModuleModalOpen(false);
+      setNewModTitle("");
+      setNewModDesc("");
+    }
+  };
+
   return (
     <Card className="border-sky-100 shadow-xl border-t-[5px] border-t-sky-500 overflow-hidden">
-      <CardHeader className="bg-slate-50/80 border-b flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <CardHeader className="bg-slate-50/80 border-b flex flex-col gap-4 p-6">
         <div>
-          <CardTitle className="flex items-center gap-2 text-xl font-headline">
+          <CardTitle className="flex items-center gap-2 text-xl font-headline text-slate-800">
             <span className="text-xl">📚</span> Constructor Teórico & Evaluaciones (Mallas)
           </CardTitle>
-          <CardDescription>Edita la teoría, recursos multimedia, respuestas de IA y el examen final del módulo.</CardDescription>
+          <CardDescription className="text-slate-500 mt-1">
+            Edita la teoría, recursos multimedia, respuestas de IA y el examen final del módulo.
+          </CardDescription>
         </div>
-        <div className="flex items-center gap-3">
-          <Label htmlFor="c-mod" className="text-xs font-bold uppercase text-slate-500 whitespace-nowrap">Módulo:</Label>
-          <select 
-            id="c-mod" 
-            className="h-10 px-3 border border-slate-300 rounded-md bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500 max-w-[220px] sm:max-w-xs"
-            value={editContentModuleId}
-            onChange={e => setEditContentModuleId(e.target.value)}
-          >
-            {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
-            {dbModules.length === 0 && <option value="">Sin módulos...</option>}
-          </select>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleOpenRename}
-            disabled={!editContentModuleId}
-            className="h-10 px-3 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-lg flex items-center gap-1.5 shrink-0"
-          >
-            <Edit3 className="h-3.5 w-3.5 text-sky-600" /> Renombrar
-          </Button>
+        {/* Fila Inferior: Escoger Módulo, Editar Info y Crear Módulo Nuevo */}
+        <div className="pt-3 border-t border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-1 items-center gap-3">
+            <Label htmlFor="c-mod" className="text-xs font-bold uppercase text-slate-500 whitespace-nowrap">
+              Módulo:
+            </Label>
+            <select 
+              id="c-mod" 
+              className="h-10 px-3 border border-slate-300 rounded-xl bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500 w-full sm:max-w-md"
+              value={editContentModuleId}
+              onChange={e => setEditContentModuleId(e.target.value)}
+            >
+              {dbModules.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+              {dbModules.length === 0 && <option value="">Sin módulos...</option>}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleOpenRename}
+              disabled={!editContentModuleId}
+              className="h-10 px-4 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center gap-1.5"
+            >
+              <Edit3 className="h-3.5 w-3.5 text-sky-600" /> Editar Info
+            </Button>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                setNewModTitle("");
+                setNewModDesc("");
+                setIsCreateModuleModalOpen(true);
+              }}
+              className="h-10 px-4 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-xl flex items-center gap-1.5 shadow-sm"
+            >
+              <PlusCircle className="h-3.5 w-3.5" /> Crear Módulo
+            </Button>
+          </div>
         </div>
       </CardHeader>
       
@@ -578,6 +625,16 @@ export function TheoryContentBuilderTab({
                         }} 
                       />
                       <p className="text-[10px] text-slate-500">Apunta a imagen web (.jpg, .png)</p>
+                      {editSecImage && (
+                        <div className="mt-3 relative w-full max-w-md aspect-video max-h-[220px] sm:max-h-[250px] flex items-center justify-center mx-auto">
+                          <img 
+                            src={editSecImage} 
+                            alt="Previsualización de imagen" 
+                            className="max-h-full max-w-full object-contain" 
+                            onError={e => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -699,16 +756,16 @@ export function TheoryContentBuilderTab({
         </div>
       </CardContent>
 
-      {/* Modal Renombrar Módulo */}
+      {/* Modal Editar Información del Módulo */}
       <Dialog open={isRenameModalOpen} onOpenChange={setIsRenameModalOpen}>
         <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-headline font-black text-slate-800 flex items-center gap-2">
               <Edit3 className="h-5 w-5 text-sky-600" />
-              Renombrar Módulo de Capacitación
+              Editar Información del Módulo
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              Escribe el nuevo nombre oficial que verán los estudiantes en la plataforma y certificados.
+              Modifica el título oficial y la sinopsis introductoria que verán los estudiantes en su Dashboard.
             </DialogDescription>
           </DialogHeader>
 
@@ -724,13 +781,71 @@ export function TheoryContentBuilderTab({
               />
             </div>
 
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-700">Sinopsis / Resumen para los Alumnos</Label>
+              <textarea
+                className="w-full min-h-[95px] p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                placeholder="Escribe la sinopsis que verán los estudiantes antes de comenzar el módulo..."
+                value={renameDescriptionInput}
+                onChange={e => setRenameDescriptionInput(e.target.value)}
+              />
+            </div>
+
             <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsRenameModalOpen(false)} className="h-10 text-xs font-bold rounded-xl">
                 Cancelar
               </Button>
               <Button type="submit" disabled={isRenamingModule} className="h-10 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-6 rounded-xl">
                 {isRenamingModule ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
-                Guardar Título
+                Guardar Información
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Crear Nuevo Módulo */}
+      <Dialog open={isCreateModuleModalOpen} onOpenChange={setIsCreateModuleModalOpen}>
+        <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-headline font-black text-slate-800 flex items-center gap-2">
+              <PlusCircle className="h-5 w-5 text-brand-green" />
+              Crear Nuevo Módulo Académico
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Ingresa el título y la sinopsis para iniciar un nuevo programa de capacitación en la plataforma.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveNewModule} className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-700">Título del Nuevo Módulo</Label>
+              <Input
+                className="h-11 text-xs bg-slate-50 font-bold text-slate-900 rounded-xl placeholder:text-slate-400 placeholder:font-normal"
+                placeholder="Inserta título del módulo..."
+                value={newModTitle}
+                onChange={e => setNewModTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-700">Sinopsis / Descripción del Módulo</Label>
+              <textarea
+                className="w-full min-h-[95px] p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 font-medium leading-relaxed"
+                placeholder="Describe brevemente los objetivos de este nuevo módulo..."
+                value={newModDesc}
+                onChange={e => setNewModDesc(e.target.value)}
+              />
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsCreateModuleModalOpen(false)} className="h-10 text-xs font-bold rounded-xl">
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isCreatingNewModule || !newModTitle.trim()} className="h-10 bg-brand-green hover:bg-[#007048] text-white font-bold text-xs px-6 rounded-xl">
+                {isCreatingNewModule ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <PlusCircle className="h-4 w-4 mr-1" />}
+                Crear Módulo
               </Button>
             </div>
           </form>

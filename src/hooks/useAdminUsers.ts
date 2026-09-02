@@ -108,7 +108,7 @@ export function useAdminUsers() {
     e.preventDefault();
     setIsCreatingUser(true);
     try {
-      const res = await fetch('/api/admin/create-user', {
+      const res = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -126,6 +126,7 @@ export function useAdminUsers() {
       alert("¡Usuario alumno creado exitosamente!");
       setNewUserName("");
       setNewUserEmail("");
+      setNewUserPassword("");
       fetchData();
     } catch (err: any) {
       alert("Error en la operación: " + err.message);
@@ -170,18 +171,48 @@ export function useAdminUsers() {
     setIsAssigning(false);
   };
 
-  const handleRenameModule = async (moduleId: string, newTitle: string) => {
+  const handleRenameModule = async (moduleId: string, newTitle: string, newDescription?: string) => {
     if (!moduleId || !newTitle.trim()) return;
+    const updates: Record<string, any> = { title: newTitle.trim() };
+    if (newDescription !== undefined) {
+      updates.description = newDescription.trim();
+    }
     const { error } = await supabase
       .from('modules')
-      .update({ title: newTitle.trim() })
+      .update(updates)
       .eq('id', moduleId);
 
     if (error) {
-      alert("Error renombrando el módulo: " + error.message);
+      alert("Error actualizando información del módulo: " + error.message);
     } else {
-      setDbModules(prev => prev.map(m => m.id === moduleId ? { ...m, title: newTitle.trim() } : m));
+      setDbModules(prev => prev.map(m => m.id === moduleId ? { ...m, ...updates } : m));
       fetchData();
+    }
+  };
+
+  const handleCreateModule = async (title: string, description: string, customId?: string) => {
+    if (!title.trim()) return null;
+    const baseId = customId?.trim() || title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const finalId = baseId ? (baseId + '-' + Date.now().toString().slice(-4)) : ('mod-' + Date.now());
+
+    const { data: newMod, error } = await supabase
+      .from('modules')
+      .insert({
+        id: finalId,
+        title: title.trim(),
+        description: description?.trim() || 'Sin descripción'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      alert("Error creando el módulo: " + error.message);
+      return null;
+    } else {
+      alert("¡Módulo académico creado exitosamente!");
+      setDbModules(prev => [...prev, newMod]);
+      fetchData();
+      return newMod;
     }
   };
 
@@ -251,6 +282,7 @@ export function useAdminUsers() {
     isAssigning,
     handleAssignModule,
     handleRenameModule,
-    handleResetUserPassword
+    handleResetUserPassword,
+    handleCreateModule
   };
 }

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Book, Users, UserCheck, Settings2 } from "lucide-react";
+import { ArrowLeft, Loader2, Book, Users, UserCheck } from "lucide-react";
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 
@@ -72,16 +72,16 @@ export default function AdminDashboard() {
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="bg-white p-1.5 border border-slate-200 shadow-sm rounded-2xl flex flex-wrap h-auto gap-1">
-            <TabsTrigger value="users" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-brand-blue data-[state=active]:text-white transition-all flex items-center gap-2">
+          <TabsList className="bg-white p-1.5 border border-slate-200 shadow-sm rounded-2xl flex flex-col sm:flex-row flex-wrap h-auto gap-1.5 w-full sm:w-auto">
+            <TabsTrigger value="users" className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-brand-blue data-[state=active]:text-white transition-all flex items-center justify-center sm:justify-start gap-2">
               <Users className="h-4 w-4" />
               Nómina & Progreso Académico
             </TabsTrigger>
-            <TabsTrigger value="control" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all flex items-center gap-2">
+            <TabsTrigger value="control" className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all flex items-center justify-center sm:justify-start gap-2">
               <UserCheck className="h-4 w-4" />
               Control de Cuentas & Asignaciones
             </TabsTrigger>
-            <TabsTrigger value="content" className="px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all flex items-center gap-2">
+            <TabsTrigger value="content" className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all flex items-center justify-center sm:justify-start gap-2">
               <Book className="h-4 w-4" />
               Constructor Teórico & Quizzes
             </TabsTrigger>
@@ -158,6 +158,7 @@ export default function AdminDashboard() {
               updateDraftField={theoryBuilder.updateDraftField}
               quizManager={quizManager}
               onRenameModule={adminUsers.handleRenameModule}
+              onCreateModule={adminUsers.handleCreateModule}
             />
           </TabsContent>
         </Tabs>
