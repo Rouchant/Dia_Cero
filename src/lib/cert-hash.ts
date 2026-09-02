@@ -56,24 +56,31 @@ function computeSignature(base64Data: string): string {
 }
 
 function base64UrlEncode(str: string): string {
-  if (typeof btoa === 'function') {
-    return btoa(encodeURIComponent(str))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
   }
-  return Buffer.from(str).toString('base64url');
+  const base64 = typeof btoa === 'function' ? btoa(binary) : Buffer.from(bytes).toString('base64');
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 function base64UrlDecode(str: string): string {
-  if (typeof atob === 'function') {
-    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) {
-      base64 += '=';
-    }
-    return decodeURIComponent(atob(base64));
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
   }
-  return Buffer.from(str, 'base64url').toString('utf8');
+  let binary = '';
+  if (typeof atob === 'function') {
+    binary = atob(base64);
+  } else {
+    binary = Buffer.from(base64, 'base64').toString('binary');
+  }
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
 }
 
 export function createSignedCertId(payload: CertPayload): string {

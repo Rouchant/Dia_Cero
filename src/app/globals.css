@@ -129,4 +129,13 @@
   pointer-events: none !important;
   transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
 }
+
+/* Protecciones avanzadas para dispositivos móviles (iOS/Android) */
+.protect-mobile-touch {
+  -webkit-touch-callout: none !important; /* Desactiva el menú emergente de presionar y mantener en iOS/Android Safari & Chrome */
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
 

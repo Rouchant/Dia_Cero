@@ -18,7 +18,10 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   const supabase = createClient();
 
   const certId = React.useMemo(() => {
-    return userId ? generateCertId(userId, moduleId) : 'DC-VALIDATED';
+    if (userId && moduleId) {
+      return generateCertId(userId, moduleId);
+    }
+    return 'DC-VALIDATED';
   }, [userId, moduleId]);
 
   useEffect(() => {

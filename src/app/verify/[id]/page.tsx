@@ -15,6 +15,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
   const [loading, setLoading] = useState(true);
   const [certData, setCertData] = useState<{
     isValid: boolean;
+    certId?: string;
     student?: string;
     moduleTitle?: string;
     score?: number;
@@ -100,7 +101,7 @@ export default function VerifyPage({ params }: { params: Promise<{ id: string }>
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Código Hash de Verificación</span>
                 <span className="text-base font-black font-mono text-brand-blue bg-brand-lightblue/20 px-3 py-1 rounded-lg border border-brand-lightblue/30">
-                  {certId.startsWith('DC-') ? certId : `DC-${certId}`}
+                  {certData.certId || (certId.startsWith('DC-') ? certId : `DC-${certId}`)}
                 </span>
               </div>
 

@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Sparkles, Loader2, ChevronRight, BookOpen } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Brain, Sparkles, Loader2, BookOpen } from "lucide-react";
 import { summarizeModuleSection } from '@/ai/flows/ai-module-summary';
 import { explainConceptAdaptively } from '@/ai/flows/ai-adaptive-explanation';
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +23,22 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
   } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Client-side cache to instantly reuse generated content without re-querying
+  const localCache = useRef<{ summary?: string; explanation?: { text: string; analogy?: string; level?: string } }>({});
+
   const handleSummarize = async () => {
+    if (localCache.current.summary) {
+      setSummary(localCache.current.summary);
+      setExplanation(null);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
       const result = await summarizeModuleSection({ sectionContent });
       if (result?.summary) {
+        localCache.current.summary = result.summary;
         setSummary(result.summary);
         setExplanation(null);
       } else {
@@ -36,13 +46,19 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
       }
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
-      setErrorMsg(`Error de IA: ${error?.message || 'Verifica GOOGLE_GENAI_API_KEY y reinicia el servidor (npm run dev).'}`);
+      setErrorMsg(`Error de IA: ${error?.message || 'Verifica la conexión.'}`);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSimplify = async () => {
+    if (localCache.current.explanation) {
+      setExplanation(localCache.current.explanation);
+      setSummary(null);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
@@ -51,18 +67,20 @@ export function AIHelper({ sectionContent, sectionTitle }: AIHelperProps) {
         context: sectionContent.substring(0, 300) 
       });
       if (result?.explanation) {
-        setExplanation({
+        const expData = {
           text: result.explanation,
           analogy: result.analogyUsed,
           level: result.simplicityLevel
-        });
+        };
+        localCache.current.explanation = expData;
+        setExplanation(expData);
         setSummary(null);
       } else {
         setErrorMsg('No se pudo generar la explicación.');
       }
     } catch (error: any) {
       console.error('Error generating AI explanation:', error);
-      setErrorMsg(`Error de IA: ${error?.message || 'Verifica GOOGLE_GENAI_API_KEY y reinicia el servidor (npm run dev).'}`);
+      setErrorMsg(`Error de IA: ${error?.message || 'Verifica la conexión.'}`);
     } finally {
       setLoading(false);
     }

@@ -26,6 +26,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
   const [mounted, setMounted] = useState(false);
   const [moduleData, setModuleData] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const supabase = createClient();
   const [isWindowBlurred, setIsWindowBlurred] = useState(false);
@@ -40,6 +41,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       
       if (currentUserId) {
         setUserId(currentUserId);
+        setUserEmail(authData.user?.email || null);
         
         // Fetch existing progress
         const { data: progress } = await supabase
@@ -215,6 +217,21 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       }
     };
 
+    // Mobile-specific event listeners (iOS & Android)
+    const handleTouchCancel = () => {
+      triggerInstantBlur();
+    };
+
+    const handleMultiTouchStart = (e: TouchEvent) => {
+      if (e.touches && e.touches.length >= 2) {
+        triggerInstantBlur();
+      }
+    };
+
+    const handlePageHide = () => {
+      triggerInstantBlur();
+    };
+
     // Attach listeners on both keydown and keyup for maximum Windows event coverage
     document.addEventListener('copy', handleCopyCutPaste);
     document.addEventListener('cut', handleCopyCutPaste);
@@ -228,6 +245,9 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     window.addEventListener('click', handleUserInteractionRestores);
     window.addEventListener('pointerdown', handleUserInteractionRestores);
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+    window.addEventListener('touchstart', handleMultiTouchStart, { passive: true });
+    window.addEventListener('pagehide', handlePageHide);
 
     return () => {
       // Clean up listeners
@@ -243,6 +263,9 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       window.removeEventListener('click', handleUserInteractionRestores);
       window.removeEventListener('pointerdown', handleUserInteractionRestores);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('touchcancel', handleTouchCancel);
+      window.removeEventListener('touchstart', handleMultiTouchStart);
+      window.removeEventListener('pagehide', handlePageHide);
       const contentEl = document.getElementById('module-protected-content');
       if (contentEl) {
         contentEl.classList.remove('anti-cheat-content-blurred');
@@ -317,8 +340,20 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     correctAnswer: q.correct_answer
   }));
 
+  const watermarkText = (userEmail || userId || 'DIACERO PROTECTED CONTENT').toUpperCase();
+
   return (
-    <div id="module-protected-area" className="flex h-dvh bg-background overflow-hidden select-none protect-print relative">
+    <div id="module-protected-area" className="flex h-dvh bg-background overflow-hidden select-none protect-print protect-mobile-touch relative">
+      {/* Dynamic Anti-Cheat Security Watermark Layer (Prevents anonymous screenshot leaks on Mobile & Web) */}
+      <div 
+        className="pointer-events-none fixed inset-0 z-[35] select-none opacity-[0.035] dark:opacity-[0.06] overflow-hidden"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='180' viewBox='0 0 360 180'><text x='50%' y='50%' fill='%23000000' font-size='11' font-family='sans-serif' font-weight='800' text-anchor='middle' transform='rotate(-22 180 90)'>${encodeURIComponent(watermarkText + ' - DIACERO ANTI-LEAK')}</text></svg>")`,
+          backgroundRepeat: 'repeat'
+        }}
+      />
+
       {isWindowBlurred && (
         <div 
           onClick={() => {
@@ -350,7 +385,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
       )}
 
       {/* Container for Protected Module Content */}
-      <div id="module-protected-content" className="flex h-full w-full overflow-hidden transition-all">
+      <div id="module-protected-content" className="flex h-full w-full overflow-hidden transition-all protect-mobile-touch">
       {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
         <div 
