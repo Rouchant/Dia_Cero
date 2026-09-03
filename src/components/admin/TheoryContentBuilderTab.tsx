@@ -757,9 +757,8 @@ export function TheoryContentBuilderTab({
                           </div>
 
                           <div className="space-y-1.5">
-                            <Label className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
-                              <span>Analogía de la Vida Real</span>
-                              <span className="text-[10px] text-amber-600 font-semibold">(Opcional)</span>
+                            <Label className="text-[11px] font-bold text-slate-700 block">
+                              Analogía de la Vida Real
                             </Label>
                             <textarea
                               spellCheck={true}
