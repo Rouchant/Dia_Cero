@@ -467,7 +467,6 @@ npm run build       # Compilación y optimización para producción
 - **Gestor de Quizzes**: Paleta ámbar/amarillo cálido, radio button interactivo en azul y selector SVG de alta fidelidad.
 - **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
 - **Estabilidad & Cobertura**: 73 tests unitarios automatizados con Vitest (8 suites pasando al 100%) y compilación TypeScript estricta con cero errores.
-- **Limpieza de Código**: Eliminación de componentes de encuesta residuales no utilizados (`FeedbackSurvey`).
 
 ---
 
