@@ -393,28 +393,34 @@ ON CONFLICT (id) DO NOTHING;
 
 ### Variables de Entorno (`.env.local`)
 
+Crea un archivo `.env.local` en la raíz del proyecto (puedes tomar como base [`.env.example`](.env.example)):
+
 ```env
-# ==========================================
+# ==============================================================================
 # Supabase - Acceso Público y de Cliente
-# ==========================================
-NEXT_PUBLIC_SUPABASE_URL=https://<tu-id>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
+# ==============================================================================
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-id-de-proyecto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-public-key>
 
-# ==========================================
-# Supabase - Clave Maestra de Administración (Backend)
-# Requerida para: creación de usuarios, reseteo de contraseñas,
-# gestión de roles RBAC y bypass seguro de RLS en endpoints /api/admin/*
-# ==========================================
-SUPABASE_SERVICE_ROLE_KEY=<tu-service-role-key>
+# ==============================================================================
+# Supabase - Clave Maestra de Administración (Backend) [OBLIGATORIA]
+# ==============================================================================
+# Dónde obtenerla: Supabase Dashboard -> Project Settings -> API -> Project API Keys -> service_role (secret)
+# Requerida para:
+#  1. Alta inmediata de usuarios y creación desde el panel de control.
+#  2. Reseteo y actualización directa de contraseñas de alumnos.
+#  3. Asignación y desvinculación de módulos académicos (/api/admin/*).
+#  4. Sincronización y ejecución de flujos de IA con Supabase.
+SUPABASE_SERVICE_ROLE_KEY=<tu-service-role-secret-key>
 
-# ==========================================
+# ==============================================================================
 # Inteligencia Artificial (Google Gemini)
-# ==========================================
-GOOGLE_GENAI_API_KEY=<tu-google-ai-key>
+# ==============================================================================
+GOOGLE_GENAI_API_KEY=<tu-google-gemini-key>
 ```
 
-> [!IMPORTANT]
-> `SUPABASE_SERVICE_ROLE_KEY` nunca debe exponerse en el cliente (no debe tener el prefijo `NEXT_PUBLIC_`). Es utilizada exclusivamente en rutas de API del servidor (`src/app/api/*`) y en flujos seguros de backend.
+> [!CAUTION]
+> **Seguridad Crítica**: `SUPABASE_SERVICE_ROLE_KEY` otorga acceso de superusuario que ignora las reglas de RLS. **Nunca debe llevar el prefijo `NEXT_PUBLIC_`** ni ser expuesta en el código del cliente. Solo se consume en el servidor (rutas `/api/admin/*`, `verify/actions.ts` y flujos de Genkit).
 
 ### Comandos de Desarrollo
 ```bash
