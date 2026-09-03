@@ -142,12 +142,12 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
       
-      {/* Reglas CSS de Impresión Universales en Formato Horizontal (Landscape) */}
+      {/* Reglas CSS de Impresión Adaptativas (Vertical y Horizontal sin cortes) */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page { 
-            size: landscape; 
-            margin: 6mm 10mm; 
+            size: auto; 
+            margin: 5mm 8mm; 
           }
           *, *::before, *::after {
             -webkit-print-color-adjust: exact !important;
@@ -164,9 +164,6 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
           }
           .certificate-paper {
              width: 100% !important;
-             max-width: 252mm !important;
-             height: 180mm !important;
-             max-height: 180mm !important;
              margin: 0 auto !important;
              padding: 0 !important;
              box-sizing: border-box !important;
@@ -187,7 +184,6 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
              width: 100% !important;
              height: 100% !important;
              border: none !important;
-             padding: 4mm 6mm !important;
              display: flex !important;
              flex-direction: column !important;
              justify-content: space-between !important;
@@ -203,25 +199,69 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
              content: none !important;
           }
           .certificate-qr-img {
-             width: 44px !important;
-             height: 44px !important;
-             max-width: 44px !important;
-             max-height: 44px !important;
              object-fit: contain !important;
              margin: 0 auto !important;
              display: block !important;
           }
+          .certificate-logo {
+             width: auto !important;
+             object-fit: contain !important;
+          }
+        }
+
+        /* Orientación Vertical (Portrait) -> La que se ve súper bien */
+        @media print and (orientation: portrait) {
+          .certificate-paper {
+             max-width: 185mm !important;
+             height: 232mm !important;
+             max-height: 232mm !important;
+          }
+          .certificate-paper-inner {
+             padding: 6mm 8mm !important;
+          }
+          .certificate-qr-img {
+             width: 48px !important;
+             height: 48px !important;
+             max-width: 48px !important;
+             max-height: 48px !important;
+          }
           .certificate-seal {
-             width: 54px !important;
-             height: 54px !important;
-             max-width: 54px !important;
-             max-height: 54px !important;
+             width: 58px !important;
+             height: 58px !important;
+             max-width: 58px !important;
+             max-height: 58px !important;
           }
           .certificate-logo {
              height: 8.5mm !important;
-             width: auto !important;
              max-height: 8.5mm !important;
-             object-fit: contain !important;
+          }
+        }
+
+        /* Orientación Horizontal (Landscape) -> Altura calibrada a 154mm para no cortarse con el pie de iPhone */
+        @media print and (orientation: landscape) {
+          .certificate-paper {
+             max-width: 255mm !important;
+             height: 154mm !important;
+             max-height: 154mm !important;
+          }
+          .certificate-paper-inner {
+             padding: 3mm 8mm !important;
+          }
+          .certificate-qr-img {
+             width: 40px !important;
+             height: 40px !important;
+             max-width: 40px !important;
+             max-height: 40px !important;
+          }
+          .certificate-seal {
+             width: 48px !important;
+             height: 48px !important;
+             max-width: 48px !important;
+             max-height: 48px !important;
+          }
+          .certificate-logo {
+             height: 7.5mm !important;
+             max-height: 7.5mm !important;
           }
         }
       `}} />
