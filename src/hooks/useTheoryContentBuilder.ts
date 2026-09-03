@@ -253,6 +253,49 @@ export function useTheoryContentBuilder(dbModules: any[]) {
     });
   };
 
+  const insertNumberedList = () => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = editSecContent;
+    const scrollTop = textarea.scrollTop;
+    const selectedText = text.substring(start, end);
+    
+    let replacement = '';
+    if (selectedText.length > 0) {
+      const lines = selectedText.split('\n');
+      let counter = 1;
+      const numberedLines = lines.map(line => {
+        if (!line.trim()) {
+          return line;
+        }
+        if (/^\d+\.\s/.test(line.trim())) {
+          return line;
+        }
+        return `${counter++}. ${line}`;
+      });
+      replacement = numberedLines.join('\n');
+    } else {
+      const prefix = (start > 0 && text[start - 1] !== '\n') ? '\n1. ' : '1. ';
+      replacement = prefix;
+    }
+    
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setEditSecContent(newContent);
+    updateDraftField('content', newContent);
+    
+    requestAnimationFrame(() => {
+      textarea.focus({ preventScroll: true });
+      textarea.scrollTop = scrollTop;
+      if (selectedText.length > 0) {
+        textarea.setSelectionRange(start, start + replacement.length);
+      } else {
+        textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+      }
+    });
+  };
+
   const handleGenerateAiForCurrentSection = async () => {
     if (!selectedSectionId || !editSecContent.trim()) {
       alert("Por favor escribe contenido en la lección antes de solicitar respuestas a la IA.");
@@ -472,6 +515,7 @@ export function useTheoryContentBuilder(dbModules: any[]) {
     contentTextareaRef,
     insertBold,
     insertBullet,
+    insertNumberedList,
     updateDraftField
   };
 }

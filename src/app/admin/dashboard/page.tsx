@@ -176,6 +176,7 @@ export default function AdminDashboard() {
               contentTextareaRef={theoryBuilder.contentTextareaRef}
               insertBold={theoryBuilder.insertBold}
               insertBullet={theoryBuilder.insertBullet}
+              insertNumberedList={theoryBuilder.insertNumberedList}
               updateDraftField={theoryBuilder.updateDraftField}
               quizManager={quizManager}
               onRenameModule={adminUsers.handleRenameModule}

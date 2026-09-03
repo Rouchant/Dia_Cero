@@ -245,8 +245,12 @@ export function QuizManagerCard({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-slate-800 font-bold text-xs">4 Posibles Respuestas</Label>
-                    <span className="text-[11px] text-rose-600 font-semibold flex items-center gap-1">
-                      🔘 Marca con el botón cuál es la Respuesta Correcta
+                    <span className="text-[11px] text-rose-600 font-semibold flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                        <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
+                        <circle cx="256" cy="256" r="144" fill="currentColor"/>
+                      </svg>
+                      <span>= Respuesta Correcta</span>
                     </span>
                   </div>
 
@@ -339,7 +343,13 @@ export function QuizManagerCard({
                     <div className="space-y-2">
                       <Label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                         <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
-                        <span className="text-[10px] text-emerald-600 font-semibold">🔘 Radio = Respuesta Correcta</span>
+                        <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                            <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
+                            <circle cx="256" cy="256" r="144" fill="currentColor"/>
+                          </svg>
+                          <span>= Respuesta Correcta</span>
+                        </span>
                       </Label>
                       <div className="grid grid-cols-1 gap-2.5">
                         {[

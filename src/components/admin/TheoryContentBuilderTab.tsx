@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { 
-  Edit3, Video, Image as ImageIcon, Save, Bold, List, Sparkles, Brain, BookOpen, 
+  Edit3, Video, Image as ImageIcon, Save, Bold, List, ListOrdered, Sparkles, Brain, BookOpen, 
   CheckCircle2, Loader2, HelpCircle, Trash2, Check, PlusCircle 
 } from "lucide-react";
 
@@ -42,6 +42,7 @@ interface TheoryContentBuilderTabProps {
   contentTextareaRef: React.RefObject<HTMLTextAreaElement | null>;
   insertBold: () => void;
   insertBullet: () => void;
+  insertNumberedList?: () => void;
   updateDraftField: (field: string, val: any) => void;
   quizManager: any;
   onRenameModule?: (modId: string, newTitle: string, newDescription?: string) => Promise<void>;
@@ -81,6 +82,7 @@ export function TheoryContentBuilderTab({
   contentTextareaRef,
   insertBold,
   insertBullet,
+  insertNumberedList,
   updateDraftField,
   quizManager,
   onRenameModule,
@@ -184,15 +186,15 @@ export function TheoryContentBuilderTab({
             </select>
           </div>
 
-          {/* Fila 2: Botones de Editar y Crear Módulo ocupan toda la fila */}
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+          {/* Fila 2: Botones de Editar y Crear Módulo (en celular usan toda la fila, en escritorio tienen ancho equilibrado) */}
+          <div className="grid grid-cols-2 sm:flex sm:justify-end gap-2.5 sm:gap-3 w-full">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleOpenRename}
               disabled={!editContentModuleId}
-              className="w-full h-11 px-3 sm:px-4 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all"
+              className="w-full sm:w-auto h-10 px-4 sm:px-6 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all"
             >
               <Edit3 className="h-4 w-4 text-sky-600 shrink-0" />
               <span>Editar Info</span>
@@ -206,7 +208,7 @@ export function TheoryContentBuilderTab({
                 setNewModDesc("");
                 setIsCreateModuleModalOpen(true);
               }}
-              className="w-full h-11 px-3 sm:px-4 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="w-full sm:w-auto h-10 px-4 sm:px-6 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               <PlusCircle className="h-4 w-4 shrink-0" />
               <span>Crear Módulo</span>
@@ -301,17 +303,12 @@ export function TheoryContentBuilderTab({
           <div className="flex-1 p-6 md:p-8 bg-white relative">
             {activeMode === 'quiz' ? (
               /* VISTA EDITOR DE QUIZZES INTEGRADA */
-              <div className="space-y-6 max-w-3xl mx-auto">
-                <div className="flex items-center justify-between border-b pb-4">
-                  <div>
-                    <h3 className="text-xl font-headline font-black text-rose-900 flex items-center gap-2">
-                      <span className="text-xl">📝</span> Evaluación Final del Módulo
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1">Configura las preguntas que responderán los alumnos al finalizar este módulo.</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setActiveMode('theory')} className="text-xs font-bold">
-                    Volver a Teoría
-                  </Button>
+              <div className="space-y-6 max-w-5xl mx-auto w-full">
+                <div className="border-b pb-4">
+                  <h3 className="text-xl font-headline font-black text-rose-900 flex items-center gap-2">
+                    <span className="text-xl">📝</span> Evaluación Final del Módulo
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">Configura las preguntas que responderán los alumnos al finalizar este módulo.</p>
                 </div>
 
                 {quizManager.isLoadingQuiz ? (
@@ -440,8 +437,12 @@ export function TheoryContentBuilderTab({
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label className="text-slate-800 font-bold text-xs">4 Posibles Respuestas</Label>
-                          <span className="text-[10px] text-rose-600 font-semibold">
-                            🔘 Selecciona con el radio cuál es la Correcta
+                          <span className="text-[10px] text-rose-600 font-semibold flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                              <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
+                              <circle cx="256" cy="256" r="144" fill="currentColor"/>
+                            </svg>
+                            <span>= Respuesta Correcta</span>
                           </span>
                         </div>
 
@@ -534,7 +535,13 @@ export function TheoryContentBuilderTab({
                           <div className="space-y-2">
                             <Label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                               <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
-                              <span className="text-[10px] text-emerald-600 font-semibold">🔘 Radio = Respuesta Correcta</span>
+                              <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                                  <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
+                                  <circle cx="256" cy="256" r="144" fill="currentColor"/>
+                                </svg>
+                                <span>= Respuesta Correcta</span>
+                              </span>
                             </Label>
                             <div className="grid grid-cols-1 gap-2.5">
                               {[
@@ -597,7 +604,7 @@ export function TheoryContentBuilderTab({
             ) : (
               /* VISTA EDITOR DE DIAPOSITIVAS TEÓRICAS */
               selectedSectionId ? (
-                <form onSubmit={onSaveAllSections} className="space-y-6 max-w-2xl mx-auto">
+                <form onSubmit={onSaveAllSections} className="space-y-6 max-w-5xl mx-auto w-full">
                   {/* Cabecera de la Sección con Botón Eliminar */}
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <span className="text-xs font-black uppercase text-sky-800 tracking-wider flex items-center gap-1.5">
@@ -639,30 +646,35 @@ export function TheoryContentBuilderTab({
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <Label className="text-slate-800 font-bold text-xs sm:text-sm">Contenido Teórico / Explicación Escrita</Label>
-                      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                        <Button
+                      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 self-start sm:self-auto">
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
                           onClick={insertBold}
                           title="Añadir Negrita (**texto**)"
-                          className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
+                          className="h-8 px-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-transparent hover:bg-white hover:shadow-2xs rounded-md flex items-center transition-all cursor-pointer"
                         >
-                          <Bold className="h-4 w-4 mr-1 text-slate-900" /> Negrita
-                        </Button>
+                          <Bold className="h-3.5 w-3.5 mr-1 text-slate-800" /> Negrita
+                        </button>
                         <div className="h-4 w-px bg-slate-300" />
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
                           onClick={insertBullet}
                           title="Añadir Lista con Puntos (• punto)"
-                          className="h-8 px-2 text-xs font-bold hover:bg-white text-slate-700 rounded-md"
+                          className="h-8 px-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-transparent hover:bg-white hover:shadow-2xs rounded-md flex items-center transition-all cursor-pointer"
                         >
-                          <List className="h-4 w-4 mr-1 text-slate-900" /> Punteo
-                        </Button>
+                          <List className="h-3.5 w-3.5 mr-1 text-slate-800" /> Punteo
+                        </button>
+                        <div className="h-4 w-px bg-slate-300" />
+                        <button
+                          type="button"
+                          onClick={insertNumberedList}
+                          title="Añadir Lista Numerada (1. elemento)"
+                          className="h-8 px-2.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-transparent hover:bg-white hover:shadow-2xs rounded-md flex items-center transition-all cursor-pointer"
+                        >
+                          <ListOrdered className="h-3.5 w-3.5 mr-1 text-slate-800" /> Numeración
+                        </button>
                       </div>
                     </div>
 
@@ -833,27 +845,37 @@ export function TheoryContentBuilderTab({
                     </div>
                   </div>
 
-                  <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500">
+                  <div className="pt-6 mt-4 border-t border-slate-100 space-y-4">
+                    {/* Fila 1: Única columna completamente centrada en el centro */}
+                    <div className="w-full flex justify-center items-center text-center text-xs font-bold text-slate-500">
                       {Object.values(draftSections).filter((s: any) => s.isModified).length > 0 ? (
-                        <span className="text-amber-600 font-black flex items-center gap-1">
-                          <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                          {Object.values(draftSections).filter((s: any) => s.isModified).length} lección(es) modificada(s) pendientes de guardar
+                        <span className="text-amber-600 font-black flex items-center justify-center gap-1.5 text-center">
+                          <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                          <span>{Object.values(draftSections).filter((s: any) => s.isModified).length} lección(es) modificada(s) pendientes de guardar</span>
                         </span>
                       ) : (
-                        <span className="text-emerald-600 flex items-center gap-1">
-                          <CheckCircle2 className="h-4 w-4" /> Todas las lecciones al día
+                        <span className="text-emerald-600 font-bold flex items-center justify-center gap-1.5 text-center">
+                          <CheckCircle2 className="h-4 w-4 shrink-0" />
+                          <span>Todas las lecciones al día</span>
                         </span>
                       )}
-                    </span>
+                    </div>
 
-                    <Button 
-                      type="submit" 
-                      disabled={isSavingContent} 
-                      className="h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-black shadow-lg shadow-sky-200 rounded-xl"
-                    >
-                      {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sincronizando Nube...</> : <><Save className="mr-2 h-4 w-4" /> Guardar Cambios</>}
-                    </Button>
+                    {/* Fila 2: Columna izquierda vacía, columna derecha con botón ocupándola completamente */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                      <div className="hidden sm:block" />
+                      <Button 
+                        type="submit" 
+                        disabled={isSavingContent} 
+                        className="w-full h-12 bg-sky-600 hover:bg-sky-700 text-white font-black shadow-lg shadow-sky-200 rounded-xl flex items-center justify-center gap-2"
+                      >
+                        {isSavingContent ? (
+                          <><Loader2 className="h-4 w-4 animate-spin shrink-0"/> Sincronizando Nube...</>
+                        ) : (
+                          <><Save className="h-4 w-4 shrink-0" /> Guardar Cambios</>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </form>
               ) : (
