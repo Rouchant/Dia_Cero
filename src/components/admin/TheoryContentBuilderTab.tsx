@@ -391,7 +391,7 @@ export function TheoryContentBuilderTab({
                       <div className="space-y-1.5">
                         <Label className="text-slate-800 font-bold text-xs">Enunciado de la Pregunta</Label>
                         <textarea
-                          className="w-full min-h-[85px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
+                          className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
                           placeholder="Ej: ¿Cuál es la primera acción preventiva en trabajo en altura?"
                           value={quizManager.newQuizQuestion}
                           onChange={e => quizManager.setNewQuizQuestion(e.target.value)}
@@ -486,7 +486,7 @@ export function TheoryContentBuilderTab({
                           <div className="space-y-1.5">
                             <Label className="text-xs font-bold text-slate-800">Enunciado de la Pregunta</Label>
                             <textarea
-                              className="w-full min-h-[85px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
+                              className="w-full min-h-[140px] sm:min-h-[90px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
                               value={quizManager.editQStatement}
                               onChange={e => quizManager.setEditQStatement(e.target.value)}
                               spellCheck={true}
@@ -627,7 +627,7 @@ export function TheoryContentBuilderTab({
                       data-gramm="true"
                       data-enable-grammarly="true"
                       data-ms-editor="true"
-                      className="flex min-h-[420px] sm:min-h-[520px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
+                      className="flex min-h-[500px] sm:min-h-[520px] md:min-h-[560px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
                       placeholder="Inserte contenido (puedes usar **negrita** y • viñetas)..."
                       value={editSecContent}
                       onChange={e => {
@@ -713,7 +713,7 @@ export function TheoryContentBuilderTab({
                           data-gramm="true"
                           data-enable-grammarly="true"
                           data-ms-editor="true"
-                          className="w-full min-h-[140px] sm:min-h-[160px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                          className="w-full min-h-[220px] sm:min-h-[160px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                           placeholder="Sin resumen pre-generado. Toca 'Generar con IA' o escribe uno..."
                           value={editSecAiSummary}
                           onChange={e => {
@@ -746,7 +746,7 @@ export function TheoryContentBuilderTab({
                               data-gramm="true"
                               data-enable-grammarly="true"
                               data-ms-editor="true"
-                              className="w-full min-h-[160px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                              className="w-full min-h-[220px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                               placeholder="Sin explicación pre-generada. Toca 'Generar con IA' o escribe una..."
                               value={editSecAiExplanationText}
                               onChange={e => {
@@ -769,7 +769,7 @@ export function TheoryContentBuilderTab({
                               data-gramm="true"
                               data-enable-grammarly="true"
                               data-ms-editor="true"
-                              className="w-full min-h-[160px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                              className="w-full min-h-[220px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                               placeholder="Ej: Como ponerse el cinturón antes de conducir..."
                               value={editSecAiAnalogy}
                               onChange={e => {
@@ -859,7 +859,7 @@ export function TheoryContentBuilderTab({
                 data-gramm="true"
                 data-enable-grammarly="true"
                 data-ms-editor="true"
-                className="w-full min-h-[95px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                className="w-full min-h-[140px] sm:min-h-[100px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                 placeholder="Escribe la sinopsis que verán los estudiantes antes de comenzar el módulo..."
                 value={renameDescriptionInput}
                 onChange={e => setRenameDescriptionInput(e.target.value)}
@@ -920,7 +920,7 @@ export function TheoryContentBuilderTab({
                 data-gramm="true"
                 data-enable-grammarly="true"
                 data-ms-editor="true"
-                className="w-full min-h-[95px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 font-medium leading-relaxed"
+                className="w-full min-h-[140px] sm:min-h-[100px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 font-medium leading-relaxed"
                 placeholder="Describe brevemente los objetivos de este nuevo módulo..."
                 value={newModDesc}
                 onChange={e => setNewModDesc(e.target.value)}

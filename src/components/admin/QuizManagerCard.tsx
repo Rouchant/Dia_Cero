@@ -226,7 +226,7 @@ export function QuizManagerCard({
                 <div className="space-y-1.5">
                   <Label className="text-slate-800 font-bold text-xs">Enunciado / Pregunta</Label>
                   <textarea
-                    className="w-full min-h-[85px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
+                    className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
                     placeholder="Ej: ¿Cuál es el plazo máximo para presentar la denuncia DIAT/DIEP?"
                     value={newQuizQuestion}
                     onChange={e => setNewQuizQuestion(e.target.value)}
@@ -321,7 +321,7 @@ export function QuizManagerCard({
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-800">Enunciado de la Pregunta</Label>
                       <textarea
-                        className="w-full min-h-[85px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
+                        className="w-full min-h-[140px] sm:min-h-[90px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
                         value={editQStatement}
                         onChange={e => setEditQStatement(e.target.value)}
                         spellCheck={true}
