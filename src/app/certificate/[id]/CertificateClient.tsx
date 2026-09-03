@@ -128,7 +128,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
             size: letter portrait; 
             margin: 0; 
           }
-          *, *:before, *:after {
+          *, *::before, *::after {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
@@ -137,30 +137,42 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
              height: 100% !important; 
              margin: 0 !important; 
              padding: 0 !important; 
-             overflow: hidden !important;
+             overflow: visible !important;
              background: #FFFFFF !important;
              background-color: #FFFFFF !important;
           }
           .certificate-paper {
-             width: 100% !important;
-             height: 100vh !important;
-             max-height: 100vh !important;
+             width: 8.5in !important;
+             height: 11in !important;
+             max-width: 8.5in !important;
+             max-height: 11in !important;
+             aspect-ratio: 8.5/11 !important;
              page-break-after: avoid !important;
              page-break-before: avoid !important;
              page-break-inside: avoid !important;
              border: none !important;
              box-shadow: none !important;
-             position: absolute !important;
+             position: relative !important;
              top: 0 !important;
              left: 0 !important;
-             padding: 0 !important;
-             margin: 0 !important;
+             padding: 0.35in !important;
+             margin: 0 auto !important;
              background: #FFFFFF !important;
              background-color: #FFFFFF !important;
           }
           .certificate-paper-inner {
-             inset: 0.4in !important;
-             padding: 1.25rem !important;
+             position: relative !important;
+             inset: auto !important;
+             width: 100% !important;
+             height: 100% !important;
+             padding: 1.5rem !important;
+             background: #FFFFFF !important;
+             background-color: #FFFFFF !important;
+             border: 5px double rgba(29, 78, 216, 0.4) !important;
+          }
+          .certificate-paper-inner::before {
+             display: none !important;
+             content: none !important;
           }
         }
       `}} />
@@ -170,27 +182,27 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
         <Button 
           type="button"
           onClick={() => router.push('/dashboard')} 
-          className="w-full sm:w-auto hover-lift bg-brand-lightblue hover:bg-[#0ea5e9] text-white font-black shadow-lg shadow-brand-lightblue/20 rounded-xl px-6 h-12 active:scale-95 transition-all"
+          className="w-full sm:w-auto hover-lift bg-brand-lightblue hover:bg-[#0ea5e9] text-white font-semibold shadow-lg shadow-brand-lightblue/20 rounded-xl px-6 h-12 active:scale-95 transition-all"
         >
            <ArrowLeft className="mr-2 h-4 w-4"/> Volver al Panel
         </Button>
         <Button 
           type="button"
           onClick={handlePrint} 
-          className="w-full sm:w-auto bg-brand-blue hover:bg-brand-blue/90 text-white font-black shadow-lg shadow-brand-blue/20 border border-brand-blue rounded-xl px-6 h-12 active:scale-95 transition-all flex items-center justify-center gap-2"
+          className="w-full sm:w-auto bg-brand-blue hover:bg-brand-blue/90 text-white font-semibold shadow-lg shadow-brand-blue/20 border border-brand-blue rounded-xl px-6 h-12 active:scale-95 transition-all flex items-center justify-center gap-2"
         >
            <Printer className="h-5 w-5"/> Imprimir o Guardar PDF
         </Button>
       </div>
 
       {/* Actual Certificate Document Wrapper */}
-      <div className="certificate-paper w-full max-w-[8.5in] aspect-[8.5/11] bg-white text-brand-blue relative overflow-hidden shadow-2xl mx-auto flex flex-col items-center">
+      <div className="certificate-paper w-full max-w-[8.5in] sm:aspect-[8.5/11] bg-white text-brand-blue relative shadow-2xl mx-auto flex flex-col items-center rounded-2xl sm:rounded-none overflow-hidden">
          
          {/* Internal Borders and Graphics */}
-         <div className="certificate-paper-inner absolute inset-4 sm:inset-6 md:inset-8 border-[6px] border-double border-brand-blue/30 flex flex-col items-center p-6 sm:p-8 md:p-10 text-center bg-white z-10 before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] before:from-brand-lightblue/10 before:to-transparent before:-z-10 print:inset-6 print:p-6">
+         <div className="certificate-paper-inner w-full sm:absolute sm:inset-6 md:inset-8 border-[4px] sm:border-[6px] border-double border-brand-blue/30 flex flex-col items-center p-4 sm:p-8 md:p-10 text-center bg-white z-10 print:inset-6 print:p-6">
             
             {/* Header: Auth Badges & Logo */}
-            <div className="w-full flex justify-between items-start mb-4 md:mb-8 print:mb-3">
+            <div className="w-full flex justify-between items-start mb-3 sm:mb-6 md:mb-8 print:mb-3">
                <div className="flex items-center gap-2 md:gap-3 bg-brand-lightblue/10 px-4 py-2 rounded-lg border border-brand-blue/10 shadow-sm print:shadow-none print:border-none print:bg-transparent print:px-0">
                  <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-brand-gold" />
                  <div className="text-left leading-tight">
@@ -201,34 +213,34 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                <Logo className="opacity-90" />
             </div>
 
-            <Award className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 text-brand-blue/10 mb-3 md:mb-6 print:mb-3 print:h-12 print:w-12 block pointer-events-none" />
+            <Award className="h-10 w-10 sm:h-16 sm:w-16 md:h-20 md:w-20 text-brand-blue/10 mb-2 sm:mb-4 md:mb-6 print:mb-3 print:h-12 print:w-12 block pointer-events-none" />
 
             {/* Core Typography Block */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tighter text-brand-blue mb-1 uppercase print:text-4xl">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-headline font-semibold tracking-tight text-brand-blue mb-1 uppercase print:text-4xl">
                Certificado
             </h1>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-light text-brand-green tracking-widest mb-6 md:mb-8 uppercase print:text-2xl print:mb-4">
+            <h2 className="text-lg sm:text-2xl md:text-3xl font-headline font-light text-brand-green tracking-widest mb-3 sm:mb-6 md:mb-8 uppercase print:text-2xl print:mb-4">
                de Aprobación
             </h2>
             
-            <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-[0.2em] mb-3 md:mb-4 font-medium print:text-[10px] print:mb-2">
+            <p className="text-[9px] sm:text-xs text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-2 sm:mb-3 md:mb-4 font-medium print:text-[10px] print:mb-2">
                El presente documento formativo reconoce formalmente a
             </p>
 
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-brand-blue font-headline mb-6 md:mb-8 border-b-[3px] border-brand-lightblue/40 pb-2 md:pb-3 inline-block px-4 md:px-12 uppercase tracking-wide print:text-3xl print:mb-4">
+            <h3 className="text-xl sm:text-3xl md:text-4xl font-semibold text-brand-blue font-headline mb-3 sm:mb-6 md:mb-8 border-b-[2px] sm:border-b-[3px] border-brand-lightblue/40 pb-1.5 sm:pb-3 inline-block px-4 md:px-12 uppercase tracking-wide print:text-3xl print:mb-4">
                {data.userName}
             </h3>
 
-            <p className="text-xs md:text-sm text-slate-600 font-medium mb-3 max-w-xl leading-relaxed mx-auto px-4 print:text-xs print:max-w-xl print:mb-2">
+            <p className="text-xs md:text-sm text-slate-600 font-medium mb-2 sm:mb-3 max-w-xl leading-relaxed mx-auto px-4 print:text-xs print:max-w-xl print:mb-2">
               Por haber participado, asimilado y completado exitosamente con nivel de suficiencia, la examinación integral del programa de instrucción técnica:
             </p>
             
-            <h4 className="text-base md:text-lg lg:text-xl font-black text-brand-green max-w-xl mx-auto uppercase py-2 leading-snug print:text-base print:py-1">
+            <h4 className="text-sm sm:text-lg lg:text-xl font-semibold text-brand-green max-w-xl mx-auto uppercase py-1 sm:py-2 leading-snug print:text-base print:py-1">
               "{data.moduleTitle}"
             </h4>
 
             {/* Flexible Spacer */}
-            <div className="flex-1"></div>
+            <div className="flex-1 min-h-4"></div>
 
             {/* Footer Signatures & QR */}
             <div className="w-full flex justify-between items-end mt-6 md:mt-12 px-2 md:px-8 pb-2 print:mt-auto print:pb-2">
