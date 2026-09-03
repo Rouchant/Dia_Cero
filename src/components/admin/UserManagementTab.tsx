@@ -17,6 +17,9 @@ interface UserManagementTabProps {
   onSelectUser: (user: any) => void;
   selectedUserStats: any;
   setSelectedUserStats: (user: any) => void;
+  onAssignModuleDirectly?: (userId: string, moduleId: string) => Promise<void>;
+  onUnassignModuleDirectly?: (userId: string, moduleId: string) => Promise<void>;
+  isAssigning?: boolean;
 }
 
 export function UserManagementTab({
@@ -25,7 +28,10 @@ export function UserManagementTab({
   setSearchQuery,
   onSelectUser,
   selectedUserStats,
-  setSelectedUserStats
+  setSelectedUserStats,
+  onAssignModuleDirectly,
+  onUnassignModuleDirectly,
+  isAssigning
 }: UserManagementTabProps) {
   return (
     <Card className="border-brand-blue/10 shadow-xl rounded-3xl overflow-hidden bg-white/90 backdrop-blur-sm">
@@ -221,11 +227,36 @@ export function UserManagementTab({
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                   {selectedUserStats.module_breakdown?.map((mod: any) => (
                     <div key={mod.module_id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-800">{mod.module_title}</span>
-                        <span className={`text-xs font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-500'}`}>
-                          {mod.is_assigned ? `${mod.progress_percentage}%` : 'No Asignado'}
-                        </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-slate-800 line-clamp-1">{mod.module_title || mod.title}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`text-[11px] font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-500'}`}>
+                            {mod.is_assigned ? `${mod.progress_percentage}%` : 'No Asignado'}
+                          </span>
+                          {mod.is_assigned ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              disabled={isAssigning}
+                              onClick={() => onUnassignModuleDirectly?.(selectedUserStats.id, mod.module_id)}
+                              className="h-6 px-2 text-[10px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-md"
+                            >
+                              Quitar
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              disabled={isAssigning}
+                              onClick={() => onAssignModuleDirectly?.(selectedUserStats.id, mod.module_id)}
+                              className="h-6 px-2 text-[10px] font-bold bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 rounded-md"
+                            >
+                              + Asignar
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       
                       {mod.is_assigned ? (
@@ -236,7 +267,7 @@ export function UserManagementTab({
                             className="h-1.5" 
                           />
                           <div className="flex items-center justify-between pt-0.5">
-                            <span className="text-[10px] text-slate-600">{mod.completed_count} de {mod.total_sections} lecciones</span>
+                            <span className="text-[10px] text-slate-600">{mod.completed_sections || 0} de {mod.total_sections} lecciones</span>
                             {mod.progress_percentage === 100 && (
                               <Link 
                                 href={`/certificate/${generateCertId(selectedUserStats.id, mod.module_id)}`} 

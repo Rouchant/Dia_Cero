@@ -107,6 +107,9 @@ export default function AdminDashboard() {
               onSelectUser={adminUsers.setSelectedUserStats}
               selectedUserStats={adminUsers.selectedUserStats}
               setSelectedUserStats={adminUsers.setSelectedUserStats}
+              onAssignModuleDirectly={adminUsers.handleAssignModuleDirectly}
+              onUnassignModuleDirectly={adminUsers.handleUnassignModuleDirectly}
+              isAssigning={adminUsers.isAssigning}
             />
           </TabsContent>
 
@@ -130,6 +133,8 @@ export default function AdminDashboard() {
               setAssignModuleId={adminUsers.setAssignModuleId}
               isAssigning={adminUsers.isAssigning}
               onAssignModule={adminUsers.handleAssignModule}
+              onAssignModuleDirectly={adminUsers.handleAssignModuleDirectly}
+              onUnassignModuleDirectly={adminUsers.handleUnassignModuleDirectly}
             />
           </TabsContent>
 

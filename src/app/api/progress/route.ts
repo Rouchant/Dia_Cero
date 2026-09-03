@@ -47,7 +47,6 @@ export async function POST(request: Request) {
         completed_sections: completedSections || [],
         quiz_scores: quizScores || {},
         current_section_index: currentSectionIndex ?? 0,
-        score: score ?? 0,
         updated_at: new Date().toISOString()
       }, { onConflict: 'user_id, module_id' })
       .select()

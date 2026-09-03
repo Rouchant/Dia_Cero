@@ -80,6 +80,7 @@ export function useAdminUsers() {
           return {
             module_id: mod.id,
             title: mod.title,
+            module_title: mod.title,
             is_assigned: isAssigned,
             completed_sections: completedSecs,
             total_sections: totalSections,
@@ -101,6 +102,7 @@ export function useAdminUsers() {
       });
 
       setUsers(enhancedUsers);
+      setSelectedUserStats((prev: any) => prev ? (enhancedUsers.find(u => u.id === prev.id) || prev) : null);
     }
     setLoading(false);
   };
@@ -141,40 +143,58 @@ export function useAdminUsers() {
     }
   };
 
+  const handleAssignModuleDirectly = async (userId: string, moduleId: string) => {
+    if (!userId || !moduleId) return;
+
+    setIsAssigning(true);
+    try {
+      const res = await fetch('/api/admin/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, moduleId })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Aviso: " + (data.error || "Error al asignar módulo"));
+        return;
+      }
+      await fetchData();
+    } catch (err: any) {
+      alert("Error de conexión al asignar el módulo: " + err.message);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const handleUnassignModuleDirectly = async (userId: string, moduleId: string) => {
+    if (!userId || !moduleId) return;
+    const confirmUnassign = window.confirm("¿Estás seguro de desvincular este módulo al estudiante? El módulo dejará de estar visible en su portal de alumno.");
+    if (!confirmUnassign) return;
+
+    setIsAssigning(true);
+    try {
+      const res = await fetch('/api/admin/assignments', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, moduleId })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Error al desvincular el módulo: " + (data.error || "Error de servidor"));
+        return;
+      }
+      await fetchData();
+    } catch (err: any) {
+      alert("Error de conexión al desvincular el módulo: " + err.message);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
   const handleAssignModule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assignUserId || !assignModuleId) return;
-
-    setIsAssigning(true);
-    // Check if progress row already exists
-    const { data: existing } = await supabase
-      .from('user_progress')
-      .select('*')
-      .eq('user_id', assignUserId)
-      .eq('module_id', assignModuleId)
-      .maybeSingle();
-
-    if (existing) {
-      alert("Aviso: El estudiante seleccionado ya tiene asignado este módulo.");
-      setIsAssigning(false);
-      return;
-    }
-
-    const { error } = await supabase
-      .from('user_progress')
-      .insert({
-        user_id: assignUserId,
-        module_id: assignModuleId,
-        completed_sections: []
-      });
-
-    if (error) {
-      alert("Falla al asignar el módulo: " + error.message);
-    } else {
-      alert("¡Módulo inyectado exitosamente al alumno!");
-      fetchData();
-    }
-    setIsAssigning(false);
+    await handleAssignModuleDirectly(assignUserId, assignModuleId);
   };
 
   const handleRenameModule = async (moduleId: string, newTitle: string, newDescription?: string) => {
@@ -287,6 +307,8 @@ export function useAdminUsers() {
     setAssignModuleId,
     isAssigning,
     handleAssignModule,
+    handleAssignModuleDirectly,
+    handleUnassignModuleDirectly,
     handleRenameModule,
     handleResetUserPassword,
     handleCreateModule
