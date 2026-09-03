@@ -28,24 +28,19 @@ export default function AdminDashboard() {
   // 3. Quiz Manager Hook (Synchronized with selected theory module)
   const quizManager = useQuizManager(adminUsers.dbModules, theoryBuilder.editContentModuleId);
 
-  if (adminUsers.loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <Loader2 className="h-10 w-10 animate-spin text-brand-blue" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Admin Header */}
       <header className="bg-white/90 backdrop-blur-md text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 sticky top-0 z-10 w-full">
         <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="icon" className="text-brand-blue hover:bg-brand-lightblue/20 border border-brand-blue/10 rounded-full shadow-sm">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+            <Link 
+              href="/dashboard"
+              aria-label="Volver al panel de estudiantes"
+              className="inline-flex items-center justify-center h-10 w-10 text-brand-blue hover:bg-brand-lightblue/20 border border-brand-blue/10 rounded-full shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Volver al panel de estudiantes</span>
             </Link>
             <div className="flex items-center gap-2">
               <Logo className="hidden sm:block" />
@@ -63,12 +58,28 @@ export default function AdminDashboard() {
 
       {/* Main Content Container */}
       <main className="max-w-7xl mx-auto p-6 md:p-8">
-        {/* Top Metric Cards Component */}
-        <AdminStatsCards 
-          totalStudents={adminUsers.totalStudents}
-          averageProgress={adminUsers.averageProgress}
-          completedStudents={adminUsers.completedStudents}
-        />
+        {adminUsers.loading ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-white rounded-2xl border border-brand-blue/10 shadow-sm animate-pulse" />
+              ))}
+            </div>
+            <div className="h-96 bg-white rounded-3xl border border-brand-blue/10 shadow-sm animate-pulse flex items-center justify-center">
+              <div className="flex items-center gap-3 text-slate-500 font-bold text-sm">
+                <Loader2 className="h-5 w-5 animate-spin text-brand-blue" />
+                Cargando métricas y nómina académica...
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Top Metric Cards Component */}
+            <AdminStatsCards 
+              totalStudents={adminUsers.totalStudents}
+              averageProgress={adminUsers.averageProgress}
+              completedStudents={adminUsers.completedStudents}
+            />
 
         {/* Tabbed Navigation */}
         <Tabs defaultValue="users" className="space-y-6">
@@ -162,7 +173,9 @@ export default function AdminDashboard() {
             />
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </>
+    )}
+  </main>
+</div>
   );
 }

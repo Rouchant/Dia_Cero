@@ -225,11 +225,19 @@ export function QuizManagerCard({
 
                 <div className="space-y-1.5">
                   <Label className="text-slate-800 font-bold text-xs">Enunciado / Pregunta</Label>
-                  <Input
-                    className="h-12 bg-white border-slate-200 text-sm font-medium focus:ring-rose-500 rounded-xl"
+                  <textarea
+                    className="w-full min-h-[85px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
                     placeholder="Ej: ¿Cuál es el plazo máximo para presentar la denuncia DIAT/DIEP?"
                     value={newQuizQuestion}
                     onChange={e => setNewQuizQuestion(e.target.value)}
+                    spellCheck={true}
+                    autoCorrect="on"
+                    autoCapitalize="sentences"
+                    autoComplete="on"
+                    lang="es"
+                    data-gramm="true"
+                    data-enable-grammarly="true"
+                    data-ms-editor="true"
                     required
                   />
                 </div>
@@ -242,7 +250,7 @@ export function QuizManagerCard({
                     </span>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-2.5">
                     {[
                       { val: newQuizOpt1, set: setNewQuizOpt1, idx: 0, label: "Opción A" },
                       { val: newQuizOpt2, set: setNewQuizOpt2, idx: 1, label: "Opción B" },
@@ -274,6 +282,11 @@ export function QuizManagerCard({
                             placeholder={`Escribe la ${item.label.toLowerCase()}...`}
                             value={item.val}
                             onChange={e => item.set(e.target.value)}
+                            spellCheck={true}
+                            autoCorrect="on"
+                            autoCapitalize="sentences"
+                            autoComplete="on"
+                            lang="es"
                           />
                         </div>
                       </div>
@@ -307,10 +320,18 @@ export function QuizManagerCard({
                   <form onSubmit={onSaveEditQuestion} className="space-y-4 mt-2">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-800">Enunciado de la Pregunta</Label>
-                      <Input
-                        className="h-11 text-xs bg-slate-50 rounded-xl"
+                      <textarea
+                        className="w-full min-h-[85px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
                         value={editQStatement}
                         onChange={e => setEditQStatement(e.target.value)}
+                        spellCheck={true}
+                        autoCorrect="on"
+                        autoCapitalize="sentences"
+                        autoComplete="on"
+                        lang="es"
+                        data-gramm="true"
+                        data-enable-grammarly="true"
+                        data-ms-editor="true"
                         required
                       />
                     </div>
@@ -320,7 +341,7 @@ export function QuizManagerCard({
                         <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
                         <span className="text-[10px] text-emerald-600 font-semibold">🔘 Radio = Respuesta Correcta</span>
                       </Label>
-                      <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-2.5">
                         {[
                           { val: editQOpt1, set: setEditQOpt1, idx: 0, label: "Opción A" },
                           { val: editQOpt2, set: setEditQOpt2, idx: 1, label: "Opción B" },
@@ -329,7 +350,7 @@ export function QuizManagerCard({
                         ].map((item) => (
                           <div
                             key={item.idx}
-                            className={`p-3 rounded-xl border transition-all flex items-center gap-2.5 ${
+                            className={`p-3 rounded-xl border transition-all flex items-center gap-3 ${
                               editQCorrectIdx === item.idx
                                 ? 'bg-emerald-50 border-emerald-300 ring-2 ring-emerald-400/30'
                                 : 'bg-slate-50 border-slate-200'
@@ -348,9 +369,14 @@ export function QuizManagerCard({
                                 {item.label} {editQCorrectIdx === item.idx && <span className="text-emerald-700 font-black">(✓ Correcta)</span>}
                               </Label>
                               <Input
-                                className="h-8 text-xs bg-white rounded-lg"
+                                className="h-9 text-xs bg-white rounded-lg"
                                 value={item.val}
                                 onChange={e => item.set(e.target.value)}
+                                spellCheck={true}
+                                autoCorrect="on"
+                                autoCapitalize="sentences"
+                                autoComplete="on"
+                                lang="es"
                               />
                             </div>
                           </div>

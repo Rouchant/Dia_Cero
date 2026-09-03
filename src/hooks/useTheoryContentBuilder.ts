@@ -59,8 +59,11 @@ export function useTheoryContentBuilder(dbModules: any[]) {
     }
   }, [dbModules, editContentModuleId]);
 
+  const draftTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Helper to preserve active section edits in draft map before switching
   const saveCurrentToDraft = () => {
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     if (!selectedSectionId) return;
     setDraftSections(prev => {
       if (!prev[selectedSectionId]) return prev;
@@ -82,17 +85,20 @@ export function useTheoryContentBuilder(dbModules: any[]) {
 
   const updateDraftField = (field: string, value: any) => {
     if (!selectedSectionId) return;
-    setDraftSections(prev => {
-      const current = prev[selectedSectionId] || { id: selectedSectionId };
-      return {
-        ...prev,
-        [selectedSectionId]: {
-          ...current,
-          [field]: value,
-          isModified: true
-        }
-      };
-    });
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      setDraftSections(prev => {
+        const current = prev[selectedSectionId] || { id: selectedSectionId };
+        return {
+          ...prev,
+          [selectedSectionId]: {
+            ...current,
+            [field]: value,
+            isModified: true
+          }
+        };
+      });
+    }, 250);
   };
 
   const loadSectionFromDraft = (secId: string, customDrafts?: Record<string, any>) => {

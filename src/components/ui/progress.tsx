@@ -15,6 +15,8 @@ const Progress = React.forwardRef<
 >(({ className, indicatorClassName, value, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
+    aria-label={props["aria-label"] || (value !== undefined ? `Progreso: ${value}%` : "Barra de progreso")}
+    value={value}
     className={cn(
       "relative h-4 w-full overflow-hidden rounded-full bg-slate-200",
       className

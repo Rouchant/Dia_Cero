@@ -116,10 +116,13 @@ export default function SettingsPage() {
       <header className="bg-white/90 text-brand-blue px-6 py-4 shadow-sm border-b border-brand-blue/10 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="icon" className="text-brand-blue hover:bg-brand-lightblue/20 mr-2 rounded-full border border-brand-blue/10">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
+            <Link 
+              href="/dashboard"
+              aria-label="Volver al panel principal"
+              className="inline-flex items-center justify-center h-10 w-10 text-brand-blue hover:bg-brand-lightblue/20 mr-2 rounded-full border border-brand-blue/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">Volver al panel principal</span>
             </Link>
             <Logo className="hidden sm:block" />
             <span className="font-headline font-black text-lg tracking-tight uppercase border-l border-brand-blue/20 sm:ml-2 sm:pl-3 mt-2.5 leading-none text-brand-blue">Preferencias</span>

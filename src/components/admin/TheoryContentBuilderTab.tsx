@@ -390,11 +390,19 @@ export function TheoryContentBuilderTab({
 
                       <div className="space-y-1.5">
                         <Label className="text-slate-800 font-bold text-xs">Enunciado de la Pregunta</Label>
-                        <Input
-                          className="h-11 bg-white border-slate-200 text-xs font-medium focus:ring-rose-500 rounded-xl"
+                        <textarea
+                          className="w-full min-h-[85px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
                           placeholder="Ej: ¿Cuál es la primera acción preventiva en trabajo en altura?"
                           value={quizManager.newQuizQuestion}
                           onChange={e => quizManager.setNewQuizQuestion(e.target.value)}
+                          spellCheck={true}
+                          autoCorrect="on"
+                          autoCapitalize="sentences"
+                          autoComplete="on"
+                          lang="es"
+                          data-gramm="true"
+                          data-enable-grammarly="true"
+                          data-ms-editor="true"
                           required
                         />
                       </div>
@@ -407,7 +415,7 @@ export function TheoryContentBuilderTab({
                           </span>
                         </div>
 
-                        <div className="grid sm:grid-cols-2 gap-2.5">
+                        <div className="grid grid-cols-1 gap-2.5">
                           {[
                             { val: quizManager.newQuizOpt1, set: quizManager.setNewQuizOpt1, idx: 0, label: "Opción A" },
                             { val: quizManager.newQuizOpt2, set: quizManager.setNewQuizOpt2, idx: 1, label: "Opción B" },
@@ -416,7 +424,7 @@ export function TheoryContentBuilderTab({
                           ].map((item) => (
                             <div
                               key={item.idx}
-                              className={`p-2.5 rounded-xl border transition-all flex items-center gap-2.5 ${
+                              className={`p-3 rounded-xl border transition-all flex items-center gap-3 ${
                                 quizManager.newQuizCorrectIdx === item.idx
                                   ? 'bg-emerald-50/90 border-emerald-300 ring-2 ring-emerald-500/20'
                                   : 'bg-white border-slate-200 hover:border-slate-300'
@@ -431,14 +439,19 @@ export function TheoryContentBuilderTab({
                                 className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
                               />
                               <div className="flex-1 min-w-0">
-                                <Label htmlFor={`new-opt-radio-${item.idx}`} className="text-[9px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">
+                                <Label htmlFor={`new-opt-radio-${item.idx}`} className="text-[10px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">
                                   {item.label} {quizManager.newQuizCorrectIdx === item.idx && <span className="text-emerald-700 font-black">(✓ Correcta)</span>}
                                 </Label>
                                 <Input
-                                  className="h-8 text-xs bg-slate-50/50 border-slate-200 rounded-lg"
+                                  className="h-9 text-xs bg-slate-50/50 border-slate-200 rounded-lg"
                                   placeholder={`Escribe la ${item.label.toLowerCase()}...`}
                                   value={item.val}
                                   onChange={e => item.set(e.target.value)}
+                                  spellCheck={true}
+                                  autoCorrect="on"
+                                  autoCapitalize="sentences"
+                                  autoComplete="on"
+                                  lang="es"
                                 />
                               </div>
                             </div>
@@ -472,10 +485,18 @@ export function TheoryContentBuilderTab({
                         <form onSubmit={quizManager.handleSaveQuizEdit} className="space-y-4 mt-2">
                           <div className="space-y-1.5">
                             <Label className="text-xs font-bold text-slate-800">Enunciado de la Pregunta</Label>
-                            <Input
-                              className="h-11 text-xs bg-slate-50 rounded-xl"
+                            <textarea
+                              className="w-full min-h-[85px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed resize-y"
                               value={quizManager.editQStatement}
                               onChange={e => quizManager.setEditQStatement(e.target.value)}
+                              spellCheck={true}
+                              autoCorrect="on"
+                              autoCapitalize="sentences"
+                              autoComplete="on"
+                              lang="es"
+                              data-gramm="true"
+                              data-enable-grammarly="true"
+                              data-ms-editor="true"
                               required
                             />
                           </div>
@@ -485,7 +506,7 @@ export function TheoryContentBuilderTab({
                               <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
                               <span className="text-[10px] text-emerald-600 font-semibold">🔘 Radio = Respuesta Correcta</span>
                             </Label>
-                            <div className="grid sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-2.5">
                               {[
                                 { val: quizManager.editQOpt1, set: quizManager.setEditQOpt1, idx: 0, label: "Opción A" },
                                 { val: quizManager.editQOpt2, set: quizManager.setEditQOpt2, idx: 1, label: "Opción B" },
@@ -494,7 +515,7 @@ export function TheoryContentBuilderTab({
                               ].map((item) => (
                                 <div
                                   key={item.idx}
-                                  className={`p-3 rounded-xl border transition-all flex items-center gap-2.5 ${
+                                  className={`p-3 rounded-xl border transition-all flex items-center gap-3 ${
                                     quizManager.editQCorrectIdx === item.idx
                                       ? 'bg-emerald-50 border-emerald-300 ring-2 ring-emerald-400/30'
                                       : 'bg-slate-50 border-slate-200'
@@ -513,9 +534,14 @@ export function TheoryContentBuilderTab({
                                       {item.label} {quizManager.editQCorrectIdx === item.idx && <span className="text-emerald-700 font-black">(✓ Correcta)</span>}
                                     </Label>
                                     <Input
-                                      className="h-8 text-xs bg-white rounded-lg"
+                                      className="h-9 text-xs bg-white rounded-lg"
                                       value={item.val}
                                       onChange={e => item.set(e.target.value)}
+                                      spellCheck={true}
+                                      autoCorrect="on"
+                                      autoCapitalize="sentences"
+                                      autoComplete="on"
+                                      lang="es"
                                     />
                                   </div>
                                 </div>
@@ -544,22 +570,27 @@ export function TheoryContentBuilderTab({
                 <form onSubmit={onSaveAllSections} className="space-y-6 max-w-2xl mx-auto">
                   
                   <div className="space-y-2">
-                    <Label className="text-slate-800 font-black text-lg">Título de la Diapositiva</Label>
+                    <Label className="text-slate-800 font-black text-xs sm:text-lg">Título de la Diapositiva</Label>
                     <Input 
-                      className="h-14 bg-sky-50 border-sky-100 text-lg font-headline font-bold" 
+                      className="h-10 sm:h-14 bg-sky-50 border-sky-100 text-xs sm:text-lg font-headline font-bold" 
                       placeholder="Inserte título"
                       value={editSecTitle} 
                       onChange={e => {
                         setEditSecTitle(e.target.value);
                         updateDraftField('title', e.target.value);
                       }} 
+                      spellCheck={true}
+                      autoCorrect="on"
+                      autoCapitalize="sentences"
+                      autoComplete="on"
+                      lang="es"
                       required 
                     />
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-slate-800 font-bold">Contenido Teórico / Explicación Escrita</Label>
+                      <Label className="text-slate-800 font-bold text-xs sm:text-sm">Contenido Teórico / Explicación Escrita</Label>
                       <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
                         <Button
                           type="button"
@@ -588,7 +619,15 @@ export function TheoryContentBuilderTab({
                     <textarea 
                       ref={contentTextareaRef}
                       required
-                      className="flex min-h-[220px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-4 py-3 text-base leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
+                      spellCheck={true}
+                      autoCorrect="on"
+                      autoCapitalize="sentences"
+                      autoComplete="on"
+                      lang="es"
+                      data-gramm="true"
+                      data-enable-grammarly="true"
+                      data-ms-editor="true"
+                      className="flex min-h-[420px] sm:min-h-[520px] w-full rounded-xl border border-slate-200 shadow-inner bg-slate-50 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm leading-relaxed ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 font-body"
                       placeholder="Inserte contenido (puedes usar **negrita** y • viñetas)..."
                       value={editSecContent}
                       onChange={e => {
@@ -666,7 +705,15 @@ export function TheoryContentBuilderTab({
                           <BookOpen className="h-4 w-4 text-brand-blue" /> Bloque 1: Resumen Rápido (IA)
                         </Label>
                         <textarea
-                          className="w-full min-h-[75px] p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                          spellCheck={true}
+                          autoCorrect="on"
+                          autoCapitalize="sentences"
+                          autoComplete="on"
+                          lang="es"
+                          data-gramm="true"
+                          data-enable-grammarly="true"
+                          data-ms-editor="true"
+                          className="w-full min-h-[140px] sm:min-h-[160px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                           placeholder="Sin resumen pre-generado. Toca 'Generar con IA' o escribe uno..."
                           value={editSecAiSummary}
                           onChange={e => {
@@ -691,7 +738,15 @@ export function TheoryContentBuilderTab({
                               Explicación Sencilla
                             </Label>
                             <textarea
-                              className="w-full min-h-[95px] p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                              spellCheck={true}
+                              autoCorrect="on"
+                              autoCapitalize="sentences"
+                              autoComplete="on"
+                              lang="es"
+                              data-gramm="true"
+                              data-enable-grammarly="true"
+                              data-ms-editor="true"
+                              className="w-full min-h-[160px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                               placeholder="Sin explicación pre-generada. Toca 'Generar con IA' o escribe una..."
                               value={editSecAiExplanationText}
                               onChange={e => {
@@ -707,7 +762,15 @@ export function TheoryContentBuilderTab({
                               <span className="text-[10px] text-amber-600 font-semibold">(Opcional)</span>
                             </Label>
                             <textarea
-                              className="w-full min-h-[95px] p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                              spellCheck={true}
+                              autoCorrect="on"
+                              autoCapitalize="sentences"
+                              autoComplete="on"
+                              lang="es"
+                              data-gramm="true"
+                              data-enable-grammarly="true"
+                              data-ms-editor="true"
+                              className="w-full min-h-[160px] sm:min-h-[180px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                               placeholder="Ej: Como ponerse el cinturón antes de conducir..."
                               value={editSecAiAnalogy}
                               onChange={e => {
@@ -777,6 +840,11 @@ export function TheoryContentBuilderTab({
                 placeholder="Ej: Módulo 01: Conceptos Básicos de Ciberseguridad"
                 value={renameTitleInput}
                 onChange={e => setRenameTitleInput(e.target.value)}
+                spellCheck={true}
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                lang="es"
                 required
               />
             </div>
@@ -784,7 +852,15 @@ export function TheoryContentBuilderTab({
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-slate-700">Sinopsis / Resumen para los Alumnos</Label>
               <textarea
-                className="w-full min-h-[95px] p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                spellCheck={true}
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                lang="es"
+                data-gramm="true"
+                data-enable-grammarly="true"
+                data-ms-editor="true"
+                className="w-full min-h-[95px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                 placeholder="Escribe la sinopsis que verán los estudiantes antes de comenzar el módulo..."
                 value={renameDescriptionInput}
                 onChange={e => setRenameDescriptionInput(e.target.value)}
@@ -825,6 +901,11 @@ export function TheoryContentBuilderTab({
                 placeholder="Inserta título del módulo..."
                 value={newModTitle}
                 onChange={e => setNewModTitle(e.target.value)}
+                spellCheck={true}
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                lang="es"
                 required
               />
             </div>
@@ -832,7 +913,15 @@ export function TheoryContentBuilderTab({
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-slate-700">Sinopsis / Descripción del Módulo</Label>
               <textarea
-                className="w-full min-h-[95px] p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 font-medium leading-relaxed"
+                spellCheck={true}
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                lang="es"
+                data-gramm="true"
+                data-enable-grammarly="true"
+                data-ms-editor="true"
+                className="w-full min-h-[95px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 font-medium leading-relaxed"
                 placeholder="Describe brevemente los objetivos de este nuevo módulo..."
                 value={newModDesc}
                 onChange={e => setNewModDesc(e.target.value)}

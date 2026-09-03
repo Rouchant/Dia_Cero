@@ -496,8 +496,15 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
         <div className="p-6 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-headline font-bold text-primary">Secciones del Módulo</h2>
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              aria-label="Cerrar barra lateral de secciones"
+              className="lg:hidden" 
+              onClick={() => setSidebarOpen(false)}
+            >
               <X className="h-5 w-5" />
+              <span className="sr-only">Cerrar barra lateral de secciones</span>
             </Button>
           </div>
           <ScrollArea className="flex-1 -mx-2 px-2">
@@ -538,6 +545,7 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
             </div>
             <Progress 
               value={progress} 
+              aria-label={`Progreso general del módulo: ${progress}%`}
               className={`h-2 transition-all duration-1000 ${progress >= 100 ? '[&>div]:bg-brand-green' : 'bg-primary/10'}`} 
             />
           </div>
@@ -549,8 +557,15 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
         {/* Header */}
         <header className="h-16 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 gap-4 sm:gap-6">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-            <Button variant="ghost" size="icon" className="lg:hidden shrink-0" onClick={() => setSidebarOpen(true)}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              aria-label="Abrir barra lateral de secciones"
+              className="lg:hidden shrink-0" 
+              onClick={() => setSidebarOpen(true)}
+            >
               <Menu className="h-5 w-5" />
+              <span className="sr-only">Abrir barra lateral de secciones</span>
             </Button>
             <div className="min-w-0 flex-1">
               <h1 

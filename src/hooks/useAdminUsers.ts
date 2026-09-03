@@ -37,16 +37,22 @@ export function useAdminUsers() {
       return;
     }
 
-    const { data: mData } = await supabase.from('modules').select('*, module_sections(*)');
+    const [
+      { data: mData },
+      { data: profiles },
+      { data: progressData }
+    ] = await Promise.all([
+      supabase.from('modules').select('*, module_sections(*)'),
+      supabase.from('profiles').select('*'),
+      supabase.from('user_progress').select('*')
+    ]);
+
     if (mData) {
       setDbModules(mData);
       if (mData.length > 0) {
         setAssignModuleId(prev => prev || mData[0].id);
       }
     }
-
-    const { data: profiles } = await supabase.from('profiles').select('*');
-    const { data: progressData } = await supabase.from('user_progress').select('*');
 
     if (profiles && mData) {
       const enhancedUsers = profiles.map(profile => {

@@ -7,8 +7,8 @@ import { LoginForm } from "@/components/auth/LoginForm";
 export default function LoginPage() {
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center bg-background p-6">
-      <Link href="/" className="mb-8">
+    <main className="min-h-dvh flex flex-col items-center justify-center bg-background p-6">
+      <Link href="/" className="mb-8" aria-label="Ir a la página de inicio">
         <Logo />
       </Link>
 
@@ -18,9 +18,9 @@ export default function LoginPage() {
         description="Ingresa tus credenciales para acceder al módulo"
       />
       
-      <p className="mt-8 text-xs text-muted-foreground/60 max-w-xs text-center">
+      <p className="mt-8 text-xs text-slate-600 max-w-xs text-center font-medium">
         Esta es una versión piloto controlada. Para asistencia técnica, contacta a help@diacero.com
       </p>
-    </div>
+    </main>
   );
 }

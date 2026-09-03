@@ -1,5 +1,19 @@
 import type {Metadata} from 'next';
+import { Inter, Dancing_Script } from 'next/font/google';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['700'],
+  display: 'swap',
+  variable: '--font-dancing-script',
+});
 
 export const metadata: Metadata = {
   title: 'DiaCero - Plataforma de aprendizaje',
@@ -12,12 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="es" className={`${inter.variable} ${dancingScript.variable}`}>
       <body className="font-body antialiased">{children}</body>
     </html>
   );

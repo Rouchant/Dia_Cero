@@ -45,7 +45,8 @@ export function UserManagementTab({
             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Buscar por nombre o correo..."
-              className="pl-9 h-10 text-xs bg-white border-slate-200 rounded-xl"
+              aria-label="Buscar alumnos por nombre o correo electrónico"
+              className="pl-9 h-10 text-xs bg-white border-slate-200 rounded-xl placeholder:text-slate-500"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
@@ -56,7 +57,7 @@ export function UserManagementTab({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[11px] font-bold border-b border-slate-100">
+            <thead className="bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] font-bold border-b border-slate-100">
               <tr>
                 <th className="py-3.5 px-6">Alumno</th>
                 <th className="py-3.5 px-6">Rol</th>
@@ -70,21 +71,25 @@ export function UserManagementTab({
                   <td className="py-4 px-6 font-medium text-slate-900">
                     <div>
                       <p className="font-bold text-slate-800">{u.name}</p>
-                      <p className="text-xs text-slate-400 font-mono">{u.email}</p>
+                      <p className="text-xs text-slate-600 font-mono">{u.email}</p>
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
                       {u.role === 'admin' ? 'Administrador' : 'Alumno'}
                     </span>
                   </td>
                   <td className="py-4 px-6">
                     <div className="w-48 space-y-1">
                       <div className="flex justify-between text-xs font-bold">
-                        <span className="text-slate-600">{u.progress_percentage || 0}%</span>
+                        <span className="text-slate-700">{u.progress_percentage || 0}%</span>
                         {u.progress_percentage === 100 && <span className="text-brand-green">¡Completado!</span>}
                       </div>
-                      <Progress value={u.progress_percentage || 0} className="h-2" />
+                      <Progress 
+                        value={u.progress_percentage || 0} 
+                        aria-label={`Progreso de ${u.name}: ${u.progress_percentage || 0}%`}
+                        className="h-2" 
+                      />
                     </div>
                   </td>
                   <td className="py-4 px-6 text-right">
@@ -92,6 +97,7 @@ export function UserManagementTab({
                       variant="outline"
                       size="sm"
                       onClick={() => onSelectUser(u)}
+                      aria-label={`Ver ficha académica de ${u.name}`}
                       className="h-8 text-xs font-bold border-brand-blue/30 text-brand-blue hover:bg-brand-blue hover:text-white transition-all rounded-lg"
                     >
                       Ver Ficha
@@ -101,7 +107,7 @@ export function UserManagementTab({
               ))}
               {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-slate-400 italic">
+                  <td colSpan={4} className="py-12 text-center text-slate-500 italic">
                     No se encontraron usuarios coincidentes con la búsqueda.
                   </td>
                 </tr>
@@ -127,23 +133,27 @@ export function UserManagementTab({
             <div className="space-y-4 mt-2">
               <div className="p-3 bg-slate-50 rounded-xl space-y-1">
                 <p className="text-sm font-bold text-slate-800">{selectedUserStats.name}</p>
-                <p className="text-xs text-slate-500 font-mono">{selectedUserStats.email}</p>
-                <p className="text-[10px] text-slate-400 font-mono">ID: {selectedUserStats.id}</p>
+                <p className="text-xs text-slate-600 font-mono">{selectedUserStats.email}</p>
+                <p className="text-[10px] text-slate-500 font-mono">ID: {selectedUserStats.id}</p>
               </div>
 
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-slate-600">Progreso Global:</span>
-                  <span className="text-brand-blue">{selectedUserStats.progress_percentage || 0}%</span>
+                  <span className="text-slate-700">Progreso Global:</span>
+                  <span className="text-brand-blue font-black">{selectedUserStats.progress_percentage || 0}%</span>
                 </div>
-                <Progress value={selectedUserStats.progress_percentage || 0} className="h-2.5" />
+                <Progress 
+                  value={selectedUserStats.progress_percentage || 0} 
+                  aria-label={`Progreso global de ${selectedUserStats.name}: ${selectedUserStats.progress_percentage || 0}%`}
+                  className="h-2.5" 
+                />
               </div>
 
               {/* Desglose por módulo */}
               <div className="space-y-2 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Desglose por Módulo</span>
-                  <span className="text-[10px] text-slate-400">({selectedUserStats.module_breakdown?.length || 0} módulos)</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Desglose por Módulo</span>
+                  <span className="text-[10px] text-slate-500">({selectedUserStats.module_breakdown?.length || 0} módulos)</span>
                 </div>
 
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -151,16 +161,20 @@ export function UserManagementTab({
                     <div key={mod.module_id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-800">{mod.module_title}</span>
-                        <span className={`text-xs font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-400'}`}>
+                        <span className={`text-xs font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-500'}`}>
                           {mod.is_assigned ? `${mod.progress_percentage}%` : 'No Asignado'}
                         </span>
                       </div>
                       
                       {mod.is_assigned ? (
                         <>
-                          <Progress value={mod.progress_percentage} className="h-1.5" />
+                          <Progress 
+                            value={mod.progress_percentage} 
+                            aria-label={`Progreso en ${mod.module_title}: ${mod.progress_percentage}%`}
+                            className="h-1.5" 
+                          />
                           <div className="flex items-center justify-between pt-0.5">
-                            <span className="text-[10px] text-slate-500">{mod.completed_count} de {mod.total_sections} lecciones</span>
+                            <span className="text-[10px] text-slate-600">{mod.completed_count} de {mod.total_sections} lecciones</span>
                             {mod.progress_percentage === 100 && (
                               <Link 
                                 href={`/certificate/${generateCertId(selectedUserStats.id, mod.module_id)}`} 
@@ -173,7 +187,7 @@ export function UserManagementTab({
                           </div>
                         </>
                       ) : (
-                        <p className="text-[10px] text-slate-400 italic">Módulo no asignado aún a este perfil</p>
+                        <p className="text-[10px] text-slate-500 italic">Módulo no asignado aún a este perfil</p>
                       )}
                     </div>
                   ))}
