@@ -1,7 +1,8 @@
 # DiaCero — Plataforma de Entrenamiento Normativo
 
 ![Versión](https://img.shields.io/badge/version-v3.0.0--release-blue?style=for-the-badge&logo=git)
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-BaaS-3ECF8E?style=for-the-badge&logo=supabase)
 ![Vitest](https://img.shields.io/badge/Tests-17%20Passed-brightgreen?style=for-the-badge&logo=vitest)
@@ -46,7 +47,7 @@ El panel administrativo (`/admin/dashboard`) integra herramientas de última gen
 
 2. **Gestor y Banco de Quizzes**:
    - Selector interactivo de preguntas y respuestas de 4 opciones (`Opción A`, `B`, `C`, `D`).
-   - Selección visual de respuesta correcta mediante botones de radio de alta fidelidad.
+   - Selección visual de respuesta correcta mediante botones de radio de alta fidelidad en azul normativo.
    - Edición modal en caliente y eliminación segura de preguntas.
 
 3. **Control de Cuentas, Roles y Asignaciones**:
@@ -74,7 +75,7 @@ Para asegurar la validez de las evaluaciones y proteger la propiedad intelectual
 
 ```mermaid
 graph TD
-    User((Usuario / Estudiante)) --> NextJS["Next.js 15 (App Router)"]
+    User((Usuario / Estudiante)) --> NextJS["Next.js 16 (App Router)"]
     Admin((Administrador)) --> NextJS
     NextJS --> Auth["Supabase Auth (RBAC)"]
     NextJS --> DB[(PostgreSQL Supabase)]
@@ -87,10 +88,12 @@ graph TD
         NextJS --> Module["/module/[id] (Visor Protegido)"]
         NextJS --> AdminDash["/admin/dashboard (Gestión & Mallas)"]
         NextJS --> Cert["/certificate/[id] (Validación SHA-256)"]
+        NextJS --> Verify["/verify/[id] (Verificación Pública)"]
     end
     
-    subgraph "Servicios Externos"
+    subgraph "Servicios Backend & API"
         DB --> Storage["Archivos & Firmas"]
+        NextJS --> API["/api/admin (Service Role)"]
         AI --> Summaries["Resúmenes Automáticos"]
         AI --> Analogies["Explicaciones Adaptativas"]
     end
@@ -102,10 +105,11 @@ graph TD
 
 | Capa | Tecnología |
 |---|---|
-| **Framework Web** | [Next.js 15](https://nextjs.org/) (App Router + Turbopack) |
+| **Framework Web** | [Next.js 16](https://nextjs.org/) (v16.3.4, App Router + Turbopack) |
+| **Librería UI Base** | [React 19](https://react.dev/) (v19.2.1) |
 | **Pruebas (Testing)** | [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/) + [JSDOM](https://github.com/jsdom/jsdom) |
 | **Inteligencia Artificial** | [Genkit](https://firebase.google.com/docs/genkit) + Google Gemini |
-| **Backend as a Service** | [Supabase](https://supabase.com/) (PostgreSQL, Row Level Security, Auth) |
+| **Backend as a Service** | [Supabase](https://supabase.com/) (PostgreSQL, Row Level Security, Auth, Service Role) |
 | **Estilos & UI** | [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/) |
 | **Visualización e Iconos** | [Recharts](https://recharts.org/) + [Lucide React](https://lucide.dev/) |
 | **Lenguaje** | TypeScript 5 (Strict Mode) |
@@ -136,20 +140,28 @@ npm run test
 
 ```text
 src/
-├── ai/                   # Flujos de IA y prompts estructurados (Genkit)
-├── app/                  # Rutas de la plataforma (Next.js App Router)
-│   ├── admin/            # Panel administrativo, analíticas y gestión de mallas
-│   ├── certificate/      # Emisión y validación pública de diplomas
-│   ├── dashboard/        # Centro de capacitación para alumnos
-│   └── module/[id]/      # Visor interactivo y seguro de lecciones
-├── components/
-│   ├── admin/            # Componentes de administración (Builder, Quizzes, Cuentas)
-│   ├── auth/             # Formularios de autenticación y control de accesos
-│   ├── module/           # Componentes core: AIHelper, Quiz, FeedbackSurvey
-│   └── ui/               # Componentes atómicos de diseño (Shadcn UI)
+├── ai/                   # Flujos de IA y prompts estructurados (Genkit + Gemini)
+│   ├── dev.ts            # Servidor local de desarrollo Genkit
+│   ├── genkit.ts         # Inicialización del cliente de IA
+│   └── flows/            # Flujos ejecutables (resúmenes y explicaciones adaptativas)
+├── app/                  # Rutas de la plataforma (Next.js 16 App Router)
+│   ├── admin/            # Panel administrativo, analíticas y constructor de mallas
+│   ├── api/              # Endpoints backend (users, modules, assignments, progress, verify)
+│   ├── auth/             # Flujos de autenticación e inicio de sesión
+│   ├── certificate/      # Emisión y visualización de diplomas
+│   ├── dashboard/        # Centro de capacitación para estudiantes
+│   ├── module/[id]/      # Visor interactivo y protegido de lecciones
+│   ├── settings/         # Ajustes de perfil del usuario
+│   └── verify/           # Verificación pública de certificados criptográficos
+├── components/           # Componentes organizados por dominio
+│   ├── admin/            # Paneles de gestión: TheoryContentBuilder, UserAccountControl, QuizManager, ModuleAssignment, AdminStats
+│   ├── auth/             # Formularios y control de acceso (LoginForm)
+│   ├── dashboard/        # Componentes del portal del alumno (MotivationalCarousel)
+│   ├── module/           # Experiencia de aprendizaje interactiva: AIHelper, Quiz, FeedbackSurvey
+│   └── ui/               # Componentes atómicos de diseño (Shadcn UI + Radix Primitives)
 ├── hooks/                # Custom React Hooks (TheoryBuilder, Toasts, Responsive)
-├── lib/                  # Funciones utilitarias, hashing y tests unitarios
-└── utils/supabase/       # Conectores y clientes de Supabase (Client, Server)
+├── lib/                  # Funciones utilitarias, hashing criptográfico y tests unitarios
+└── utils/supabase/       # Conectores de Supabase (Client para el navegador, Server para SSR/API)
 ```
 
 ---
@@ -157,18 +169,36 @@ src/
 ## ⚙️ Configuración y Despliegue
 
 ### Variables de Entorno (`.env.local`)
+
 ```env
+# ==========================================
+# Supabase - Acceso Público y de Cliente
+# ==========================================
 NEXT_PUBLIC_SUPABASE_URL=https://<tu-id>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
+
+# ==========================================
+# Supabase - Clave Maestra de Administración (Backend)
+# Requerida para: creación de usuarios, reseteo de contraseñas,
+# gestión de roles RBAC y bypass seguro de RLS en endpoints /api/admin/*
+# ==========================================
+SUPABASE_SERVICE_ROLE_KEY=<tu-service-role-key>
+
+# ==========================================
+# Inteligencia Artificial (Google Gemini)
+# ==========================================
 GOOGLE_GENAI_API_KEY=<tu-google-ai-key>
 ```
+
+> [!IMPORTANT]
+> `SUPABASE_SERVICE_ROLE_KEY` nunca debe exponerse en el cliente (no debe tener el prefijo `NEXT_PUBLIC_`). Es utilizada exclusivamente en rutas de API del servidor (`src/app/api/*`) y en flujos seguros de backend.
 
 ### Comandos de Desarrollo
 ```bash
 npm install         # Instalar dependencias del proyecto
-npm run dev         # Servidor de desarrollo local (Puerto 9002)
+npm run dev         # Servidor de desarrollo local con Turbopack (Puerto 9002)
 npm run typecheck   # Validación estricta de tipos de TypeScript (tsc --noEmit)
-npm run test:run    # Ejecución de la suite completa de pruebas unitarias
+npm run test:run    # Ejecución de la suite completa de pruebas unitarias con Vitest
 npm run build       # Compilación y optimización para producción
 ```
 
@@ -177,10 +207,13 @@ npm run build       # Compilación y optimización para producción
 ## 🏷️ Historial de Versiones
 
 ### [v3.0.0-release] — 2026-09-03
-- **Constructor Teórico**: Adición de toolbar de edición enriquecida con soporte para **Negrita**, **Punteo** y **Numeración ordenada**.
-- **Gestor de Quizzes**: Paleta renovada en tonos ámbar/amarillo cálido, ícono vectorial SVG azul para respuesta correcta y placeholder intuitivo.
+- **Actualización de Stack**: Migración a **Next.js 16** (`^16.3.4`) con soporte para **React 19** (`^19.2.1`) y App Router con Turbopack.
+- **Seguridad & Backend**: Incorporación de `SUPABASE_SERVICE_ROLE_KEY` para operaciones administrativas privilegiadas en rutas `/api/admin/*` (gestión de roles, usuarios y asignaciones).
+- **Estructura de Componentes**: Organización modular completa en 5 dominios (`admin/`, `auth/`, `dashboard/`, `module/`, `ui/`).
+- **Constructor Teórico**: Toolbar de edición enriquecida (**Negrita**, **Punteo** y **Numeración ordenada**).
+- **Gestor de Quizzes**: Paleta ámbar/amarillo cálido, radio button interactivo en azul y selector SVG de alta fidelidad.
 - **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
-- **Arquitectura & Estabilidad**: Cobertura ampliada a 17 tests unitarios con Vitest y validación de tipos TypeScript en estricto cero errores.
+- **Estabilidad**: 17 tests unitarios automatizados con Vitest pasando al 100% y cero errores de TypeScript.
 
 ---
 
