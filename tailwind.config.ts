@@ -17,9 +17,15 @@ export default {
       '2xl': '1536px',
     },
     extend: {
+      fontWeight: {
+        semibold: '600',
+        bold: '600',
+        extrabold: '600',
+        black: '600',
+      },
       fontFamily: {
-        body: ['var(--font-inter)', 'Inter', 'sans-serif'],
-        headline: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        body: ['var(--font-teachers)', 'Teachers', 'sans-serif'],
+        headline: ['var(--font-teachers)', 'Teachers', 'sans-serif'],
         signature: ['var(--font-dancing-script)', 'Dancing Script', 'cursive', 'sans-serif'],
         code: ['monospace'],
       },

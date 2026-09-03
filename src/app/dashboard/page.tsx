@@ -203,23 +203,23 @@ export default function Dashboard() {
 
               <CardContent className="p-4 space-y-2">
                 <Link href="/settings" className="block">
-                  <Button variant="ghost" className="w-full justify-start h-12 font-bold text-slate-600 hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-xl">
-                    <Settings className="h-5 w-5 mr-3" /> Preferencias 
+                  <Button variant="ghost" className="w-full justify-start h-12 font-semibold text-sm text-slate-700 hover:text-brand-blue hover:bg-brand-lightblue/20 rounded-xl">
+                    <Settings className="h-5 w-5 mr-3 text-slate-500" /> Preferencias 
                   </Button>
                 </Link>
                 
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="block">
-                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-black bg-brand-yellow hover:bg-[#fde047] text-slate-900 transition-all rounded-xl shadow-sm active:scale-95 border border-yellow-400/50">
+                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-semibold text-sm bg-brand-yellow hover:bg-[#fde047] text-slate-900 transition-all rounded-xl shadow-sm active:scale-95 border border-yellow-400/50">
                       <LayoutDashboard className="h-5 w-5 mr-3 text-slate-900" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-70 text-slate-900"/>
                     </Button>
                   </Link>
                 )}
                 
-                <div className="h-px bg-brand-blue/5 my-2 w-full"></div>
+                <div className="h-px bg-slate-100 my-2 w-full"></div>
                 
                 <Link href="/auth/login" className="block">
-                  <Button variant="ghost" className="w-full justify-start h-12 font-bold text-red-500 hover:text-white hover:bg-red-500 transition-colors rounded-xl">
+                  <Button variant="ghost" className="w-full justify-start h-12 font-semibold text-sm text-red-500 hover:text-white hover:bg-red-500 transition-colors rounded-xl">
                     <LogOut className="h-5 w-5 mr-3" /> Cerrar Sesión
                   </Button>
                 </Link>
@@ -235,24 +235,24 @@ export default function Dashboard() {
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-brand-blue/10 px-6 py-3 flex justify-around items-center md:hidden z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Link href="/dashboard" className="flex flex-col items-center gap-1 text-brand-blue transition-transform active:scale-90">
           <BookOpen className="h-6 w-6" />
-          <span className="text-[10px] font-black uppercase tracking-tighter">Módulos</span>
+          <span className="text-[10px] font-semibold uppercase tracking-tight">Módulos</span>
         </Link>
         
         {isAdmin && (
           <Link href="/admin/dashboard" className="flex flex-col items-center gap-1 text-brand-gold transition-transform active:scale-90">
             <LayoutDashboard className="h-6 w-6" />
-            <span className="text-[10px] font-black uppercase tracking-tighter">Admin</span>
+            <span className="text-[10px] font-semibold uppercase tracking-tight">Admin</span>
           </Link>
         )}
         
         <Link href="/settings" className="flex flex-col items-center gap-1 text-slate-500 transition-transform active:scale-90">
           <Settings className="h-6 w-6" />
-          <span className="text-[10px] font-black uppercase tracking-tighter">Ajustes</span>
+          <span className="text-[10px] font-semibold uppercase tracking-tight">Ajustes</span>
         </Link>
         
         <Link href="/auth/login" className="flex flex-col items-center gap-1 text-red-400 transition-transform active:scale-90">
           <LogOut className="h-6 w-6" />
-          <span className="text-[10px] font-black uppercase tracking-tighter">Salir</span>
+          <span className="text-[10px] font-semibold uppercase tracking-tight">Salir</span>
         </Link>
       </div>
     </div>
