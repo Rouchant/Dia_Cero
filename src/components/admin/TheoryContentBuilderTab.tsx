@@ -46,6 +46,8 @@ interface TheoryContentBuilderTabProps {
   quizManager: any;
   onRenameModule?: (modId: string, newTitle: string, newDescription?: string) => Promise<void>;
   onCreateModule?: (title: string, description: string) => Promise<any>;
+  onDeleteModule?: (modId: string) => Promise<boolean | void>;
+  onDeleteSection?: (secId: string) => Promise<boolean | void>;
 }
 
 export function TheoryContentBuilderTab({
@@ -82,7 +84,9 @@ export function TheoryContentBuilderTab({
   updateDraftField,
   quizManager,
   onRenameModule,
-  onCreateModule
+  onCreateModule,
+  onDeleteModule,
+  onDeleteSection
 }: TheoryContentBuilderTabProps) {
   const [activeMode, setActiveMode] = useState<'theory' | 'quiz'>('theory');
 
@@ -91,6 +95,7 @@ export function TheoryContentBuilderTab({
   const [renameTitleInput, setRenameTitleInput] = useState("");
   const [renameDescriptionInput, setRenameDescriptionInput] = useState("");
   const [isRenamingModule, setIsRenamingModule] = useState(false);
+  const [isDeletingModule, setIsDeletingModule] = useState(false);
 
   // Create Module Modal State
   const [isCreateModuleModalOpen, setIsCreateModuleModalOpen] = useState(false);
@@ -112,6 +117,27 @@ export function TheoryContentBuilderTab({
     await onRenameModule(editContentModuleId, renameTitleInput.trim(), renameDescriptionInput.trim());
     setIsRenamingModule(false);
     setIsRenameModalOpen(false);
+  };
+
+  const handleDeleteCurrentModule = async () => {
+    if (!editContentModuleId || !onDeleteModule) return;
+    const currentMod = dbModules.find(m => m.id === editContentModuleId);
+    const modTitle = currentMod?.title || "este módulo";
+
+    const confirmed = window.confirm(
+      `¿Estás seguro de que deseas eliminar permanentemente el módulo "${modTitle}"?\n\nEsta acción borrará todas sus lecciones teóricas, preguntas de examen y el progreso de los alumnos en este módulo de forma irreversible.`
+    );
+    if (!confirmed) return;
+
+    setIsDeletingModule(true);
+    try {
+      const ok = await onDeleteModule(editContentModuleId);
+      if (ok !== false) {
+        setIsRenameModalOpen(false);
+      }
+    } finally {
+      setIsDeletingModule(false);
+    }
   };
 
   const handleSaveNewModule = async (e: React.FormEvent) => {
@@ -568,6 +594,26 @@ export function TheoryContentBuilderTab({
               /* VISTA EDITOR DE DIAPOSITIVAS TEÓRICAS */
               selectedSectionId ? (
                 <form onSubmit={onSaveAllSections} className="space-y-6 max-w-2xl mx-auto">
+                  {/* Cabecera de la Sección con Botón Eliminar */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <span className="text-xs font-black uppercase text-sky-800 tracking-wider flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-sky-500" />
+                      Lección {contentSections.findIndex(s => s.id === selectedSectionId) + 1} de {contentSections.length}
+                    </span>
+                    {onDeleteSection && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isSavingContent}
+                        onClick={() => onDeleteSection(selectedSectionId!)}
+                        className="h-8 px-3 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Eliminar Sección
+                      </Button>
+                    )}
+                  </div>
                   
                   <div className="space-y-2">
                     <Label className="text-slate-800 font-black text-xs sm:text-lg">Título de la Diapositiva</Label>
@@ -820,13 +866,13 @@ export function TheoryContentBuilderTab({
 
       {/* Modal Editar Información del Módulo */}
       <Dialog open={isRenameModalOpen} onOpenChange={setIsRenameModalOpen}>
-        <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
+        <DialogContent className="w-[94vw] sm:max-w-xl md:max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-headline font-black text-slate-800 flex items-center gap-2">
+            <DialogTitle className="text-xl font-headline font-black text-slate-800 flex items-center gap-2">
               <Edit3 className="h-5 w-5 text-sky-600" />
               Editar Información del Módulo
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs sm:text-sm text-slate-500">
               Modifica el título oficial y la sinopsis introductoria que verán los estudiantes en su Dashboard.
             </DialogDescription>
           </DialogHeader>
@@ -835,7 +881,7 @@ export function TheoryContentBuilderTab({
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-slate-700">Título Oficial del Módulo</Label>
               <Input
-                className="h-11 text-xs bg-slate-50 font-bold text-slate-900 rounded-xl"
+                className="h-11 text-xs sm:text-sm bg-slate-50 font-bold text-slate-900 rounded-xl w-full"
                 placeholder="Ej: Módulo 01: Conceptos Básicos de Ciberseguridad"
                 value={renameTitleInput}
                 onChange={e => setRenameTitleInput(e.target.value)}
@@ -859,21 +905,35 @@ export function TheoryContentBuilderTab({
                 data-gramm="true"
                 data-enable-grammarly="true"
                 data-ms-editor="true"
-                className="w-full min-h-[140px] sm:min-h-[100px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
+                className="w-full min-h-[140px] sm:min-h-[120px] p-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500 font-medium leading-relaxed"
                 placeholder="Escribe la sinopsis que verán los estudiantes antes de comenzar el módulo..."
                 value={renameDescriptionInput}
                 onChange={e => setRenameDescriptionInput(e.target.value)}
               />
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsRenameModalOpen(false)} className="h-10 text-xs font-bold rounded-xl">
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isRenamingModule} className="h-10 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-6 rounded-xl">
-                {isRenamingModule ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
-                Guardar Información
-              </Button>
+            <div className="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3">
+              {onDeleteModule ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDeleteCurrentModule}
+                  disabled={isDeletingModule || isRenamingModule}
+                  className="h-10 text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 rounded-xl flex items-center justify-center gap-1.5 shrink-0"
+                >
+                  {isDeletingModule ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  Eliminar Módulo
+                </Button>
+              ) : <div />}
+              <div className="flex items-center justify-end gap-2 shrink-0">
+                <Button type="button" variant="outline" onClick={() => setIsRenameModalOpen(false)} className="h-10 text-xs font-bold rounded-xl px-4">
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isRenamingModule || isDeletingModule} className="h-10 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-5 rounded-xl shadow-xs">
+                  {isRenamingModule ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Save className="h-4 w-4 mr-1.5" />}
+                  Guardar Información
+                </Button>
+              </div>
             </div>
           </form>
         </DialogContent>
@@ -881,7 +941,7 @@ export function TheoryContentBuilderTab({
 
       {/* Modal Crear Nuevo Módulo */}
       <Dialog open={isCreateModuleModalOpen} onOpenChange={setIsCreateModuleModalOpen}>
-        <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
+        <DialogContent className="w-[94vw] sm:max-w-xl md:max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-headline font-black text-slate-800 flex items-center gap-2">
               <PlusCircle className="h-5 w-5 text-brand-green" />

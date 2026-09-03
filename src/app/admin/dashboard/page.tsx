@@ -124,9 +124,14 @@ export default function AdminDashboard() {
               setNewUserEmail={adminUsers.setNewUserEmail}
               newUserPassword={adminUsers.newUserPassword}
               setNewUserPassword={adminUsers.setNewUserPassword}
+              newUserRole={adminUsers.newUserRole}
+              setNewUserRole={adminUsers.setNewUserRole}
               isCreatingUser={adminUsers.isCreatingUser}
               onCreateUser={adminUsers.handleCreateUser}
               onResetPassword={adminUsers.handleResetUserPassword}
+              onChangeUserRole={adminUsers.handleChangeUserRole}
+              onDeleteUser={adminUsers.handleDeleteUser}
+              currentAdminId={adminUsers.currentAdminId}
               assignUserId={adminUsers.assignUserId}
               setAssignUserId={adminUsers.setAssignUserId}
               assignModuleId={adminUsers.assignModuleId}
@@ -175,6 +180,15 @@ export default function AdminDashboard() {
               quizManager={quizManager}
               onRenameModule={adminUsers.handleRenameModule}
               onCreateModule={adminUsers.handleCreateModule}
+              onDeleteSection={theoryBuilder.handleDeleteContentSection}
+              onDeleteModule={async (modId: string) => {
+                const ok = await adminUsers.handleDeleteModule(modId);
+                if (ok) {
+                  const remaining = adminUsers.dbModules.filter(m => m.id !== modId);
+                  theoryBuilder.setEditContentModuleId(remaining.length > 0 ? remaining[0].id : "");
+                }
+                return ok;
+              }}
             />
           </TabsContent>
         </Tabs>

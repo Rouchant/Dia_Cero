@@ -13,11 +13,13 @@ export function useAdminUsers() {
   const [dbModules, setDbModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserStats, setSelectedUserStats] = useState<any>(null);
+  const [currentAdminId, setCurrentAdminId] = useState<string>("");
 
   // User Creation State
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("Cambiar123!");
+  const [newUserRole, setNewUserRole] = useState<'estudiante' | 'admin'>('estudiante');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
 
   // Assignment State
@@ -31,6 +33,7 @@ export function useAdminUsers() {
       router.push('/auth/login');
       return;
     }
+    setCurrentAdminId(authData.user.id);
     const userRole = authData.user.user_metadata?.role;
     if (userRole !== 'admin') {
       router.push('/dashboard');
@@ -122,19 +125,21 @@ export function useAdminUsers() {
         body: JSON.stringify({
           email: newUserEmail,
           password: newUserPassword,
-          name: newUserName
+          name: newUserName,
+          role: newUserRole
         })
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Falla creando perfil de alumno');
+        throw new Error(data.error || 'Falla creando perfil de usuario');
       }
 
-      alert("¡Usuario alumno creado exitosamente!");
+      alert(`¡Usuario (${newUserRole === 'admin' ? 'Administrador' : 'Estudiante'}) creado exitosamente!`);
       setNewUserName("");
       setNewUserEmail("");
       setNewUserPassword("");
+      setNewUserRole("estudiante");
       fetchData();
     } catch (err: any) {
       alert("Error en la operación: " + err.message);
@@ -268,6 +273,82 @@ export function useAdminUsers() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userName?: string) => {
+    if (!userId) return false;
+    const confirmDelete = window.confirm(
+      `¿Estás seguro de que deseas eliminar permanentemente al alumno "${userName || userId}"?\n\nEsta acción borrará su cuenta, acceso, avance y certificaciones de forma irreversible.`
+    );
+    if (!confirmDelete) return false;
+
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Error al eliminar alumno: " + (data.error || "Error de servidor"));
+        return false;
+      }
+      alert("¡Alumno eliminado exitosamente del sistema!");
+      if (selectedUserStats?.id === userId) {
+        setSelectedUserStats(null);
+      }
+      await fetchData();
+      return true;
+    } catch (err: any) {
+      alert("Error de conexión al eliminar alumno: " + err.message);
+      return false;
+    }
+  };
+
+  const handleDeleteModule = async (moduleId: string) => {
+    if (!moduleId) return false;
+
+    try {
+      const res = await fetch('/api/admin/modules', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moduleId })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Error al eliminar módulo: " + (data.error || "Error de servidor"));
+        return false;
+      }
+      alert("¡Módulo eliminado correctamente!");
+      await fetchData();
+      return true;
+    } catch (err: any) {
+      alert("Error de conexión al eliminar módulo: " + err.message);
+      return false;
+    }
+  };
+
+  const handleChangeUserRole = async (targetUserId: string, newRole: 'admin' | 'estudiante') => {
+    if (!targetUserId || !newRole) return false;
+
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: targetUserId, newRole })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Error actualizando rol: " + (data.error || "Error de servidor"));
+        return false;
+      }
+      alert(`¡Rol del usuario actualizado a ${newRole === 'admin' ? 'Administrador' : 'Alumno'} con éxito!`);
+      await fetchData();
+      return true;
+    } catch (err: any) {
+      alert("Error de conexión al cambiar rol: " + err.message);
+      return false;
+    }
+  };
+
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -288,6 +369,7 @@ export function useAdminUsers() {
     filteredUsers,
     students,
     dbModules,
+    currentAdminId,
     totalStudents,
     averageProgress,
     completedStudents,
@@ -299,8 +381,12 @@ export function useAdminUsers() {
     setNewUserEmail,
     newUserPassword,
     setNewUserPassword,
+    newUserRole,
+    setNewUserRole,
     isCreatingUser,
     handleCreateUser,
+    handleDeleteUser,
+    handleChangeUserRole,
     assignUserId,
     setAssignUserId,
     assignModuleId,
@@ -310,6 +396,7 @@ export function useAdminUsers() {
     handleAssignModuleDirectly,
     handleUnassignModuleDirectly,
     handleRenameModule,
+    handleDeleteModule,
     handleResetUserPassword,
     handleCreateModule
   };

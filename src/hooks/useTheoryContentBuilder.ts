@@ -325,6 +325,55 @@ export function useTheoryContentBuilder(dbModules: any[]) {
     setIsSavingContent(false);
   };
 
+  const handleDeleteContentSection = async (sectionId?: string) => {
+    const targetId = sectionId || selectedSectionId;
+    if (!targetId) return false;
+
+    const sec = contentSections.find(s => s.id === targetId);
+    const secTitle = sec?.title || "esta sección";
+
+    const confirmed = window.confirm(
+      `¿Estás seguro de que deseas eliminar permanentemente la lección "${secTitle}"? Esta acción no se puede deshacer.`
+    );
+    if (!confirmed) return false;
+
+    setIsSavingContent(true);
+    try {
+      const { error } = await supabase
+        .from('module_sections')
+        .delete()
+        .eq('id', targetId);
+
+      if (error) {
+        alert("Error al eliminar la sección: " + error.message);
+        return false;
+      }
+
+      const remainingSections = contentSections.filter(s => s.id !== targetId);
+      setContentSections(remainingSections);
+
+      const updatedDrafts = { ...draftSections };
+      delete updatedDrafts[targetId];
+      setDraftSections(updatedDrafts);
+
+      if (selectedSectionId === targetId) {
+        if (remainingSections.length > 0) {
+          loadSectionFromDraft(remainingSections[0].id, updatedDrafts);
+        } else {
+          clearContentForm();
+        }
+      }
+
+      alert("¡Sección eliminada exitosamente!");
+      return true;
+    } catch (err: any) {
+      alert("Error de conexión: " + err.message);
+      return false;
+    } finally {
+      setIsSavingContent(false);
+    }
+  };
+
   const handleSaveAllContentSections = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!editContentModuleId) return;
@@ -417,6 +466,7 @@ export function useTheoryContentBuilder(dbModules: any[]) {
     setEditSecAiAnalogy,
     loadSectionFromDraft,
     handleAddNewContentSection,
+    handleDeleteContentSection,
     handleSaveAllContentSections,
     handleGenerateAiForCurrentSection,
     contentTextareaRef,

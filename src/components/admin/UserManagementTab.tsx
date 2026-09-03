@@ -288,7 +288,7 @@ export function UserManagementTab({
               </div>
 
               <div className="pt-2 flex justify-end">
-                <Button variant="outline" onClick={() => setSelectedUserStats(null)} className="h-9 text-xs font-bold">
+                <Button variant="outline" onClick={() => setSelectedUserStats(null)} className="h-9 text-xs font-bold rounded-xl">
                   Cerrar
                 </Button>
               </div>
