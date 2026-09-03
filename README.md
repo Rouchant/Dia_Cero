@@ -164,8 +164,14 @@ src/
 │   ├── dashboard/        # Componentes del portal del alumno (MotivationalCarousel)
 │   ├── module/           # Experiencia de aprendizaje interactiva: AIHelper, Quiz, FeedbackSurvey
 │   └── ui/               # Componentes atómicos de diseño (Shadcn UI + Radix Primitives)
-├── hooks/                # Custom React Hooks (TheoryBuilder, Toasts, Responsive)
-├── lib/                  # Funciones utilitarias, hashing criptográfico y tests unitarios
+├── hooks/                # Custom React Hooks (useTheoryBuilder, useAdminUsers, useQuizManager)
+├── lib/                  # Utilidades, hashing criptográfico y suites de pruebas unitarias
+│   ├── cert-hash.ts      # Generación de folios DC-[HASH] y firma QR
+│   ├── cert-hash.test.ts # Tests de validación y firma de certificados
+│   ├── certificates-and-progress.test.ts # Tests de métricas, cohortes y diplomas
+│   ├── progress-tracker.test.ts # Tests de tracking de avance y asignaciones
+│   ├── quiz-manager.test.ts # Tests de creación, edición y borrado de preguntas
+│   └── utils.test.ts     # Tests de utilidades y fusión de clases Tailwind
 └── utils/supabase/       # Conectores de Supabase (Client para el navegador, Server para SSR/API)
 ```
 
@@ -461,7 +467,7 @@ npm run build       # Compilación y optimización para producción
 - **Constructor Teórico**: Toolbar de edición enriquecida (**Negrita**, **Punteo** y **Numeración ordenada**).
 - **Gestor de Quizzes**: Paleta ámbar/amarillo cálido, radio button interactivo en azul y selector SVG de alta fidelidad.
 - **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
-- **Estabilidad**: 17 tests unitarios automatizados con Vitest pasando al 100% y cero errores de TypeScript.
+- **Estabilidad & Cobertura**: 77 tests unitarios automatizados con Vitest (9 suites pasando al 100%) y compilación TypeScript estricta con cero errores.
 
 ---
 
