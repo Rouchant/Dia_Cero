@@ -1,5 +1,11 @@
 # DiaCero — Plataforma de Entrenamiento Normativo
 
+![Versión](https://img.shields.io/badge/version-v3.0.0--release-blue?style=for-the-badge&logo=git)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-BaaS-3ECF8E?style=for-the-badge&logo=supabase)
+![Vitest](https://img.shields.io/badge/Tests-17%20Passed-brightgreen?style=for-the-badge&logo=vitest)
+
 > **Cero papeleo. 100% digital.** Una experiencia educativa de vanguardia para la capacitación en normativas de seguridad ocupacional en Chile, diseñada para transformar el cumplimiento reactivo en aprendizaje proactivo.
 
 ---
@@ -7,7 +13,7 @@
 ## 🚀 Filosofía: El Fin del Papeleo
 DiaCero nace con una misión clara: **Digitalización total del proceso de cumplimiento**. 
 - **Eficiencia**: Eliminación de registros físicos y carpetas olvidadas.
-- **Trazabilidad**: Cada interacción, desde la lectura hasta el examen, queda registrada con firma digital.
+- **Trazabilidad**: Cada interacción, desde la lectura hasta el examen, queda registrada con firma digital y hash criptográfico.
 - **Accesibilidad**: Formación disponible 24/7 desde cualquier dispositivo móvil en faena.
 
 ---
@@ -16,30 +22,51 @@ DiaCero nace con una misión clara: **Digitalización total del proceso de cumpl
 
 | Feature | Descripción |
 |---|---|
-| 🔐 **Autenticación Robusta** | Sistema unificado con **Supabase Auth** para un acceso seguro y trazable. |
-| 🤖 **Asistente de IA** | Integración nativa con GenAI para resúmenes automáticos y explicaciones adaptativas de conceptos técnicos. |
-| 📚 **Módulos Interactivos** | Visor de contenido dinámico con videos, lecturas y seguimiento de progreso en tiempo real. |
-| 🛡️ **Seguridad Anti-Trampas** | Medidas de protección de contenido avanzadas contra copias, capturas e impresión no autorizadas. |
-| 📱 **Diseño Optimizados para WebKit** | Perfecta visualización y adaptabilidad responsive en Safari (iOS) usando Dynamic Viewports (`dvh`). |
-| 🎓 **Dashboard Personalizado** | Visualización clara de metas, barra de progreso y descarga inmediata de certificaciones. |
-| 🛡️ **Panel de Administración** | KPIs en tiempo real, monitoreo de cumplimiento por cohorte y gestión de usuarios. |
-| 🏅 **Certificación Automática** | Generación instantánea de certificados A4 validados al completar satisfactoriamente los módulos. |
+| 🔐 **Autenticación y Roles RBAC** | Sistema unificado con **Supabase Auth** y panel administrativo para asignación de roles (`admin`, `student`) y actualización de contraseñas. |
+| 🛠️ **Constructor Teórico y de Quizzes** | Panel interactivo para editar módulos, redactar diapositivas con barra de formato (negrita, punteo, numeración), multimedia y editor de preguntas. |
+| 🤖 **Asistente de IA (Genkit)** | Resúmenes automáticos y explicaciones adaptativas con analogías cotidianas para conceptos técnicos complejos de la legislación chilena. |
+| 📚 **Visor de Módulos Dinámico** | Experiencia interactiva para el alumno con video explicativo, diapositivas estructuradas y barra de avance en tiempo real. |
+| 🛡️ **Seguridad Anti-Trampas** | Protección contra copia (`select-none`), inhabilitación de portapapeles, bloqueo de clic derecho y detección de pérdida de foco (`window.blur`). |
+| 📱 **Diseño 100% Responsive** | Interfaz adaptada minuciosamente para smartphones, tablets y pantallas de escritorio, optimizada para WebKit/Safari (`dvh`). |
+| 📊 **Panel de Control y Métricas** | KPIs en tiempo real: tasa de aprobación, progreso global, desglose por cohorte y auditoría de altas inmediatas. |
+| 🏅 **Certificación Criptográfica** | Certificados A4 emitidos al instante con folio único y código hash de validación SHA-256 verificable. |
+
+---
+
+## 🛠️ Panel de Administración y Creación de Contenidos
+
+El panel administrativo (`/admin/dashboard`) integra herramientas de última generación para la gestión integral de la academia:
+
+1. **Constructor Teórico & Evaluaciones (Mallas)**:
+   - **Gestión de Módulos**: Selección de cursos, creación rápida y renombrado de títulos/descripciones.
+   - **Editor de Diapositivas**: Redacción de contenido con barra de formato enriquecido (**Negrita**, **Punteo** y **Numeración correlativa automática**).
+   - **Soporte Multimedia**: Integración de URLs de video de YouTube e imágenes de portada por lección.
+   - **Asistente IA Integrado**: Generación instantánea de resúmenes ejecutivos y analogías adaptativas con un solo clic.
+   - **Control de Borradores**: Detección de cambios locales no sincronizados y guardado masivo con un solo botón.
+
+2. **Gestor y Banco de Quizzes**:
+   - Selector interactivo de preguntas y respuestas de 4 opciones (`Opción A`, `B`, `C`, `D`).
+   - Selección visual de respuesta correcta mediante botones de radio de alta fidelidad.
+   - Edición modal en caliente y eliminación segura de preguntas.
+
+3. **Control de Cuentas, Roles y Asignaciones**:
+   - Visualización de usuarios registrados, roles asignados y estado de cursos.
+   - Actualización directa de contraseña desde el panel de control.
+   - Concesión de "Alta Inmediata" para acelerar el ingreso de nuevos colaboradores.
+   - Diseño optimizado sin desbordes para uso fluido desde dispositivos móviles en terreno.
 
 ---
 
 ## 🛡️ Medidas Anti-Trampas (Protección de Contenido)
 
-Para asegurar la validez de las evaluaciones y proteger la propiedad intelectual del material educativo en faenas críticas, hemos implementado una sólida suite de seguridad en el visor de aprendizaje:
+Para asegurar la validez de las evaluaciones y proteger la propiedad intelectual del material educativo en faenas críticas:
 
-1. **Bloqueo Semántico de Copias (`select-none`)**: El contenido educativo e interactivo se encuentra bajo una restricción de selección por CSS. El alumno no puede sombrear ni seleccionar textos o preguntas.
-2. **Inhabilitación del Portapapeles (Copy/Cut/Paste)**: Los eventos de copiado, cortado y pegado son interceptados y anulados. En caso de bypass, se inyecta un texto sustituto disuasorio (*"Contenido protegido por DiaCero."*).
-3. **Bloqueo del Menú de Clic Derecho**: Desactivación del menú contextual (`contextmenu`) para impedir la inspección de elementos o accesos rápidos de copia.
-4. **Protección Inteligente de Foco (Anti-Capturas de Pantalla)**: 
-   - Detecta de forma activa cuándo el usuario pierde el foco de la ventana del navegador (`window.blur`), por ejemplo, al abrir herramientas de recorte (Snipping Tool, Skitch), iniciar grabadores de pantalla o enfocar una ventana en un segundo monitor.
-   - En milisegundos, el visor despliega un overlay de cristal esmerilado de alta fidelidad (`backdrop-blur-md`) titulado **"Contenido Protegido"**, bloqueando visualmente el material de estudio e impidiendo capturas en segundo plano.
-5. **Restricción de Arrastre de Imágenes**: Se evita la descarga rápida de material gráfico mediante la inhabilitación del evento `dragstart` en imágenes.
-6. **Supresión de Impresión y Exportación a PDF**: Se define una consulta de medios `@media print` en los estilos globales que oculta por completo (`display: none !important`) la aplicación si el usuario abre el menú de impresión o intenta guardar el material como un archivo PDF.
-7. **Control de Atajos de Teclado**: Se interceptan y bloquean combinaciones clave como la tecla `PrintScreen` (limpiando inmediatamente el portapapeles), `Ctrl/Cmd + P` (imprimir), `Ctrl/Cmd + C` (copiar) y `Ctrl/Cmd + U` (ver código fuente).
+1. **Bloqueo Semántico de Copias (`select-none`)**: Restricción CSS para impedir la selección o sombreado de textos y preguntas.
+2. **Inhabilitación del Portapapeles (Copy/Cut/Paste)**: Los eventos de copiado son interceptados e inyectan el aviso disuasorio: *"Contenido protegido por DiaCero."*
+3. **Bloqueo del Menú de Clic Derecho**: Desactivación de `contextmenu` para evitar inspección o accesos rápidos del navegador.
+4. **Protección Inteligente de Foco (Anti-Capturas)**: Detección en tiempo real de pérdida de foco (`window.blur`). Despliega de inmediato una capa de cristal esmerilado (`backdrop-blur-md`) con el aviso **"Contenido Protegido"** ante intentos de uso de herramientas de recorte (Snipping Tool, Skitch, etc.).
+5. **Supresión de Impresión**: Regla `@media print` que oculta el contenido (`display: none !important`) si se intenta imprimir o exportar a PDF no autorizado.
+6. **Intercepción de Atajos de Teclado**: Bloqueo de combinaciones como `PrintScreen`, `Ctrl/Cmd + P`, `Ctrl/Cmd + C` y `Ctrl/Cmd + U`.
 
 ---
 
@@ -47,23 +74,25 @@ Para asegurar la validez de las evaluaciones y proteger la propiedad intelectual
 
 ```mermaid
 graph TD
-    User((Usuario)) --> NextJS["Next.js App Router"]
-    NextJS --> Auth["Supabase Auth"]
-    NextJS --> DB[(PostgreSQL)]
-    NextJS --> AI["AI Engine / Genkit"]
-    NextJS --> UI["Shadcn UI / Tailwind"]
+    User((Usuario / Estudiante)) --> NextJS["Next.js 15 (App Router)"]
+    Admin((Administrador)) --> NextJS
+    NextJS --> Auth["Supabase Auth (RBAC)"]
+    NextJS --> DB[(PostgreSQL Supabase)]
+    NextJS --> AI["Genkit / Google Gemini"]
+    NextJS --> UI["Tailwind CSS / Shadcn UI"]
     NextJS --> Tests["Vitest Suite / JSDOM"]
     
-    subgraph "Capas de Aplicación"
-        NextJS --> Dashboard["/dashboard"]
-        NextJS --> Module["/module/id"]
-        NextJS --> Admin["/admin/dashboard"]
+    subgraph "Rutas de Aplicación"
+        NextJS --> Dashboard["/dashboard (Estudiante)"]
+        NextJS --> Module["/module/[id] (Visor Protegido)"]
+        NextJS --> AdminDash["/admin/dashboard (Gestión & Mallas)"]
+        NextJS --> Cert["/certificate/[id] (Validación SHA-256)"]
     end
     
-    subgraph "Servicios"
-        DB --> Storage["Archivos / Certificados"]
-        AI --> Summaries[Resúmenes]
-        AI --> Explanations[Explicaciones]
+    subgraph "Servicios Externos"
+        DB --> Storage["Archivos & Firmas"]
+        AI --> Summaries["Resúmenes Automáticos"]
+        AI --> Analogies["Explicaciones Adaptativas"]
     end
 ```
 
@@ -73,45 +102,33 @@ graph TD
 
 | Capa | Tecnología |
 |---|---|
-| **Framework** | [Next.js 15](https://nextjs.org/) (App Router + Turbopack) |
+| **Framework Web** | [Next.js 15](https://nextjs.org/) (App Router + Turbopack) |
 | **Pruebas (Testing)** | [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/) + [JSDOM](https://github.com/jsdom/jsdom) |
-| **Inteligencia Artificial** | [Genkit](https://firebase.google.com/docs/genkit) + Google Gemini Pro |
-| **Backend as a Service** | [Supabase](https://supabase.com/) (PostgreSQL, Auth, Storage) |
+| **Inteligencia Artificial** | [Genkit](https://firebase.google.com/docs/genkit) + Google Gemini |
+| **Backend as a Service** | [Supabase](https://supabase.com/) (PostgreSQL, Row Level Security, Auth) |
 | **Estilos & UI** | [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/) |
-| **Visualización** | [Recharts](https://recharts.org/) + [Lucide Icons](https://lucide.dev/) |
-| **Lenguaje** | TypeScript 5 |
+| **Visualización e Iconos** | [Recharts](https://recharts.org/) + [Lucide React](https://lucide.dev/) |
+| **Lenguaje** | TypeScript 5 (Strict Mode) |
 
 ---
 
 ## 🧪 Entorno de Pruebas (Unit Testing)
 
-Contamos con una suite completa de pruebas unitarias y de simulación para validar la lógica funcional y de componentes sin requerir servicios en la nube activos.
+La suite de pruebas automatizadas garantiza la robustez y previene regresiones funcionales:
 
-### Pruebas Cubiertas:
-1. **Funciones Utilitarias (`src/lib/utils.test.ts`)**: Cobertura de combinación de estilos dinámicos de Tailwind CSS (`clsx` + `tailwind-merge`).
-2. **Componente Cuestionario (`src/components/module/Quiz.test.tsx`)**: Simulación interactiva de respuestas, retroalimentación en tiempo real (respuestas correctas/incorrectas), flujo de avance y lógica de finalización con reporte de puntaje exacto.
-3. **Encuesta de Comentarios (`src/components/module/FeedbackSurvey.test.tsx`)**: Validación de estados de envío de formularios, valoraciones por estrellas y simulación de delay asíncrono con **Fake Timers** de Vitest.
+```bash
+# Ejecutar todas las pruebas unitarias
+npm run test:run
 
-### Comandos de Pruebas:
-- **Modo Watch (Desarrollo Interactivo)**:
-  ```bash
-  npm run test
-  ```
-- **Modo Ejecución Única (CI/CD)**:
-  ```bash
-  npm run test:run
-  ```
+# Modo interactivo / observador
+npm run test
+```
 
----
-
-## 🧠 Componentes Inteligentes (AI Features)
-
-La plataforma integra capacidades de IA para mejorar la experiencia de aprendizaje:
-
-1.  **AI Helper (`src/components/module/AIHelper.tsx`)**: 
-    - **Punto Clave**: Genera resúmenes ejecutivos de secciones extensas de seguridad.
-    - **Explicación Adaptativa**: Utiliza analogías del mundo cotidiano para explicar conceptos técnicos de la normativa chilena.
-2.  **Generación de Contexto**: Utiliza `ai-module-summary` y `ai-adaptive-explanation` para personalizar el aprendizaje según la sección actual.
+### Cobertura de Suites de Prueba (17 Tests — 100% Aprobados):
+1. **`src/lib/utils.test.ts`**: Fusión y precedencia de clases dinámicas Tailwind (`cn`).
+2. **`src/lib/cert-hash.test.ts`**: Verificación y consistencia del algoritmo criptográfico SHA-256 para emisión de certificados.
+3. **`src/components/module/Quiz.test.tsx`**: Flujo completo de evaluación, habilitación de envíos, feedback de opciones correctas/incorrectas, paginación de preguntas y cálculo de puntaje.
+4. **`src/components/module/FeedbackSurvey.test.tsx`**: Comportamiento de encuestas de satisfacción, rating por estrellas y simulación asíncrona de envío con fake timers.
 
 ---
 
@@ -119,46 +136,54 @@ La plataforma integra capacidades de IA para mejorar la experiencia de aprendiza
 
 ```text
 src/
-├── ai/                   # Lógica de prompts y flujos de IA (Genkit)
-├── app/                  # Sistema de rutas (App Router)
-│   ├── admin/            # Panel administrativo y reportes
-│   ├── certificate/      # Generación dinámica de certificados
-│   ├── dashboard/        # Portal del estudiante
-│   └── module/[id]/      # Visor interactivo de cursos
+├── ai/                   # Flujos de IA y prompts estructurados (Genkit)
+├── app/                  # Rutas de la plataforma (Next.js App Router)
+│   ├── admin/            # Panel administrativo, analíticas y gestión de mallas
+│   ├── certificate/      # Emisión y validación pública de diplomas
+│   ├── dashboard/        # Centro de capacitación para alumnos
+│   └── module/[id]/      # Visor interactivo y seguro de lecciones
 ├── components/
-│   ├── auth/             # Componentes de Login y Registro
-│   ├── module/           # Componentes core: AIHelper, Quiz (con Tests), Feedback (con Tests)
-│   └── ui/               # Librería de componentes visuales (Shadcn)
-├── hooks/                # Hooks personalizados (Toast, Mobile detection)
-├── lib/                  # Utilidades (con Tests) y configuración compartida
-└── utils/supabase/       # Integración con el cliente de base de datos
+│   ├── admin/            # Componentes de administración (Builder, Quizzes, Cuentas)
+│   ├── auth/             # Formularios de autenticación y control de accesos
+│   ├── module/           # Componentes core: AIHelper, Quiz, FeedbackSurvey
+│   └── ui/               # Componentes atómicos de diseño (Shadcn UI)
+├── hooks/                # Custom React Hooks (TheoryBuilder, Toasts, Responsive)
+├── lib/                  # Funciones utilitarias, hashing y tests unitarios
+└── utils/supabase/       # Conectores y clientes de Supabase (Client, Server)
 ```
 
 ---
 
 ## ⚙️ Configuración y Despliegue
 
-### Requisitos Previos
-- Cuenta en [Supabase](https://supabase.com/)
-- Claves de API de Google AI (para funciones de GenAI)
-
-### Variables de Entorno (.env.local)
+### Variables de Entorno (`.env.local`)
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://<tu-id>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-key>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
 GOOGLE_GENAI_API_KEY=<tu-google-ai-key>
 ```
 
 ### Comandos de Desarrollo
 ```bash
-npm install         # Instalación de dependencias
-npm run dev         # Desarrollo local (Puerto 9002)
-npm run typecheck   # Validación de tipos estáticos en TS
-npm run build       # Compilación y empaquetamiento para producción
+npm install         # Instalar dependencias del proyecto
+npm run dev         # Servidor de desarrollo local (Puerto 9002)
+npm run typecheck   # Validación estricta de tipos de TypeScript (tsc --noEmit)
+npm run test:run    # Ejecución de la suite completa de pruebas unitarias
+npm run build       # Compilación y optimización para producción
 ```
+
+---
+
+## 🏷️ Historial de Versiones
+
+### [v3.0.0-release] — 2026-09-03
+- **Constructor Teórico**: Adición de toolbar de edición enriquecida con soporte para **Negrita**, **Punteo** y **Numeración ordenada**.
+- **Gestor de Quizzes**: Paleta renovada en tonos ámbar/amarillo cálido, ícono vectorial SVG azul para respuesta correcta y placeholder intuitivo.
+- **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
+- **Arquitectura & Estabilidad**: Cobertura ampliada a 17 tests unitarios con Vitest y validación de tipos TypeScript en estricto cero errores.
 
 ---
 
 ## 📄 Licencia
 
-Proyecto privado — © DiaCero. Todos los derechos reservados. Diseñado para transformar la seguridad industrial en Chile.
+Proyecto privado — © DiaCero. Todos los derechos reservados. Diseñado para transformar la capacitación y seguridad industrial en Chile.
