@@ -5,7 +5,7 @@
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-BaaS-3ECF8E?style=for-the-badge&logo=supabase)
-![Vitest](https://img.shields.io/badge/Tests-45%20Passed-brightgreen?style=for-the-badge&logo=vitest)
+![Vitest](https://img.shields.io/badge/Tests-55%20Passed-brightgreen?style=for-the-badge&logo=vitest)
 
 > **Cero papeleo. 100% digital.** Una experiencia educativa de vanguardia para la capacitación en normativas de seguridad ocupacional en Chile, diseñada para transformar el cumplimiento reactivo en aprendizaje proactivo.
 
@@ -128,14 +128,15 @@ npm run test:run
 npm run test
 ```
 
-### Cobertura de Suites de Prueba (45 Tests — 100% Aprobados):
-1. **`src/app/api/admin/modules/route.test.ts`**: Creación, edición, generación de slugs limpios con normalización de acentos y eliminación en cascada de módulos (quizzes, secciones y progresos).
-2. **`src/app/api/admin/users/route.test.ts`**: Control total de cuentas: altas inmediatas, actualización de roles (`admin`/`estudiante`), reseteo de contraseñas, bajas de usuarios y protección estricta de la cuenta administradora raíz.
-3. **`src/lib/progress-tracker.test.ts`**: Cálculo algorítmico de avance por módulo, prevención de división por cero, promedio general del estudiante y endpoints de asignación/desvinculación de cursos.
-4. **`src/lib/utils.test.ts`**: Fusión y precedencia de clases dinámicas Tailwind (`cn`).
-5. **`src/lib/cert-hash.test.ts`**: Verificación y consistencia del algoritmo criptográfico SHA-256 para emisión de certificados.
-6. **`src/components/module/Quiz.test.tsx`**: Flujo completo de evaluación, habilitación de envíos, feedback de opciones correctas/incorrectas, paginación de preguntas y cálculo de puntaje.
-7. **`src/components/module/FeedbackSurvey.test.tsx`**: Comportamiento de encuestas de satisfacción, rating por estrellas y simulación asíncrona de envío con fake timers.
+### Cobertura de Suites de Prueba (55 Tests — 100% Aprobados):
+1. **`src/lib/quiz-manager.test.ts`**: Gestión integral de quizzes: creación de contenedor evaluativo, validación estricta de preguntas (4 opciones, enunciados no vacíos, puntero a alternativa correcta), edición en caliente y eliminación segura de preguntas.
+2. **`src/app/api/admin/modules/route.test.ts`**: Creación, edición, generación de slugs limpios con normalización de acentos y eliminación en cascada de módulos (quizzes, secciones y progresos).
+3. **`src/app/api/admin/users/route.test.ts`**: Control total de cuentas: altas inmediatas, actualización de roles (`admin`/`estudiante`), reseteo de contraseñas, bajas de usuarios y protección estricta de la cuenta administradora raíz.
+4. **`src/lib/progress-tracker.test.ts`**: Cálculo algorítmico de avance por módulo, prevención de división por cero, promedio general del estudiante y endpoints de asignación/desvinculación de cursos.
+5. **`src/lib/utils.test.ts`**: Fusión y precedencia de clases dinámicas Tailwind (`cn`).
+6. **`src/lib/cert-hash.test.ts`**: Verificación y consistencia del algoritmo criptográfico SHA-256 para emisión de certificados.
+7. **`src/components/module/Quiz.test.tsx`**: Flujo completo de evaluación del estudiante, habilitación de envíos, feedback de opciones correctas/incorrectas, paginación y cálculo de puntaje.
+8. **`src/components/module/FeedbackSurvey.test.tsx`**: Comportamiento de encuestas de satisfacción, rating por estrellas y simulación asíncrona de envío con fake timers.
 
 ---
 
