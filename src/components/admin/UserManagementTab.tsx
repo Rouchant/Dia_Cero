@@ -229,34 +229,9 @@ export function UserManagementTab({
                     <div key={mod.module_id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-bold text-slate-800 line-clamp-1">{mod.module_title || mod.title}</span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-[11px] font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-500'}`}>
-                            {mod.is_assigned ? `${mod.progress_percentage}%` : 'No Asignado'}
-                          </span>
-                          {mod.is_assigned ? (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              disabled={isAssigning}
-                              onClick={() => onUnassignModuleDirectly?.(selectedUserStats.id, mod.module_id)}
-                              className="h-6 px-2 text-[10px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-md"
-                            >
-                              Quitar
-                            </Button>
-                          ) : (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              disabled={isAssigning}
-                              onClick={() => onAssignModuleDirectly?.(selectedUserStats.id, mod.module_id)}
-                              className="h-6 px-2 text-[10px] font-bold bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 rounded-md"
-                            >
-                              + Asignar
-                            </Button>
-                          )}
-                        </div>
+                        <span className={`text-[11px] font-bold ${mod.is_assigned ? 'text-brand-blue' : 'text-slate-500'}`}>
+                          {mod.is_assigned ? `${mod.progress_percentage}%` : 'No Asignado'}
+                        </span>
                       </div>
                       
                       {mod.is_assigned ? (
