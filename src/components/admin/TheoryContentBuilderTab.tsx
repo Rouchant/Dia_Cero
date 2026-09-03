@@ -156,7 +156,7 @@ export function TheoryContentBuilderTab({
 
   return (
     <Card className="border-sky-100 shadow-xl border-t-[5px] border-t-sky-500 overflow-hidden">
-      <CardHeader className="bg-slate-50/80 border-b flex flex-col gap-4 p-6">
+      <CardHeader className="bg-slate-50/80 border-b flex flex-col gap-4 p-4 sm:p-6">
         <div>
           <CardTitle className="flex items-center gap-2 text-xl font-headline text-slate-800">
             <span className="text-xl">📚</span> Constructor Teórico & Evaluaciones (Mallas)
@@ -166,15 +166,16 @@ export function TheoryContentBuilderTab({
           </CardDescription>
         </div>
 
-        {/* Fila Inferior: Escoger Módulo, Editar Info y Crear Módulo Nuevo */}
-        <div className="pt-3 border-t border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex flex-1 items-center gap-3">
-            <Label htmlFor="c-mod" className="text-xs font-bold uppercase text-slate-500 whitespace-nowrap">
+        {/* Selector de Módulo (Fila 1) y Botones de Acción (Fila 2 - Usan toda la fila) */}
+        <div className="pt-3 border-t border-slate-200/70 flex flex-col gap-3 w-full">
+          {/* Fila 1: Selector de Módulo ocupa toda la fila */}
+          <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <Label htmlFor="c-mod" className="text-xs font-bold uppercase text-slate-500 whitespace-nowrap shrink-0">
               Módulo:
             </Label>
             <select 
               id="c-mod" 
-              className="h-10 px-3 border border-slate-300 rounded-xl bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500 w-full sm:max-w-md"
+              className="h-11 px-3.5 border border-slate-300 rounded-xl bg-white text-sm font-bold text-sky-950 focus:ring-2 focus:ring-sky-500 w-full shadow-2xs truncate cursor-pointer"
               value={editContentModuleId}
               onChange={e => setEditContentModuleId(e.target.value)}
             >
@@ -183,16 +184,18 @@ export function TheoryContentBuilderTab({
             </select>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Fila 2: Botones de Editar y Crear Módulo ocupan toda la fila */}
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleOpenRename}
               disabled={!editContentModuleId}
-              className="h-10 px-4 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center gap-1.5"
+              className="w-full h-11 px-3 sm:px-4 text-xs font-bold border-slate-300 text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all"
             >
-              <Edit3 className="h-3.5 w-3.5 text-sky-600" /> Editar Info
+              <Edit3 className="h-4 w-4 text-sky-600 shrink-0" />
+              <span>Editar Info</span>
             </Button>
 
             <Button
@@ -203,9 +206,10 @@ export function TheoryContentBuilderTab({
                 setNewModDesc("");
                 setIsCreateModuleModalOpen(true);
               }}
-              className="h-10 px-4 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-xl flex items-center gap-1.5 shadow-sm"
+              className="w-full h-11 px-3 sm:px-4 text-xs font-bold bg-brand-green hover:bg-[#007048] text-white rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all"
             >
-              <PlusCircle className="h-3.5 w-3.5" /> Crear Módulo
+              <PlusCircle className="h-4 w-4 shrink-0" />
+              <span>Crear Módulo</span>
             </Button>
           </div>
         </div>
