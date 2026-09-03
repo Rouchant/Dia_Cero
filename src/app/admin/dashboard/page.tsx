@@ -57,7 +57,7 @@ export default function AdminDashboard() {
       </header>
 
       {/* Main Content Container */}
-      <main className="max-w-7xl mx-auto p-6 md:p-8">
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
         {adminUsers.loading ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

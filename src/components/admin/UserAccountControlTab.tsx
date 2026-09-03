@@ -110,43 +110,43 @@ export function UserAccountControlTab({
       <Card className="border-slate-200/80 shadow-xl border-t-[5px] border-t-indigo-600 rounded-3xl overflow-hidden bg-white/95 backdrop-blur-sm">
         
         {/* Cabecera Principal del Recuadro */}
-        <CardHeader className="bg-slate-50/70 border-b border-slate-200/80 p-6">
+        <CardHeader className="bg-slate-50/70 border-b border-slate-200/80 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-headline font-extrabold text-slate-800">
-                <Users className="h-6 w-6 text-indigo-600" />
-                Control de Cuentas, Roles y Asignaciones
+              <CardTitle className="flex items-center gap-2.5 text-lg sm:text-2xl font-headline font-extrabold text-slate-800">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600 shrink-0" />
+                <span>Control de Cuentas, Roles y Asignaciones</span>
               </CardTitle>
               <CardDescription className="text-slate-500 text-xs sm:text-sm mt-1">
                 Alta de nuevos usuarios, administración centralizada de credenciales, roles, malla académica y bajas de cuenta.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              {students.length} cuentas registradas
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs self-start sm:self-auto shrink-0 whitespace-nowrap">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+              <span>{students.length} cuentas registradas</span>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-6 sm:p-8 space-y-8">
+        <CardContent className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
 
           {/* 1. MÓDULO CREAR NUEVO USUARIO (ARRIBA - DESPLEGABLE) */}
           <div className="bg-emerald-50/40 border border-emerald-200/80 rounded-2xl overflow-hidden shadow-2xs transition-all">
             <button
               type="button"
               onClick={() => setIsCreateUserOpen(!isCreateUserOpen)}
-              className="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-50/70 transition-colors text-left"
+              className="w-full p-3.5 sm:p-5 flex items-center justify-between hover:bg-emerald-50/70 transition-colors text-left"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                 <div className="h-9 w-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 shadow-2xs">
                   <UserPlus className="h-4.5 w-4.5" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm sm:text-base font-bold text-slate-800 font-headline">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-800 font-headline whitespace-nowrap">
                       Crear Nuevo Usuario
                     </h3>
-                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="shrink-0 whitespace-nowrap text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-200">
                       Alta Inmediata
                     </span>
                   </div>
@@ -156,7 +156,7 @@ export function UserAccountControlTab({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 ml-2">
                 <span className="text-xs font-bold text-emerald-700 hidden sm:inline">
                   {isCreateUserOpen ? "Ocultar formulario" : "Desplegar formulario"}
                 </span>
@@ -167,9 +167,9 @@ export function UserAccountControlTab({
             </button>
 
             {isCreateUserOpen && (
-              <div className="p-5 sm:p-6 pt-0 border-t border-emerald-100/80 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="p-4 sm:p-6 pt-0 border-t border-emerald-100/80 animate-in fade-in slide-in-from-top-2 duration-200">
                 <form onSubmit={onCreateUser} className="space-y-4 pt-4">
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-700">Nombre Completo</Label>
                       <Input
@@ -224,7 +224,7 @@ export function UserAccountControlTab({
                     <Button
                       type="submit"
                       disabled={isCreatingUser}
-                      className="h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full sm:w-auto h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                     >
                       {isCreatingUser ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
                       {isCreatingUser ? "Registrando..." : "Dar de Alta Usuario"}
@@ -240,22 +240,22 @@ export function UserAccountControlTab({
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase font-extrabold tracking-wider">
-              <span className="bg-white px-3 text-slate-400">Gestión de Cuentas Existentes</span>
+            <div className="relative flex justify-center text-[10px] sm:text-xs uppercase font-extrabold tracking-wider">
+              <span className="bg-white px-2.5 sm:px-3 text-slate-400 text-center">Gestión de Cuentas Existentes</span>
             </div>
           </div>
 
           {/* 2. LUEGO: SELECCIONAR USUARIO A ADMINISTRAR */}
           <div className="space-y-2">
-            <Label className="text-xs font-extrabold uppercase text-slate-700 tracking-wider flex items-center justify-between">
+            <Label className="text-xs font-extrabold uppercase text-slate-700 tracking-wider flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <span className="flex items-center gap-2">
-                <User className="h-4 w-4 text-indigo-600" />
+                <User className="h-4 w-4 text-indigo-600 shrink-0" />
                 Seleccionar Usuario a Administrar
               </span>
               {selectedUser && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100 flex items-center gap-1">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-600" /> Cuenta Seleccionada
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100 flex items-center gap-1 shrink-0 whitespace-nowrap">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-600 shrink-0" /> Cuenta Seleccionada
                   </span>
                   <button
                     type="button"
@@ -263,7 +263,7 @@ export function UserAccountControlTab({
                       setAssignUserId("");
                       setResetNewPass("");
                     }}
-                    className="text-[11px] font-bold text-slate-400 hover:text-rose-600 underline transition-colors cursor-pointer"
+                    className="text-[11px] font-bold text-slate-400 hover:text-rose-600 underline transition-colors cursor-pointer shrink-0"
                   >
                     Deseleccionar
                   </button>
@@ -272,7 +272,7 @@ export function UserAccountControlTab({
             </Label>
 
             <select
-              className="w-full h-12 px-4 border border-slate-200 rounded-2xl bg-slate-50 text-xs sm:text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 shadow-2xs transition-all cursor-pointer"
+              className="w-full h-12 px-3 sm:px-4 border border-slate-200 rounded-2xl bg-slate-50 text-xs sm:text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 shadow-2xs transition-all cursor-pointer truncate max-w-full"
               value={assignUserId || ""}
               onChange={e => {
                 setAssignUserId(e.target.value);
@@ -292,19 +292,19 @@ export function UserAccountControlTab({
           </div>
 
           {selectedUser ? (
-            <div className="space-y-8 animate-in fade-in duration-200">
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-200">
               
               {/* 3 & 4. CONTROL DE ROLES Y CONTRASEÑA */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 
                 {/* 3. CONTROL DE ROLES */}
-                <div className="p-5 bg-amber-50/30 border border-amber-200/70 rounded-2xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-amber-100 pb-2.5">
-                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline">
-                      <ShieldCheck className="h-4 w-4 text-amber-600" />
-                      Control de Roles
+                <div className="p-4 sm:p-5 bg-amber-50/30 border border-amber-200/70 rounded-2xl space-y-3.5 sm:space-y-4">
+                  <div className="flex items-center justify-between gap-2 border-b border-amber-100 pb-2.5">
+                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
+                      <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />
+                      <span className="truncate">Control de Roles</span>
                     </h4>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black ${
+                    <span className={`shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-black ${
                       selectedUser.role === 'admin'
                         ? 'bg-amber-100 text-amber-900 border border-amber-300'
                         : 'bg-sky-100 text-sky-900 border border-sky-300'
@@ -313,7 +313,7 @@ export function UserAccountControlTab({
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 break-words leading-relaxed">
                     Cambia los permisos operativos de <strong className="text-slate-700">{selectedUser.name}</strong> para otorgar o remover acceso al panel de administración.
                   </p>
 
@@ -332,17 +332,17 @@ export function UserAccountControlTab({
                             setIsUpdatingRole(false);
                           }
                         }}
-                        className={`w-full h-10 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 ${
+                        className={`w-full min-h-10 h-auto py-2.5 px-3 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 text-center whitespace-normal ${
                           selectedUser.role === 'admin'
                             ? 'bg-sky-600 hover:bg-sky-700 text-white'
                             : 'bg-amber-600 hover:bg-amber-700 text-white'
                         }`}
                       >
-                        {isUpdatingRole ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                        Cambiar a Rol {selectedUser.role === 'admin' ? 'Alumno' : 'Administrador'}
+                        {isUpdatingRole ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <ShieldCheck className="h-4 w-4 shrink-0" />}
+                        <span>Cambiar a Rol {selectedUser.role === 'admin' ? 'Alumno' : 'Administrador'}</span>
                       </Button>
                     ) : (
-                      <div className="p-2.5 bg-slate-100 rounded-xl text-[11px] text-slate-500 italic text-center">
+                      <div className="p-2.5 bg-slate-100 rounded-xl text-[11px] text-slate-500 italic text-center break-words">
                         * La cuenta principal de Administrador no puede ser modificada.
                       </div>
                     )}
@@ -350,13 +350,13 @@ export function UserAccountControlTab({
                 </div>
 
                 {/* 4. CONTRASEÑA */}
-                <div className="p-5 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
-                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline">
-                      <KeyRound className="h-4 w-4 text-slate-600" />
-                      Restablecer Contraseña
+                <div className="p-4 sm:p-5 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3.5 sm:space-y-4">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
+                      <KeyRound className="h-4 w-4 text-slate-600 shrink-0" />
+                      <span className="truncate">Restablecer Contraseña</span>
                     </h4>
-                    <span className="text-[11px] text-slate-500 font-medium">Mín. 6 caracteres</span>
+                    <span className="text-[11px] text-slate-500 font-medium shrink-0 whitespace-nowrap">Mín. 6 carac.</span>
                   </div>
 
                   <form onSubmit={handleExecuteResetPassword} className="space-y-3">
@@ -376,34 +376,34 @@ export function UserAccountControlTab({
                     <Button
                       type="submit"
                       disabled={isResettingPassword || resetNewPass.length < 6}
-                      className="w-full h-10 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full min-h-10 h-auto py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-center whitespace-normal"
                     >
-                      {isResettingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
-                      {isResettingPassword ? "Actualizando..." : `Actualizar Contraseña de ${selectedUser.name}`}
+                      {isResettingPassword ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <KeyRound className="h-4 w-4 shrink-0" />}
+                      <span>{isResettingPassword ? "Actualizando..." : "Actualizar Contraseña"}</span>
                     </Button>
                   </form>
                 </div>
               </div>
 
               {/* 5. Y ABAJO: ASIGNACIÓN DE MÓDULOS */}
-              <div className="p-5 sm:p-6 bg-indigo-50/30 border border-indigo-200/70 rounded-2xl space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-3">
-                  <div>
-                    <h4 className="text-base font-bold text-slate-800 flex items-center gap-2 font-headline">
-                      <BookOpen className="h-5 w-5 text-indigo-600" />
-                      Asignación de Módulos Académicos
+              <div className="p-4 sm:p-6 bg-indigo-50/30 border border-indigo-200/70 rounded-2xl space-y-4 sm:space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-indigo-100 pb-3">
+                  <div className="min-w-0">
+                    <h4 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2 font-headline">
+                      <BookOpen className="h-5 w-5 text-indigo-600 shrink-0" />
+                      <span>Asignación de Módulos Académicos</span>
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {selectedUser.name} ({selectedUser.email}) • {selectedUser.assigned_count || 0} de {dbModules.length} módulos habilitados
+                    <p className="text-xs text-slate-500 mt-1 break-words">
+                      <strong className="text-slate-700">{selectedUser.name}</strong> ({selectedUser.email}) • {selectedUser.assigned_count || 0} de {dbModules.length} módulos habilitados
                     </p>
                   </div>
-                  <span className="text-xs font-bold text-indigo-800 bg-indigo-100/70 px-3 py-1 rounded-xl border border-indigo-200 self-start sm:self-auto">
+                  <span className="text-xs font-bold text-indigo-800 bg-indigo-100/70 px-3 py-1 rounded-xl border border-indigo-200 self-start sm:self-auto shrink-0 whitespace-nowrap">
                     {selectedUser.assigned_count === dbModules.length ? "Malla Completa" : `${selectedUser.assigned_count || 0} Cursos Activos`}
                   </span>
                 </div>
 
                 {/* Grid de módulos */}
-                <div className="grid sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {dbModules.map(mod => {
                     const breakdownItem = selectedUser.module_breakdown?.find((mb: any) => mb.module_id === mod.id);
                     const isAssigned = breakdownItem?.is_assigned ?? false;
@@ -418,17 +418,17 @@ export function UserAccountControlTab({
                             : 'bg-white/60 border-slate-200 opacity-75 hover:opacity-100'
                         }`}
                       >
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <h5 className="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1">
+                            <h5 className="font-bold text-slate-800 text-xs sm:text-sm line-clamp-1 min-w-0">
                               {mod.title}
                             </h5>
                             {isAssigned ? (
-                              <span className="shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              <span className="shrink-0 whitespace-nowrap text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                                 Matriculado
                               </span>
                             ) : (
-                              <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                              <span className="shrink-0 whitespace-nowrap text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
                                 No asignado
                               </span>
                             )}
@@ -461,7 +461,7 @@ export function UserAccountControlTab({
                                 size="sm"
                                 variant="outline"
                                 onClick={() => onUnassignModuleDirectly?.(selectedUser.id, mod.id)}
-                                className="h-8 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl"
+                                className="w-full sm:w-auto h-8 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl"
                               >
                                 Desvincular Módulo
                               </Button>
@@ -470,7 +470,7 @@ export function UserAccountControlTab({
                                 type="button"
                                 size="sm"
                                 onClick={() => onAssignModuleDirectly?.(selectedUser.id, mod.id)}
-                                className="h-8 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs"
+                                className="w-full sm:w-auto h-8 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs"
                               >
                                 Asignar Módulo
                               </Button>
@@ -484,24 +484,24 @@ export function UserAccountControlTab({
               </div>
 
               {/* 6. Y ABAJO DEL TODO: ZONA DE PELIGRO BOTÓN DE ELIMINAR CUENTA */}
-              <div className="p-5 sm:p-6 bg-rose-50/50 border border-rose-200 rounded-2xl space-y-4">
+              <div className="p-4 sm:p-6 bg-rose-50/50 border border-rose-200 rounded-2xl space-y-4">
                 <div className="flex items-center gap-2 border-b border-rose-200/70 pb-2.5">
-                  <Trash2 className="h-5 w-5 text-rose-600" />
-                  <h4 className="text-base font-bold text-slate-800 font-headline">
+                  <Trash2 className="h-5 w-5 text-rose-600 shrink-0" />
+                  <h4 className="text-sm sm:text-base font-bold text-slate-800 font-headline">
                     Zona de Peligro: Eliminar Cuenta
                   </h4>
                 </div>
 
                 {isProtectedFromDelete ? (
-                  <div className="p-4 bg-white/80 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-center gap-2.5">
-                    <span className="text-base">🛡️</span>
-                    <p>
+                  <div className="p-3.5 sm:p-4 bg-white/80 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-start gap-2.5">
+                    <span className="text-base shrink-0 mt-0.5">🛡️</span>
+                    <p className="break-words leading-relaxed">
                       La cuenta <strong>{selectedUser.name}</strong> ({selectedUser.email}) corresponde a tu sesión activa de administrador o a la cuenta raíz principal y se encuentra protegida contra eliminación.
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="text-xs text-rose-700 leading-relaxed max-w-xl">
+                    <div className="text-xs text-rose-700 leading-relaxed max-w-xl break-words">
                       <p className="font-bold text-rose-900 mb-0.5">
                         Dar de baja definitiva a {selectedUser.name} ({selectedUser.email})
                       </p>
@@ -514,10 +514,10 @@ export function UserAccountControlTab({
                       type="button"
                       disabled={isDeletingUser}
                       onClick={handleExecuteDeleteUser}
-                      className="h-11 px-6 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0 self-start sm:self-auto"
+                      className="w-full sm:w-auto min-h-11 h-auto py-2.5 px-5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0 self-stretch sm:self-auto text-center whitespace-normal"
                     >
-                      {isDeletingUser ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                      {isDeletingUser ? "Eliminando Cuenta..." : `Eliminar Cuenta de ${selectedUser.name}`}
+                      {isDeletingUser ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Trash2 className="h-4 w-4 shrink-0" />}
+                      <span>{isDeletingUser ? "Eliminando Cuenta..." : "Eliminar Cuenta"}</span>
                     </Button>
                   </div>
                 )}
@@ -525,7 +525,7 @@ export function UserAccountControlTab({
 
             </div>
           ) : (
-            <div className="p-10 rounded-2xl bg-slate-50/60 border border-dashed border-slate-200 text-center space-y-2">
+            <div className="p-6 sm:p-10 rounded-2xl bg-slate-50/60 border border-dashed border-slate-200 text-center space-y-2">
               <User className="h-8 w-8 text-slate-400 mx-auto" />
               <p className="text-sm font-bold text-slate-700">Ningún usuario seleccionado</p>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
