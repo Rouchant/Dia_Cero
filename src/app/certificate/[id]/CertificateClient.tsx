@@ -142,12 +142,12 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
       
-      {/* Reglas CSS de Impresión Universales (Garantiza encaje perfecto en Carta y A4 sin cortes de bordes) */}
+      {/* Reglas CSS de Impresión Universales (Blindado para iOS Safari AirPrint, Carta y A4 en 1 sola página) */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page { 
-            size: auto; 
-            margin: 6mm 8mm; 
+            size: portrait; 
+            margin: 4mm 6mm; 
           }
           *, *::before, *::after {
             -webkit-print-color-adjust: exact !important;
@@ -155,28 +155,32 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
           }
           html, body, #__next, body > div, .min-h-screen { 
              width: 100% !important; 
-             height: 100% !important; 
+             height: auto !important; 
+             min-height: 0 !important;
              margin: 0 !important; 
              padding: 0 !important; 
-             overflow: visible !important;
              background: #FFFFFF !important;
              background-color: #FFFFFF !important;
           }
           .certificate-paper {
              width: 100% !important;
-             max-width: 192mm !important;
-             height: 252mm !important;
-             max-height: 252mm !important;
+             max-width: 178mm !important;
+             height: 228mm !important;
+             max-height: 228mm !important;
              margin: 0 auto !important;
              padding: 0 !important;
              box-sizing: border-box !important;
              border: none !important;
              box-shadow: none !important;
-             page-break-after: avoid !important;
-             page-break-before: avoid !important;
              page-break-inside: avoid !important;
+             break-inside: avoid !important;
+             page-break-after: avoid !important;
+             break-after: avoid !important;
+             page-break-before: avoid !important;
+             -webkit-column-break-inside: avoid !important;
              background: #FFFFFF !important;
              background-color: #FFFFFF !important;
+             overflow: hidden !important;
           }
           .certificate-paper-inner {
              position: relative !important;
@@ -185,38 +189,40 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
              height: 100% !important;
              max-height: 100% !important;
              box-sizing: border-box !important;
-             padding: 10mm 10mm !important;
-             border: 4px double rgba(29, 78, 216, 0.45) !important;
+             padding: 6mm 8mm !important;
+             border: 3.5px double rgba(29, 78, 216, 0.45) !important;
              display: flex !important;
              flex-direction: column !important;
              justify-content: space-between !important;
              align-items: center !important;
              background: #FFFFFF !important;
              background-color: #FFFFFF !important;
+             page-break-inside: avoid !important;
+             break-inside: avoid !important;
           }
           .certificate-paper-inner::before {
              display: none !important;
              content: none !important;
           }
           .certificate-qr-img {
-             width: 54px !important;
-             height: 54px !important;
-             max-width: 54px !important;
-             max-height: 54px !important;
+             width: 48px !important;
+             height: 48px !important;
+             max-width: 48px !important;
+             max-height: 48px !important;
              object-fit: contain !important;
              margin: 0 auto !important;
              display: block !important;
           }
           .certificate-seal {
-             width: 64px !important;
-             height: 64px !important;
-             max-width: 64px !important;
-             max-height: 64px !important;
+             width: 58px !important;
+             height: 58px !important;
+             max-width: 58px !important;
+             max-height: 58px !important;
           }
           .certificate-logo {
-             height: 9.5mm !important;
+             height: 8.5mm !important;
              width: auto !important;
-             max-height: 9.5mm !important;
+             max-height: 8.5mm !important;
              object-fit: contain !important;
           }
         }
