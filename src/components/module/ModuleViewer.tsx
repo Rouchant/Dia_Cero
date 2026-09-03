@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Quiz } from './Quiz';
 import { AIHelper } from './AIHelper';
-import { FeedbackSurvey } from './FeedbackSurvey';
 import { ChevronRight, ChevronLeft, CheckCircle2, Circle, Menu, X, ShieldCheck } from "lucide-react";
 import Image from 'next/image';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -686,12 +685,6 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
             {currentSection.type === 'quiz' && (
               <div className="flex-1 flex flex-col items-center justify-center py-8 h-full">
                 <Quiz questions={mappedQuestions || []} onComplete={handleQuizComplete} />
-              </div>
-            )}
-
-            {currentSection.type === 'feedback' && (
-              <div className="flex-1 flex flex-col items-center justify-center py-8 h-full">
-                <FeedbackSurvey onComplete={handleFeedbackComplete} />
               </div>
             )}
           </div>

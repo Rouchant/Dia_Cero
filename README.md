@@ -5,7 +5,7 @@
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-BaaS-3ECF8E?style=for-the-badge&logo=supabase)
-![Vitest](https://img.shields.io/badge/Tests-77%20Passed-brightgreen?style=for-the-badge&logo=vitest)
+![Vitest](https://img.shields.io/badge/Tests-73%20Passed-brightgreen?style=for-the-badge&logo=vitest)
 
 > **Cero papeleo. 100% digital.** Una experiencia educativa de vanguardia para la capacitación en normativas de seguridad ocupacional en Chile, diseñada para transformar el cumplimiento reactivo en aprendizaje proactivo.
 
@@ -128,7 +128,7 @@ npm run test:run
 npm run test
 ```
 
-### Cobertura de Suites de Prueba (77 Tests — 100% Aprobados):
+### Cobertura de Suites de Prueba (73 Tests — 100% Aprobados, 8 Suites):
 1. **`src/lib/certificates-and-progress.test.ts`**: Métricas de avance individual y multi-módulo, cálculo de avance promedio de cohortes (AdminStatsCards), criterio de elegibilidad para certificados (100%), folios únicos `DC-[HASH]` y validación criptográfica anti-adulteración.
 2. **`src/lib/quiz-manager.test.ts`**: Gestión integral de quizzes: creación de contenedor evaluativo, validación estricta de preguntas (4 opciones, enunciados no vacíos, puntero a alternativa correcta), edición en caliente y eliminación segura de preguntas.
 3. **`src/app/api/admin/modules/route.test.ts`**: Creación, edición, generación de slugs limpios con normalización de acentos y eliminación en cascada de módulos (quizzes, secciones y progresos).
@@ -137,7 +137,6 @@ npm run test
 6. **`src/lib/utils.test.ts`**: Fusión y precedencia de clases dinámicas Tailwind (`cn`).
 7. **`src/lib/cert-hash.test.ts`**: Verificación y consistencia del algoritmo criptográfico SHA-256 para emisión de certificados.
 8. **`src/components/module/Quiz.test.tsx`**: Flujo completo de evaluación del estudiante, habilitación de envíos, feedback de opciones correctas/incorrectas, paginación y cálculo de puntaje.
-9. **`src/components/module/FeedbackSurvey.test.tsx`**: Comportamiento de encuestas de satisfacción, rating por estrellas y simulación asíncrona de envío con fake timers.
 
 ---
 
@@ -162,7 +161,7 @@ src/
 │   ├── admin/            # Paneles de gestión: TheoryContentBuilder, UserAccountControl, QuizManager, ModuleAssignment, AdminStats
 │   ├── auth/             # Formularios y control de acceso (LoginForm)
 │   ├── dashboard/        # Componentes del portal del alumno (MotivationalCarousel)
-│   ├── module/           # Experiencia de aprendizaje interactiva: AIHelper, Quiz, FeedbackSurvey
+│   ├── module/           # Experiencia de aprendizaje interactiva: AIHelper, Quiz
 │   └── ui/               # Componentes atómicos de diseño (Shadcn UI + Radix Primitives)
 ├── hooks/                # Custom React Hooks (useTheoryBuilder, useAdminUsers, useQuizManager)
 ├── lib/                  # Utilidades, hashing criptográfico y suites de pruebas unitarias
@@ -467,7 +466,8 @@ npm run build       # Compilación y optimización para producción
 - **Constructor Teórico**: Toolbar de edición enriquecida (**Negrita**, **Punteo** y **Numeración ordenada**).
 - **Gestor de Quizzes**: Paleta ámbar/amarillo cálido, radio button interactivo en azul y selector SVG de alta fidelidad.
 - **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
-- **Estabilidad & Cobertura**: 77 tests unitarios automatizados con Vitest (9 suites pasando al 100%) y compilación TypeScript estricta con cero errores.
+- **Estabilidad & Cobertura**: 73 tests unitarios automatizados con Vitest (8 suites pasando al 100%) y compilación TypeScript estricta con cero errores.
+- **Limpieza de Código**: Eliminación de componentes de encuesta residuales no utilizados (`FeedbackSurvey`).
 
 ---
 
