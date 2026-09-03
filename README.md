@@ -466,6 +466,7 @@ npm run build       # Compilación y optimización para producción
 - **Constructor Teórico**: Toolbar de edición enriquecida (**Negrita**, **Punteo** y **Numeración ordenada**).
 - **Gestor de Quizzes**: Paleta ámbar/amarillo cálido, radio button interactivo en azul y selector SVG de alta fidelidad.
 - **Control de Cuentas**: Diseño 100% responsivo para celulares, badge "Alta Inmediata" sin desbordes y actualización directa de credenciales.
+- **Experiencia de Usuario (UX) & Diseño**: Mejora de UX general, paleta de colores más atractiva y optimización sustancial de contraste y legibilidad.
 - **Estabilidad & Cobertura**: 73 tests unitarios automatizados con Vitest (8 suites pasando al 100%) y compilación TypeScript estricta con cero errores.
 
 ---
