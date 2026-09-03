@@ -122,10 +122,10 @@ La suite de pruebas automatizadas garantiza la robustez y previene regresiones f
 
 ```bash
 # Ejecutar todas las pruebas unitarias
-npm run test:run
+pnpm test:run
 
 # Modo interactivo / observador
-npm run test
+pnpm test
 ```
 
 ### Cobertura de Suites de Prueba (73 Tests — 100% Aprobados, 8 Suites):
@@ -446,13 +446,13 @@ GOOGLE_GENAI_API_KEY=<tu-google-gemini-key>
 > [!CAUTION]
 > **Seguridad Crítica**: `SUPABASE_SERVICE_ROLE_KEY` otorga acceso de superusuario que ignora las reglas de RLS. **Nunca debe llevar el prefijo `NEXT_PUBLIC_`** ni ser expuesta en el código del cliente. Solo se consume en el servidor (rutas `/api/admin/*`, `verify/actions.ts` y flujos de Genkit).
 
-### Comandos de Desarrollo
+### Comandos de Desarrollo (pnpm)
 ```bash
-npm install         # Instalar dependencias del proyecto
-npm run dev         # Servidor de desarrollo local con Turbopack (Puerto 9002)
-npm run typecheck   # Validación estricta de tipos de TypeScript (tsc --noEmit)
-npm run test:run    # Ejecución de la suite completa de pruebas unitarias con Vitest
-npm run build       # Compilación y optimización para producción
+pnpm install       # Instalar dependencias del proyecto
+pnpm dev           # Servidor de desarrollo local con Turbopack (Puerto 9002)
+pnpm typecheck     # Validación estricta de tipos de TypeScript (tsc --noEmit)
+pnpm test:run      # Ejecución de la suite completa de pruebas unitarias con Vitest
+pnpm build         # Compilación y optimización para producción en Vercel
 ```
 
 ---
