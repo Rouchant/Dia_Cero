@@ -185,17 +185,21 @@ Crea automáticamente:
 
 ```sql
 -- ==============================================================================
--- DiaCero — Script de Creación de Base de Datos (Supabase / PostgreSQL)
+-- DiaCero — Script de Base de Datos Oficial (Supabase / PostgreSQL)
 -- ==============================================================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 1. TABLA: profiles (Perfiles vinculados a auth.users)
+-- 1. TABLA: public.profiles (Perfiles de usuario)
 CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT NOT NULL,
+    id UUID NOT NULL,
     name TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'admin')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+    email TEXT NOT NULL UNIQUE,
+    role TEXT NOT NULL DEFAULT 'estudiante'::text,
+    last_active TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT profiles_pkey PRIMARY KEY (id),
+    CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -217,15 +221,19 @@ USING (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, name, role)
+    INSERT INTO public.profiles (id, email, name, role, last_active)
     VALUES (
         NEW.id,
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
-        COALESCE(NEW.raw_user_meta_data->>'role', 'student')
+        COALESCE(NEW.raw_user_meta_data->>'role', 'estudiante'),
+        now()
     )
     ON CONFLICT (id) DO UPDATE
-    SET email = EXCLUDED.email, name = COALESCE(EXCLUDED.name, public.profiles.name);
+    SET 
+        email = EXCLUDED.email,
+        name = COALESCE(EXCLUDED.name, public.profiles.name),
+        last_active = now();
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -235,37 +243,40 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 3. TABLA: modules (Módulos y Cursos de Capacitación)
+-- 3. TABLA: public.modules (Módulos y Cursos de Capacitación)
 CREATE TABLE IF NOT EXISTS public.modules (
-    id TEXT PRIMARY KEY,
+    id TEXT NOT NULL,
     title TEXT NOT NULL,
-    description TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+    description TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT modules_pkey PRIMARY KEY (id)
 );
 
 ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Módulos visibles para usuarios autenticados"
+CREATE POLICY "Módulos visibles para todos los usuarios autenticados"
 ON public.modules FOR SELECT TO authenticated USING (true);
 
 CREATE POLICY "Gestión de módulos para administradores"
 ON public.modules FOR ALL TO authenticated
 USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
--- 4. TABLA: module_sections (Diapositivas teóricas y secciones de examen)
+-- 4. TABLA: public.module_sections (Diapositivas y contenedor de examen)
 CREATE TABLE IF NOT EXISTS public.module_sections (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-    module_id TEXT NOT NULL REFERENCES public.modules(id) ON DELETE CASCADE,
+    id TEXT NOT NULL,
+    module_id TEXT,
     title TEXT NOT NULL,
-    type TEXT NOT NULL DEFAULT 'content', -- 'content' o 'quiz'
+    type TEXT NOT NULL,
     content TEXT,
-    sort_order INTEGER NOT NULL DEFAULT 0,
     video_url TEXT,
     image_url TEXT,
+    image_hint TEXT,
+    sort_order INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     ai_summary TEXT,
     ai_explanation TEXT,
-    ai_analogy TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+    CONSTRAINT module_sections_pkey PRIMARY KEY (id),
+    CONSTRAINT module_sections_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.modules(id) ON DELETE CASCADE
 );
 
 ALTER TABLE public.module_sections ENABLE ROW LEVEL SECURITY;
@@ -277,14 +288,16 @@ CREATE POLICY "Gestión de secciones para administradores"
 ON public.module_sections FOR ALL TO authenticated
 USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
--- 5. TABLA: quiz_questions (Banco de preguntas de opción múltiple)
+-- 5. TABLA: public.quiz_questions (Banco de preguntas de exámenes)
 CREATE TABLE IF NOT EXISTS public.quiz_questions (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-    section_id TEXT NOT NULL REFERENCES public.module_sections(id) ON DELETE CASCADE,
+    id TEXT NOT NULL,
+    section_id TEXT,
     question TEXT NOT NULL,
-    options JSONB NOT NULL DEFAULT '[]'::jsonb,
-    correct_answer INTEGER NOT NULL DEFAULT 0,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+    options JSONB NOT NULL,
+    correct_answer INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT quiz_questions_pkey PRIMARY KEY (id),
+    CONSTRAINT quiz_questions_section_id_fkey FOREIGN KEY (section_id) REFERENCES public.module_sections(id) ON DELETE CASCADE
 );
 
 ALTER TABLE public.quiz_questions ENABLE ROW LEVEL SECURITY;
@@ -296,17 +309,18 @@ CREATE POLICY "Gestión de preguntas para administradores"
 ON public.quiz_questions FOR ALL TO authenticated
 USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
--- 6. TABLA: user_progress (Avance del alumno, notas y certificaciones)
+-- 6. TABLA: public.user_progress (Progreso de los alumnos)
 CREATE TABLE IF NOT EXISTS public.user_progress (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    module_id TEXT NOT NULL REFERENCES public.modules(id) ON DELETE CASCADE,
-    completed_sections JSONB NOT NULL DEFAULT '[]'::jsonb,
-    quiz_scores JSONB NOT NULL DEFAULT '{}'::jsonb,
-    current_section_index INTEGER NOT NULL DEFAULT 0,
-    completed BOOLEAN NOT NULL DEFAULT false,
-    score NUMERIC DEFAULT 0,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    user_id UUID,
+    module_id TEXT,
+    completed_sections JSONB DEFAULT '[]'::jsonb,
+    quiz_scores JSONB DEFAULT '{}'::jsonb,
+    current_section_index INTEGER DEFAULT 0,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT user_progress_pkey PRIMARY KEY (id),
+    CONSTRAINT user_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+    CONSTRAINT user_progress_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.modules(id) ON DELETE CASCADE,
     CONSTRAINT unique_user_module UNIQUE (user_id, module_id)
 );
 
@@ -328,7 +342,7 @@ CREATE POLICY "Administradores gestionan todo el progreso"
 ON public.user_progress FOR ALL TO authenticated
 USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
--- 7. DATOS SEMILLA (Seed Data - Módulo Piloto Ley 16.744)
+-- 7. DATOS SEMILLA (Seed Data — Módulo Piloto Ley 16.744)
 INSERT INTO public.modules (id, title, description)
 VALUES (
     'mod-1',
