@@ -740,7 +740,7 @@ export function TheoryContentBuilderTab({
                       disabled={isSavingContent} 
                       className="h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-black shadow-lg shadow-sky-200 rounded-xl"
                     >
-                      {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sincronizando Nube...</> : <><Save className="mr-2 h-4 w-4" /> Guardar Cambios del Módulo</>}
+                      {isSavingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sincronizando Nube...</> : <><Save className="mr-2 h-4 w-4" /> Guardar Cambios</>}
                     </Button>
                   </div>
                 </form>
