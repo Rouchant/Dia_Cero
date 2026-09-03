@@ -223,7 +223,7 @@ export function useAdminUsers() {
 
   const handleCreateModule = async (title: string, description: string, customId?: string) => {
     if (!title.trim()) return null;
-    const baseId = customId?.trim() || title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const baseId = customId?.trim() || title.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const finalId = baseId ? (baseId + '-' + Date.now().toString().slice(-4)) : ('mod-' + Date.now());
 
     const { data: newMod, error } = await supabase
