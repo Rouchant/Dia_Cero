@@ -268,18 +268,18 @@ export function TheoryContentBuilderTab({
                     onClick={() => setActiveMode('quiz')}
                     className={`w-full text-left px-3 py-3 rounded-xl text-sm transition-all border shadow-xs flex items-center justify-between gap-2 ${
                       activeMode === 'quiz'
-                        ? 'bg-rose-100 font-bold border-rose-300 text-rose-950 border-l-4 border-l-rose-600'
-                        : 'bg-gradient-to-r from-rose-50 to-pink-50 hover:bg-rose-100/80 border-rose-200 text-rose-900'
+                        ? 'bg-amber-100 font-bold border-amber-300 text-amber-950 border-l-4 border-l-amber-500'
+                        : 'bg-gradient-to-r from-amber-50 to-yellow-50 hover:bg-amber-100/80 border-amber-200 text-amber-900'
                     }`}
                   >
                     <div className="min-w-0 flex-1 flex items-center gap-2">
                       <span className="text-base">📝</span>
                       <div>
-                        <span className="block text-[10px] uppercase font-black text-rose-600 tracking-wider">Evaluación Final</span>
+                        <span className="block text-[10px] uppercase font-black text-amber-600 tracking-wider">Evaluación Final</span>
                         <span className="font-bold text-xs">Quiz del Módulo</span>
                       </div>
                     </div>
-                    <span className="shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-200 text-rose-800">
+                    <span className="shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
                       {quizManager.quizQuestions?.length || 0} preg.
                     </span>
                   </button>
@@ -305,7 +305,7 @@ export function TheoryContentBuilderTab({
               /* VISTA EDITOR DE QUIZZES INTEGRADA */
               <div className="space-y-6 max-w-5xl mx-auto w-full">
                 <div className="border-b pb-4">
-                  <h3 className="text-xl font-headline font-black text-rose-900 flex items-center gap-2">
+                  <h3 className="text-xl font-headline font-black text-amber-950 flex items-center gap-2">
                     <span className="text-xl">📝</span> Evaluación Final del Módulo
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">Configura las preguntas que responderán los alumnos al finalizar este módulo.</p>
@@ -313,12 +313,12 @@ export function TheoryContentBuilderTab({
 
                 {quizManager.isLoadingQuiz ? (
                   <div className="py-12 flex justify-center text-slate-400">
-                    <Loader2 className="h-8 w-8 animate-spin text-rose-500" />
+                    <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
                   </div>
                 ) : !quizManager.quizSectionId ? (
                   <div className="p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center text-center">
                     <p className="text-slate-600 mb-6 max-w-md font-medium text-sm">Este módulo aún no tiene un examen final asignado. Genera el contenedor antes de añadir preguntas.</p>
-                    <Button onClick={quizManager.handleCreateQuizSection} disabled={quizManager.isCreatingQuizSection} className="bg-rose-600 hover:bg-rose-700 text-white font-bold h-11 px-6">
+                    <Button onClick={quizManager.handleCreateQuizSection} disabled={quizManager.isCreatingQuizSection} className="bg-amber-500 hover:bg-amber-600 text-white font-bold h-11 px-6 shadow-md shadow-amber-200">
                       {quizManager.isCreatingQuizSection ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Activar Examen para este Módulo"}
                     </Button>
                   </div>
@@ -328,7 +328,7 @@ export function TheoryContentBuilderTab({
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                          <HelpCircle className="h-5 w-5 text-rose-500" />
+                          <HelpCircle className="h-5 w-5 text-amber-500" />
                           Preguntas del Examen ({quizManager.quizQuestions.length})
                         </h4>
                         <span className="text-xs text-slate-500 font-medium">4 Opciones por pregunta con respuesta válida indicada</span>
@@ -341,10 +341,10 @@ export function TheoryContentBuilderTab({
                       ) : (
                         <div className="space-y-3">
                           {quizManager.quizQuestions.map((q: any, i: number) => (
-                            <div key={q.id} className="p-4 bg-white rounded-2xl border border-slate-200/80 hover:border-rose-300 transition-all space-y-3 shadow-xs">
+                            <div key={q.id} className="p-4 bg-white rounded-2xl border border-slate-200/80 hover:border-amber-300 transition-all space-y-3 shadow-xs">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-2.5">
-                                  <span className="h-6 w-6 rounded-lg bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                  <span className="h-6 w-6 rounded-lg bg-amber-100 text-amber-800 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                                     Q{i + 1}
                                   </span>
                                   <h5 className="font-bold text-slate-800 text-sm leading-snug">{q.question}</h5>
@@ -355,7 +355,7 @@ export function TheoryContentBuilderTab({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => quizManager.handleOpenEditQuizQuestion(q)}
-                                    className="h-7 px-2 text-xs font-bold text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg"
+                                    className="h-7 px-2 text-xs font-bold text-slate-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg"
                                   >
                                     <Edit3 className="h-3.5 w-3.5 mr-1" /> Editar
                                   </Button>
@@ -365,9 +365,9 @@ export function TheoryContentBuilderTab({
                                     size="sm"
                                     disabled={quizManager.deletingQuestionId === q.id}
                                     onClick={() => quizManager.handleDeleteQuizQuestion(q.id)}
-                                    className="h-7 px-2 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                                    className="h-7 px-2 text-xs font-bold text-slate-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg"
                                   >
-                                    {quizManager.deletingQuestionId === q.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />} Eliminar
+                                    {quizManager.deletingQuestionId === q.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-1 text-amber-600" />} Eliminar
                                   </Button>
                                 </div>
                               </div>
@@ -406,20 +406,20 @@ export function TheoryContentBuilderTab({
                     </div>
 
                     {/* Formulario Añadir Pregunta de 4 opciones */}
-                    <form onSubmit={quizManager.handleAddQuestion} className="bg-gradient-to-br from-rose-50/70 to-pink-50/30 p-5 rounded-2xl border border-rose-200 space-y-4 shadow-xs">
-                      <div className="flex items-center justify-between border-b border-rose-200/60 pb-2.5">
-                        <h4 className="font-black text-rose-900 text-base flex items-center gap-2">
-                          <PlusCircle className="h-4 w-4 text-rose-600" />
+                    <form onSubmit={quizManager.handleAddQuestion} className="bg-gradient-to-br from-amber-50/70 to-yellow-50/30 p-5 rounded-2xl border border-amber-200 space-y-4 shadow-xs">
+                      <div className="flex items-center justify-between border-b border-amber-200/60 pb-2.5">
+                        <h4 className="font-black text-amber-950 text-base flex items-center gap-2">
+                          <PlusCircle className="h-4 w-4 text-amber-600" />
                           Añadir Nueva Pregunta al Examen
                         </h4>
-                        <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full">4 Opciones</span>
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">4 Opciones</span>
                       </div>
 
                       <div className="space-y-1.5">
                         <Label className="text-slate-800 font-bold text-xs">Enunciado de la Pregunta</Label>
                         <textarea
-                          className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
-                          placeholder="Ej: ¿Cuál es la primera acción preventiva en trabajo en altura?"
+                          className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-amber-500 rounded-xl leading-relaxed resize-y"
+                          placeholder="Escribe la pregunta del quiz..."
                           value={quizManager.newQuizQuestion}
                           onChange={e => quizManager.setNewQuizQuestion(e.target.value)}
                           spellCheck={true}
@@ -437,8 +437,8 @@ export function TheoryContentBuilderTab({
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label className="text-slate-800 font-bold text-xs">4 Posibles Respuestas</Label>
-                          <span className="text-[10px] text-rose-600 font-semibold flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                          <span className="text-[10px] text-amber-700 font-semibold flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0 text-blue-600" fill="currentColor">
                               <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
                               <circle cx="256" cy="256" r="144" fill="currentColor"/>
                             </svg>
@@ -467,7 +467,7 @@ export function TheoryContentBuilderTab({
                                 name="newQuizCorrectRadio"
                                 checked={quizManager.newQuizCorrectIdx === item.idx}
                                 onChange={() => quizManager.setNewQuizCorrectIdx(item.idx)}
-                                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer shrink-0"
                               />
                               <div className="flex-1 min-w-0">
                                 <Label htmlFor={`new-opt-radio-${item.idx}`} className="text-[10px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">
@@ -493,7 +493,7 @@ export function TheoryContentBuilderTab({
                       <Button
                         type="submit"
                         disabled={quizManager.isCreatingQuizQuestion}
-                        className="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+                        className="w-full h-11 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-200 transition-all flex items-center justify-center gap-2 mt-2"
                       >
                         {quizManager.isCreatingQuizQuestion ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlusCircle className="h-4 w-4" />}
                         {quizManager.isCreatingQuizQuestion ? "Guardando..." : "Añadir Pregunta al Examen del Módulo"}
@@ -536,7 +536,7 @@ export function TheoryContentBuilderTab({
                             <Label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                               <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
                               <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0 text-blue-600" fill="currentColor">
                                   <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
                                   <circle cx="256" cy="256" r="144" fill="currentColor"/>
                                 </svg>
@@ -564,7 +564,7 @@ export function TheoryContentBuilderTab({
                                     name="editQuizCorrectRadio"
                                     checked={quizManager.editQCorrectIdx === item.idx}
                                     onChange={() => quizManager.setEditQCorrectIdx(item.idx)}
-                                    className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer shrink-0"
                                   />
                                   <div className="flex-1 min-w-0">
                                     <Label htmlFor={`edit-opt-radio-${item.idx}`} className="text-[10px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">

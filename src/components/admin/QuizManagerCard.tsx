@@ -96,7 +96,7 @@ export function QuizManagerCard({
   onDeleteQuestion
 }: QuizManagerCardProps) {
   return (
-    <Card className="mt-8 border-rose-100 shadow-lg border-t-[5px] border-t-rose-500">
+    <Card className="mt-8 border-amber-100 shadow-lg border-t-[5px] border-t-amber-500">
       <CardHeader className="bg-slate-50 border-b">
         <CardTitle className="flex items-center gap-2 text-xl font-headline">
           <span className="text-xl">📝</span> Central de Evaluaciones (Quizzes)
@@ -109,7 +109,7 @@ export function QuizManagerCard({
             <Label htmlFor="q-mod" className="text-slate-800 font-bold">Seleccionar Módulo a Editar</Label>
             <select 
               id="q-mod" 
-              className="w-full h-11 px-3 border border-slate-300 rounded-md bg-rose-50/50 text-sm font-medium"
+              className="w-full h-11 px-3 border border-slate-300 rounded-md bg-amber-50/50 text-sm font-medium"
               value={quizModuleId}
               onChange={e => setQuizModuleId(e.target.value)}
             >
@@ -120,12 +120,12 @@ export function QuizManagerCard({
 
           {isLoadingQuiz ? (
             <div className="py-12 flex justify-center text-slate-400">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
             </div>
           ) : !quizSectionId ? (
             <div className="mt-6 p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center text-center">
               <p className="text-slate-600 mb-6 max-w-md font-medium">Este módulo actualmente no tiene ninguna Evaluación Final insertada en su malla curricular. Debes generar el contenedor físico en Supabase antes de inyectar preguntas.</p>
-              <Button onClick={onCreateQuizSection} disabled={isCreatingQuizSection || !quizModuleId} className="bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200 text-white font-bold h-12 px-6">
+              <Button onClick={onCreateQuizSection} disabled={isCreatingQuizSection || !quizModuleId} className="bg-amber-500 hover:bg-amber-600 shadow-md shadow-amber-200 text-white font-bold h-12 px-6">
                 {isCreatingQuizSection ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Generando Segmento Base...</> : "Activar Motor de Examen para el Módulo"}
               </Button>
             </div>
@@ -135,7 +135,7 @@ export function QuizManagerCard({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                    <HelpCircle className="h-5 w-5 text-rose-500" />
+                    <HelpCircle className="h-5 w-5 text-amber-500" />
                     Banco de Preguntas Vigentes ({quizQuestions.length})
                   </h4>
                   <span className="text-xs text-slate-500 font-medium">Respuestas con opción correcta resaltada</span>
@@ -148,10 +148,10 @@ export function QuizManagerCard({
                 ) : (
                   <div className="space-y-4">
                     {quizQuestions.map((q, i) => (
-                      <div key={q.id} className="p-5 bg-white shadow-xs rounded-2xl border border-slate-200/80 hover:border-rose-300 transition-all space-y-4">
+                      <div key={q.id} className="p-5 bg-white shadow-xs rounded-2xl border border-slate-200/80 hover:border-amber-300 transition-all space-y-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-start gap-2.5">
-                            <span className="h-7 w-7 rounded-lg bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="h-7 w-7 rounded-lg bg-amber-100 text-amber-800 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                               Q{i + 1}
                             </span>
                             <h5 className="font-bold text-slate-800 text-base leading-snug">{q.question}</h5>
@@ -162,7 +162,7 @@ export function QuizManagerCard({
                               variant="ghost"
                               size="sm"
                               onClick={() => onOpenEditQuestion(q)}
-                              className="h-8 px-2.5 text-xs font-bold text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg"
+                              className="h-8 px-2.5 text-xs font-bold text-slate-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg"
                             >
                               <Edit3 className="h-3.5 w-3.5 mr-1" /> Editar
                             </Button>
@@ -172,9 +172,9 @@ export function QuizManagerCard({
                               size="sm"
                               disabled={deletingQuestionId === q.id}
                               onClick={() => onDeleteQuestion(q.id)}
-                              className="h-8 px-2.5 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                              className="h-8 px-2.5 text-xs font-bold text-slate-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg"
                             >
-                              {deletingQuestionId === q.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />} Eliminar
+                              {deletingQuestionId === q.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-1 text-amber-600" />} Eliminar
                             </Button>
                           </div>
                         </div>
@@ -198,11 +198,13 @@ export function QuizManagerCard({
                                   </span>
                                   <span className="truncate">{opt}</span>
                                 </div>
-                                {isCorrect && (
-                                  <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-                                    <Check className="h-3 w-3" /> Correcta
-                                  </span>
-                                )}
+                                <div className="flex items-center gap-2">
+                                  {isCorrect && (
+                                    <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+                                      <Check className="h-3 w-3" /> Correcta
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}
@@ -214,20 +216,20 @@ export function QuizManagerCard({
               </div>
 
               {/* Formulario inyector de 4 opciones con Radio Buttons */}
-              <form onSubmit={onAddQuestion} className="bg-gradient-to-br from-rose-50/70 to-pink-50/30 p-6 rounded-2xl border border-rose-200 space-y-5 relative overflow-hidden shadow-xs">
-                <div className="flex items-center justify-between border-b border-rose-200/60 pb-3">
-                  <h4 className="font-black text-rose-900 font-headline text-lg flex items-center gap-2">
-                    <PlusCircle className="h-5 w-5 text-rose-600" />
+              <form onSubmit={onAddQuestion} className="bg-gradient-to-br from-amber-50/70 to-yellow-50/30 p-6 rounded-2xl border border-amber-200 space-y-5 relative overflow-hidden shadow-xs">
+                <div className="flex items-center justify-between border-b border-amber-200/60 pb-3">
+                  <h4 className="font-black text-amber-950 font-headline text-lg flex items-center gap-2">
+                    <PlusCircle className="h-5 w-5 text-amber-600" />
                     Añadir Nueva Pregunta al Examen
                   </h4>
-                  <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2.5 py-1 rounded-full">4 Opciones</span>
+                  <span className="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full">4 Opciones</span>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label className="text-slate-800 font-bold text-xs">Enunciado / Pregunta</Label>
                   <textarea
-                    className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-rose-500 rounded-xl leading-relaxed resize-y"
-                    placeholder="Ej: ¿Cuál es el plazo máximo para presentar la denuncia DIAT/DIEP?"
+                    className="w-full min-h-[140px] sm:min-h-[90px] p-3 bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-amber-500 rounded-xl leading-relaxed resize-y"
+                    placeholder="Escribe la pregunta del quiz..."
                     value={newQuizQuestion}
                     onChange={e => setNewQuizQuestion(e.target.value)}
                     spellCheck={true}
@@ -245,8 +247,8 @@ export function QuizManagerCard({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-slate-800 font-bold text-xs">4 Posibles Respuestas</Label>
-                    <span className="text-[11px] text-rose-600 font-semibold flex items-center gap-1.5">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                    <span className="text-[11px] text-amber-700 font-semibold flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0 text-blue-600" fill="currentColor">
                         <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
                         <circle cx="256" cy="256" r="144" fill="currentColor"/>
                       </svg>
@@ -265,8 +267,8 @@ export function QuizManagerCard({
                         key={item.idx}
                         className={`p-3 rounded-xl border transition-all flex items-center gap-3 ${
                           newQuizCorrectIdx === item.idx
-                            ? 'bg-emerald-50/90 border-emerald-300 ring-2 ring-emerald-500/20'
-                            : 'bg-white border-slate-200 hover:border-slate-300'
+                            ? 'bg-emerald-50 border-emerald-300 ring-2 ring-emerald-400/30'
+                            : 'bg-slate-50 border-slate-200'
                         }`}
                       >
                         <input
@@ -275,15 +277,15 @@ export function QuizManagerCard({
                           name="newQuizCorrectRadio"
                           checked={newQuizCorrectIdx === item.idx}
                           onChange={() => setNewQuizCorrectIdx(item.idx)}
-                          className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <Label htmlFor={`new-opt-radio-${item.idx}`} className="text-[10px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">
                             {item.label} {newQuizCorrectIdx === item.idx && <span className="text-emerald-700 font-black">(✓ Correcta)</span>}
                           </Label>
                           <Input
-                            className="h-9 text-xs bg-slate-50/50 border-slate-200 rounded-lg"
-                            placeholder={`Escribe la ${item.label.toLowerCase()}...`}
+                            className="h-9 text-xs bg-white rounded-lg"
+                            placeholder={`Escribe el contenido de la ${item.label.toLowerCase()}...`}
                             value={item.val}
                             onChange={e => item.set(e.target.value)}
                             spellCheck={true}
@@ -291,6 +293,10 @@ export function QuizManagerCard({
                             autoCapitalize="sentences"
                             autoComplete="on"
                             lang="es"
+                            data-gramm="true"
+                            data-enable-grammarly="true"
+                            data-ms-editor="true"
+                            required
                           />
                         </div>
                       </div>
@@ -301,7 +307,7 @@ export function QuizManagerCard({
                 <Button
                   type="submit"
                   disabled={isCreatingQuizQuestion}
-                  className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+                  className="w-full h-12 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-md shadow-amber-200 transition-all flex items-center justify-center gap-2 mt-2"
                 >
                   {isCreatingQuizQuestion ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlusCircle className="h-4 w-4" />}
                   {isCreatingQuizQuestion ? "Guardando Pregunta..." : "Añadir Pregunta al Banco"}
@@ -344,7 +350,7 @@ export function QuizManagerCard({
                       <Label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                         <span>Opciones de Respuesta & Selección de Respuesta Correcta</span>
                         <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-3.5 w-3.5 shrink-0 text-blue-600" fill="currentColor">
                             <path d="M448,256c0-106-86-192-192-192S64,150,64,256s86,192,192,192S448,362,448,256Z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
                             <circle cx="256" cy="256" r="144" fill="currentColor"/>
                           </svg>
@@ -372,7 +378,7 @@ export function QuizManagerCard({
                               name="editQuizCorrectRadio"
                               checked={editQCorrectIdx === item.idx}
                               onChange={() => setEditQCorrectIdx(item.idx)}
-                              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer shrink-0"
                             />
                             <div className="flex-1 min-w-0">
                               <Label htmlFor={`edit-opt-radio-${item.idx}`} className="text-[10px] font-bold text-slate-500 uppercase cursor-pointer block mb-0.5">
