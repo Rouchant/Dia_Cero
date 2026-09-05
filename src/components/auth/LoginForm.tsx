@@ -35,7 +35,7 @@ export function LoginForm({
     setErrorMsg("");
     
     // Autenticación real contra la base de datos de Supabase Auth
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authResult, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -46,7 +46,7 @@ export function LoginForm({
       return;
     }
 
-    // Redirección al panel del estudiante
+    // Redirección directa al panel de usuario / estudiante para todos los roles
     router.push('/dashboard');
   };
 
@@ -118,6 +118,18 @@ export function LoginForm({
           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Iniciar Formación Ahora"}
         </Button>
       </form>
+
+      <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+        <p className="text-xs text-slate-500 font-medium">
+          ¿Eres estudiante nuevo con código de empresa?
+        </p>
+        <a 
+          href="/auth/register" 
+          className="inline-block mt-1 text-xs font-bold text-brand-blue hover:text-brand-green transition-colors underline"
+        >
+          Crear cuenta de estudiante aquí →
+        </a>
+      </div>
     </div>
   );
 }

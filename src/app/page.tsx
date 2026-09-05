@@ -2,6 +2,7 @@
 
 import { Logo } from "@/components/ui/logo";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { Footer } from "@/components/layout/Footer";
 import { BookOpen, Shield, Zap, Target } from "lucide-react";
 
 export default function Home() {
@@ -94,6 +95,9 @@ export default function Home() {
 
         </div>
       </main>
+
+      {/* Footer Institucional con Marco Legal y Derechos ARCO+P */}
+      <Footer />
     </div>
   );
 }

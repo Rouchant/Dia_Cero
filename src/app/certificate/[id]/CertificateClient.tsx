@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Award, Printer, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
-
 import { generateCertId } from '@/lib/cert-hash';
 
 export default function CertificateClient({ moduleId }: { moduleId: string }) {
@@ -43,7 +42,42 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
     async function loadCert() {
       setLoading(true);
 
-      // 1. Try to fetch verified certificate metadata via API endpoint
+      // 1. Intentar consultar primero la tabla inmutable public.certificates
+      try {
+        const { data: certDb } = await supabase
+          .from('certificates')
+          .select('*')
+          .eq('id', moduleId)
+          .maybeSingle();
+
+        if (certDb) {
+          setData({
+            userName: certDb.student_name,
+            userRut: certDb.student_rut,
+            userHireDate: certDb.student_hire_date,
+            companyName: certDb.company_name,
+            companyRut: certDb.company_rut,
+            companyLogoUrl: certDb.company_logo_url,
+            signerName: certDb.signer_name,
+            signerRole: certDb.signer_role,
+            moduleTitle: certDb.module_title,
+            score: certDb.score || 100,
+            date: new Date(certDb.issued_at || certDb.created_at).toLocaleDateString('es-ES', {
+              timeZone: 'America/Santiago',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            certId: certDb.id
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Error consultando certificates table:", err);
+      }
+
+      // 2. Consulta a API de verificación
       try {
         const res = await fetch(`/api/verify/${moduleId}`);
         if (res.ok) {
@@ -51,10 +85,17 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
           if (verifyData.isValid) {
             setData({
               userName: verifyData.student,
+              userRut: verifyData.studentRut,
+              userHireDate: verifyData.studentHireDate,
+              companyName: verifyData.companyName,
+              companyRut: verifyData.companyRut,
+              companyLogoUrl: verifyData.companyLogoUrl,
+              signerName: verifyData.signerName,
+              signerRole: verifyData.signerRole,
               moduleTitle: verifyData.moduleTitle,
               score: verifyData.score,
               date: verifyData.date,
-              certId: verifyData.certId
+              certId: verifyData.certId || moduleId
             });
             setLoading(false);
             return;
@@ -64,54 +105,88 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
         console.error("API verification lookup error:", err);
       }
 
-      // 2. Direct Certificate Hash/Code Lookup (DC-...)
-      if (moduleId.startsWith('DC-')) {
-        const { data: allProgress } = await supabase.from('user_progress').select('*, profiles(name), modules(title)');
-        if (allProgress) {
-          const match = allProgress.find(p => generateCertId(p.user_id, p.module_id) === moduleId);
-          if (match) {
-            setData({
-              userName: match.profiles?.name || 'Estudiante Día Cero',
-              moduleTitle: match.modules?.title || 'Programa de Capacitación',
-              score: 100,
-              date: new Date(match.updated_at || match.created_at || new Date()).toLocaleDateString('es-ES', { timeZone: 'America/Santiago', year: 'numeric', month: 'long', day: 'numeric' }),
-              certId: moduleId
-            });
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
-      // 2. Direct student lookup fallback (when moduleId is a direct module ID like 'mod-1')
+      // 3. Consulta de estudiante autenticado con datos de empresa enriquecidos
       const { data: authData } = await supabase.auth.getUser();
       if (authData?.user) {
         const uid = authData.user.id;
         setUserId(uid);
         
-        const { data: profile } = await supabase.from('profiles').select('name').eq('id', uid).maybeSingle();
-        const { data: moduleData } = await supabase.from('modules').select('title, module_sections(*)').eq('id', moduleId).maybeSingle();
-        const { data: progress } = await supabase.from('user_progress').select('*').eq('user_id', uid).eq('module_id', moduleId).maybeSingle();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*, companies(*)')
+          .eq('id', uid)
+          .maybeSingle();
+
+        const { data: moduleData } = await supabase
+          .from('modules')
+          .select('id, title, module_sections(*)')
+          .eq('id', moduleId)
+          .maybeSingle();
+
+        const { data: progress } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', uid)
+          .eq('module_id', moduleId)
+          .maybeSingle();
 
         if (profile && moduleData && progress) {
           const totalSections = Math.max(1, moduleData.module_sections?.length || 1);
           const completedLen = Array.isArray(progress.completed_sections) ? progress.completed_sections.length : 0;
           const modPercentage = Math.round((completedLen / totalSections) * 100);
+          const computedCertId = generateCertId(uid, moduleId);
 
-          setData({
+          const comp = profile.companies;
+          const compName = comp?.business_name || comp?.name || 'Día Cero Prevención SpA';
+          const compRut = comp?.rut || '76.543.210-K';
+          const compLogo = comp?.logo_url || null;
+
+          const certPayload = {
             userName: profile.name,
+            userRut: profile.rut,
+            userHireDate: profile.hire_date ? new Date(profile.hire_date).toLocaleDateString('es-ES', { timeZone: 'America/Santiago' }) : undefined,
+            companyName: compName,
+            companyRut: compRut,
+            companyLogoUrl: compLogo,
+            signerName: 'Director de Capacitación y Prevención',
+            signerRole: 'Representante Técnico Autorizado',
             moduleTitle: moduleData.title,
             score: modPercentage > 100 ? 100 : modPercentage,
             date: new Date(progress.updated_at || new Date()).toLocaleDateString('es-ES', { timeZone: 'America/Santiago', year: 'numeric', month: 'long', day: 'numeric' }),
-            certId: generateCertId(uid, moduleId)
-          });
+            certId: computedCertId
+          };
+
+          // Auto-inscribir de forma inmutable en tabla certificates
+          try {
+            await supabase.from('certificates').upsert({
+              id: computedCertId,
+              student_id: profile.id,
+              student_name: profile.name,
+              student_rut: profile.rut || '11.111.111-1',
+              student_hire_date: profile.hire_date || null,
+              company_id: profile.company_id || null,
+              company_name: compName,
+              company_rut: compRut,
+              company_logo_url: compLogo,
+              signer_name: certPayload.signerName,
+              signer_role: certPayload.signerRole,
+              module_id: moduleData.id,
+              module_title: moduleData.title,
+              score: certPayload.score,
+              status: 'valid',
+              issued_at: progress.updated_at || new Date().toISOString()
+            });
+          } catch (e) {
+            console.error('Error sellando en certificates:', e);
+          }
+
+          setData(certPayload);
         }
       }
       setLoading(false);
     }
     loadCert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleId]);
+  }, [moduleId, supabase]);
 
   const handlePrint = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -127,102 +202,49 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
   if (loading) return (
      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 text-brand-blue/70">
         <Loader2 className="h-8 w-8 animate-spin text-brand-green" />
-        <p className="font-semibold font-headline animate-pulse">Generando certificado en papel virtual...</p>
+        <p className="font-semibold font-headline animate-pulse">Generando certificado oficial y sellado inmutable...</p>
      </div>
   );
 
   if (!data) return (
      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4">
         <h2 className="text-xl font-bold text-brand-blue">No hay registros de aprobación.</h2>
-        <p className="text-slate-500 max-w-sm text-center">No pudimos verificar que poseas los requisitos en este módulo en este momento.</p>
-        <Button onClick={()=>router.push('/dashboard')} className="mt-4"><ArrowLeft className="mr-2 h-4 w-4" /> Volver a Seguridad</Button>
+        <p className="text-slate-500 max-w-sm text-center text-xs">No pudimos verificar que poseas los requisitos en este módulo en este momento.</p>
+        <Button onClick={()=>router.push('/dashboard')} className="mt-4"><ArrowLeft className="mr-2 h-4 w-4" /> Volver al Panel</Button>
      </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 md:py-10 print:bg-white print:py-0 print:min-h-0 flex flex-col items-center overflow-x-hidden">
+    <div className="min-h-screen bg-slate-900/90 py-8 px-2 sm:px-4 flex flex-col items-center justify-center font-sans print:bg-white print:p-0 print:m-0">
       
-      {/* Reglas CSS de Impresión Universales Blindadas (Encaje perfecto en Carta y A4, Vertical y Horizontal) */}
+      {/* Estilos CSS estrictos para impresión Landscape */}
       <style dangerouslySetInnerHTML={{__html: `
+        @page {
+          size: letter landscape;
+          margin: 0 !important;
+        }
         @media print {
-          @page { 
-            size: auto; 
-            margin: 4mm 6mm; 
-          }
-          *, *::before, *::after {
+          html, body {
+            width: 279.4mm !important;
+            height: 215.9mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-          }
-          html, body, #__next, body > div, .min-h-screen { 
-             width: 100% !important; 
-             height: auto !important; 
-             min-height: 0 !important;
-             margin: 0 !important; 
-             padding: 0 !important; 
-             background: #FFFFFF !important;
-             background-color: #FFFFFF !important;
+            overflow: hidden !important;
           }
           .certificate-paper {
-             width: 100% !important;
-             max-width: 198mm !important;
-             height: 158mm !important;
-             max-height: 158mm !important;
-             margin: 0 auto !important;
-             padding: 0 !important;
-             box-sizing: border-box !important;
-             border: none !important;
-             box-shadow: none !important;
-             page-break-inside: avoid !important;
-             break-inside: avoid !important;
-             page-break-after: avoid !important;
-             break-after: avoid !important;
-             page-break-before: avoid !important;
-             -webkit-column-break-inside: avoid !important;
-             background: #FFFFFF !important;
-             background-color: #FFFFFF !important;
-             overflow: hidden !important;
-          }
-          .certificate-paper-inner {
-             position: relative !important;
-             inset: auto !important;
-             width: 100% !important;
-             height: 100% !important;
-             border: none !important;
-             padding: 4mm 6mm !important;
-             display: flex !important;
-             flex-direction: column !important;
-             justify-content: space-between !important;
-             align-items: center !important;
-             background: #FFFFFF !important;
-             background-color: #FFFFFF !important;
-             page-break-inside: avoid !important;
-             break-inside: avoid !important;
-             box-sizing: border-box !important;
-          }
-          .certificate-paper-inner::before {
-             display: none !important;
-             content: none !important;
-          }
-          .certificate-qr-img {
-             width: 42px !important;
-             height: 42px !important;
-             max-width: 42px !important;
-             max-height: 42px !important;
-             object-fit: contain !important;
-             margin: 0 auto !important;
-             display: block !important;
-          }
-          .certificate-seal {
-             width: 50px !important;
-             height: 50px !important;
-             max-width: 50px !important;
-             max-height: 50px !important;
-          }
-          .certificate-logo {
-             height: 7.5mm !important;
-             max-height: 7.5mm !important;
-             width: auto !important;
-             object-fit: contain !important;
+            width: 279.4mm !important;
+            height: 215.9mm !important;
+            max-width: 279.4mm !important;
+            max-height: 215.9mm !important;
+            margin: 0 !important;
+            padding: 9mm 14mm !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
           }
         }
       `}} />
@@ -245,51 +267,71 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
         </Button>
       </div>
 
-      {/* Actual Certificate Document Wrapper (Horizontal Landscape 11 x 8.5, borderless) */}
+      {/* Documento Certificado Oficial */}
       <div className="w-full max-w-[860px] px-2 sm:px-4 mx-auto print:p-0 print:m-0 print:max-w-none">
         <div 
           className="certificate-paper [container-type:inline-size] w-full aspect-[11/8.5] bg-white text-brand-blue relative shadow-2xl rounded-2xl mx-auto flex flex-col justify-between p-[3.5cqw] sm:p-[4cqw] print:p-0 print:shadow-none print:rounded-none"
         >
-           {/* Internal Container - Sin bordes, perfectamente distribuido */}
            <div className="certificate-paper-inner w-full h-full flex flex-col justify-between items-center text-center bg-white z-10 print:p-0">
               
-              {/* Header: Auth Badges & Logo */}
+              {/* Header: Código Hash, Empresa y Logos */}
               <div className="w-full flex justify-between items-center">
                  <div className="flex items-center gap-[1cqw] bg-brand-lightblue/10 px-[1.5cqw] py-[0.5cqw] rounded-lg border border-brand-blue/10 shadow-xs print:shadow-none print:border-none print:bg-transparent print:px-0">
                    <ShieldCheck className="h-[2.8cqw] w-[2.8cqw] text-brand-gold print:h-5 print:w-5" />
                    <div className="text-left leading-tight">
-                     <p className="text-[0.9cqw] font-bold text-slate-500 uppercase tracking-widest print:text-[8px]">Validación Oficial</p>
-                     <p className="text-[1.2cqw] font-bold text-brand-blue font-mono tracking-wider print:text-[11px]">ID-{certId}</p>
+                     <p className="text-[0.9cqw] font-bold text-slate-500 uppercase tracking-widest print:text-[8px]">Certificado Acreditado</p>
+                     <p className="text-[1.2cqw] font-bold text-brand-blue font-mono tracking-wider print:text-[11px]">{certId}</p>
                    </div>
                  </div>
-                 <div className="flex items-center justify-end">
-                   <Logo className="certificate-logo h-[4cqw] w-auto object-contain opacity-90 print:h-[8.5mm]" />
+
+                 {/* Logos Corporativos Vigentes */}
+                 <div className="flex items-center gap-3">
+                   {data.companyLogoUrl ? (
+                     <img 
+                       src={data.companyLogoUrl} 
+                       alt={data.companyName || 'Logo Empresa'} 
+                       className="h-[4.5cqw] max-w-[120px] object-contain print:h-[10mm]" 
+                     />
+                   ) : (
+                     <div className="text-right">
+                       <p className="text-[1cqw] font-bold text-slate-800 uppercase print:text-[8px]">{data.companyName}</p>
+                       <p className="text-[0.8cqw] font-mono text-slate-500 print:text-[7px]">RUT: {data.companyRut}</p>
+                     </div>
+                   )}
+                   <div className="h-6 w-px bg-slate-200 mx-1 print:hidden" />
+                   <Logo className="h-[4cqw] w-auto object-contain opacity-90 print:h-[8.5mm]" />
                  </div>
               </div>
 
-              {/* Top Block: Award Icon + Title */}
+              {/* Título Principal */}
               <div className="flex flex-col items-center my-auto pt-[0.5cqw]">
                 <Award className="h-[4.8cqw] w-[4.8cqw] text-brand-blue/15 mb-[0.4cqw] block pointer-events-none print:h-8 print:w-8 print:mb-1" />
                 <h1 className="text-[3.6cqw] font-headline font-bold tracking-tight text-brand-blue mb-[0.1cqw] uppercase leading-none print:text-2xl">
                    Certificado
                 </h1>
                 <h2 className="text-[2.2cqw] font-headline font-light text-brand-green tracking-[0.25em] uppercase leading-snug print:text-base">
-                   de Aprobación
+                   de Acreditación Laboral
                 </h2>
               </div>
 
-              {/* Middle Block: Recipient + Course */}
+              {/* Receptor, RUT, Empresa y Curso */}
               <div className="flex flex-col items-center my-auto max-w-[85%] py-[0.5cqw]">
                 <p className="text-[1cqw] text-slate-500 uppercase tracking-[0.2em] mb-[0.8cqw] font-medium print:text-[10px] print:mb-1.5">
-                   El presente documento formativo reconoce formalmente a
+                   Por cuanto se reconoce formalmente a
                 </p>
 
-                <h3 className="text-[3.2cqw] font-bold text-brand-blue font-headline mb-[0.8cqw] border-b-2 border-brand-lightblue/40 pb-[0.4cqw] inline-block px-[4cqw] uppercase tracking-wide leading-none print:text-2xl print:mb-1.5">
+                <h3 className="text-[3.2cqw] font-bold text-brand-blue font-headline mb-[0.3cqw] border-b-2 border-brand-lightblue/40 pb-[0.4cqw] inline-block px-[4cqw] uppercase tracking-wide leading-none print:text-2xl print:mb-1">
                    {data.userName}
                 </h3>
 
-                <p className="text-[1.2cqw] text-slate-600 font-medium mb-[0.8cqw] leading-relaxed mx-auto px-[2cqw] print:text-xs print:mb-1.5">
-                  Por haber participado, asimilado y completado exitosamente con nivel de suficiencia, la examinación integral del programa de instrucción técnica:
+                {data.userRut && (
+                  <p className="text-[1.1cqw] font-mono font-bold text-slate-600 mb-[0.6cqw] print:text-xs">
+                    RUT: {data.userRut} {data.userHireDate ? `• Fecha de Ingreso: ${data.userHireDate}` : ''}
+                  </p>
+                )}
+
+                <p className="text-[1.1cqw] text-slate-600 font-medium mb-[0.6cqw] leading-relaxed mx-auto px-[2cqw] print:text-xs print:mb-1.5">
+                  Colaborador de <strong>{data.companyName}</strong> (RUT: {data.companyRut}), por haber superado satisfactoriamente la examinación del programa normativo de seguridad ocupacional:
                 </p>
                 
                 <h4 className="text-[1.8cqw] font-bold text-brand-green uppercase leading-snug print:text-sm">
@@ -297,7 +339,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                 </h4>
               </div>
 
-              {/* Footer Signatures & QR */}
+              {/* Pie de firmas, Sello de Rendimiento y Código QR */}
               <div className="w-full flex justify-between items-end pt-[1.5cqw] border-t border-brand-blue/15 mt-auto">
                  <div className="text-center w-1/3 flex flex-col items-center justify-end">
                    <div className="relative mb-[0.2cqw]">
@@ -306,13 +348,13 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                      </span>
                    </div>
                    <div className="h-px w-[12cqw] bg-brand-blue/30 mx-auto mb-[0.5cqw] print:w-20 print:mb-1"></div>
-                   <p className="text-[0.9cqw] font-bold text-brand-blue uppercase tracking-wider print:text-[8px]">Comité Evaluador</p>
-                   <p className="text-[0.7cqw] text-slate-500 font-medium uppercase mt-[0.2cqw] print:text-[6px]">Plataforma Diacero</p>
+                   <p className="text-[0.9cqw] font-bold text-brand-blue uppercase tracking-wider print:text-[8px]">{data.signerName || 'Representante Técnico'}</p>
+                   <p className="text-[0.7cqw] text-slate-500 font-medium uppercase mt-[0.2cqw] print:text-[6px]">{data.signerRole || 'Comité Evaluador Día Cero'}</p>
                  </div>
                  
                  <div className="flex flex-col items-center justify-end w-1/3">
                    <div className="certificate-seal bg-amber-50 text-brand-gold border-2 border-brand-gold/40 rounded-full h-[7.5cqw] w-[7.5cqw] max-w-[58px] max-h-[58px] flex flex-col items-center justify-center p-[0.4cqw] shadow-xs print:h-12 print:w-12">
-                      <span className="text-[0.7cqw] font-bold uppercase tracking-wider opacity-80 mb-[0.1cqw] text-amber-800 print:text-[6px]">Rendimiento</span>
+                      <span className="text-[0.7cqw] font-bold uppercase tracking-wider opacity-80 mb-[0.1cqw] text-amber-800 print:text-[6px]">Calificación</span>
                       <span className="text-[2cqw] font-bold tracking-tight text-amber-700 leading-none print:text-sm">{data.score}%</span>
                    </div>
                  </div>
@@ -339,7 +381,7 @@ export default function CertificateClient({ moduleId }: { moduleId: string }) {
                      rel="noopener noreferrer" 
                      className="hover:underline cursor-pointer"
                    >
-                     <p className="text-[0.7cqw] text-slate-500 font-medium uppercase mt-[0.2cqw] print:text-[6px]">Sello Electrónico Formal (ID-{certId})</p>
+                     <p className="text-[0.7cqw] text-slate-500 font-medium uppercase mt-[0.2cqw] print:text-[6px]">Sello Inmutable (ID-{certId})</p>
                    </a>
                  </div>
               </div>

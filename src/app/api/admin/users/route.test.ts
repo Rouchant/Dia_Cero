@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST, PATCH, DELETE } from './route';
+import { GET, POST, PATCH, DELETE } from './route';
 
 const mockCreateUser = vi.fn();
 const mockUpdateUserById = vi.fn();
@@ -207,6 +207,132 @@ describe('API Control de Usuarios - /api/admin/users', () => {
         password: 'NuevaClaveValida123',
       });
     });
+
+    it('debe actualizar la fecha de contratacion (hireDate) con éxito', async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { hire_date: '2024-01-01', email: 'alumno@empresa.cl' },
+                  error: null,
+                }),
+              }),
+            }),
+            update: mockUpdate,
+          };
+        }
+        return {};
+      });
+
+      const request = new Request('http://localhost:3000/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'u-789',
+          hireDate: '2025-06-15',
+        }),
+      });
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith({
+        hire_date: '2025-06-15',
+      });
+    });
+
+    it('debe actualizar el rut con formato chileno válido con éxito', async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { rut: '11.111.111-1', email: 'alumno@empresa.cl' },
+                  error: null,
+                }),
+              }),
+            }),
+            update: mockUpdate,
+          };
+        }
+        return {};
+      });
+
+      const request = new Request('http://localhost:3000/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'u-789',
+          rut: '12345678-5', // Rut válido módulo 11
+        }),
+      });
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith({
+        rut: '12.345.678-5',
+      });
+    });
+
+    it('debe actualizar el nombre de usuario (name) con éxito', async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: { name: 'Nombre Antiguo', email: 'alumno@empresa.cl' },
+                  error: null,
+                }),
+              }),
+            }),
+            update: mockUpdate,
+          };
+        }
+        return {};
+      });
+
+      const request = new Request('http://localhost:3000/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'u-101',
+          name: 'Nombre Corregido Pérez',
+        }),
+      });
+
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith({
+        name: 'Nombre Corregido Pérez',
+      });
+      expect(mockUpdateUserById).toHaveBeenCalledWith('u-101', {
+        user_metadata: { name: 'Nombre Corregido Pérez' },
+      });
+    });
   });
 
   describe('DELETE /api/admin/users (Baja de Usuario)', () => {
@@ -291,6 +417,55 @@ describe('API Control de Usuarios - /api/admin/users', () => {
       expect(data.success).toBe(true);
       expect(data.message).toContain('Alumno eliminado exitosamente');
       expect(mockDeleteUser).toHaveBeenCalledWith('u-eliminar-1');
+    });
+  });
+
+  describe('GET /api/admin/users (Consulta de Usuarios, Progreso y Módulos)', () => {
+    it('debe retornar módulos, perfiles y datos de progreso', async () => {
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'modules') {
+          return {
+            select: vi.fn().mockResolvedValue({
+              data: [{ id: 'mod-1', title: 'Seguridad' }],
+              error: null,
+            }),
+          };
+        }
+        if (table === 'profiles') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [{ id: 'user-1', name: 'Alumno 1', role: 'estudiante' }],
+                error: null,
+              }),
+            }),
+          };
+        }
+        if (table === 'user_progress') {
+          return {
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({
+                data: [{ user_id: 'user-1', module_id: 'mod-1', completed_sections: ['sec-1'] }],
+                error: null,
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      const request = new Request('http://localhost:3000/api/admin/users?companyId=comp-123', {
+        method: 'GET',
+      });
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.modules).toHaveLength(1);
+      expect(data.users).toHaveLength(1);
+      expect(data.progressData).toHaveLength(1);
+      expect(data.progressData[0].user_id).toBe('user-1');
     });
   });
 });

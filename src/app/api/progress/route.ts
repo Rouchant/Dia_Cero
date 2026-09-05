@@ -38,6 +38,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Se requiere moduleId' }, { status: 400 });
     }
 
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : (request.headers.get('x-real-ip') || '127.0.0.1');
+    const now = new Date().toISOString();
+
     // Persistir el progreso del colaborador asociado a su UUID
     const { data: progressData, error: upsertError } = await supabase
       .from('user_progress')
@@ -47,7 +51,9 @@ export async function POST(request: Request) {
         completed_sections: completedSections || [],
         quiz_scores: quizScores || {},
         current_section_index: currentSectionIndex ?? 0,
-        updated_at: new Date().toISOString()
+        updated_at: now,
+        last_active_at: now,
+        last_ip_address: ip
       }, { onConflict: 'user_id, module_id' })
       .select()
       .single();

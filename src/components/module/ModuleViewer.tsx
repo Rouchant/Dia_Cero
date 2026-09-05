@@ -167,13 +167,15 @@ export function ModuleViewer({ moduleId }: { moduleId: string }) {
     if (mounted && moduleData && dataLoaded && userId) {
       // Save progress to database
       async function saveProgress() {
+        const nowIso = new Date().toISOString();
         await supabase.from('user_progress').upsert({
           user_id: userId,
           module_id: moduleId,
           completed_sections: completedSections,
           quiz_scores: quizScores,
           current_section_index: currentSectionIndex,
-          updated_at: new Date().toISOString()
+          updated_at: nowIso,
+          last_active_at: nowIso
         }, { onConflict: 'user_id, module_id' });
       }
       saveProgress();

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  UserPlus, KeyRound, BookOpen, ShieldCheck, Loader2, CheckCircle2, User, Trash2, Users, AlertTriangle, ChevronDown, ChevronUp 
+  UserPlus, KeyRound, BookOpen, ShieldCheck, Loader2, CheckCircle2, User, Trash2, Users, AlertTriangle, ChevronDown, ChevronUp,
+  Calendar, CalendarCheck
 } from "lucide-react";
 
 interface UserAccountControlTabProps {
@@ -21,11 +22,18 @@ interface UserAccountControlTabProps {
   setNewUserPassword: (val: string) => void;
   newUserRole?: 'estudiante' | 'admin';
   setNewUserRole?: (val: 'estudiante' | 'admin') => void;
+  newUserRut?: string;
+  setNewUserRut?: (val: string) => void;
+  newUserHireDate?: string;
+  setNewUserHireDate?: (val: string) => void;
   isCreatingUser: boolean;
   onCreateUser: (e: React.FormEvent) => void;
-  // Reset Password & Role
+  // Reset Password, Role, RUT & Hire Date
   onResetPassword?: (userId: string, newPass: string) => Promise<boolean>;
   onChangeUserRole?: (userId: string, newRole: 'admin' | 'estudiante') => Promise<boolean>;
+  onChangeUserHireDate?: (userId: string, newHireDate: string | null) => Promise<boolean>;
+  onChangeUserRut?: (userId: string, newRut: string | null) => Promise<boolean>;
+  onChangeUserName?: (userId: string, newName: string) => Promise<boolean>;
   // Delete User
   onDeleteUser?: (userId: string, userName?: string) => Promise<boolean | void>;
   currentAdminId?: string;
@@ -51,10 +59,17 @@ export function UserAccountControlTab({
   setNewUserPassword,
   newUserRole = 'estudiante',
   setNewUserRole,
+  newUserRut,
+  setNewUserRut,
+  newUserHireDate,
+  setNewUserHireDate,
   isCreatingUser,
   onCreateUser,
   onResetPassword,
   onChangeUserRole,
+  onChangeUserHireDate,
+  onChangeUserRut,
+  onChangeUserName,
   onDeleteUser,
   currentAdminId,
   assignUserId,
@@ -68,6 +83,13 @@ export function UserAccountControlTab({
   const [isUpdatingRole, setIsUpdatingRole] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
+  const [actionModId, setActionModId] = useState<string | null>(null);
+
+  // Local state for name, hire date and rut modification
+  const [selectedName, setSelectedName] = useState("");
+  const [selectedHireDate, setSelectedHireDate] = useState("");
+  const [selectedRut, setSelectedRut] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   // Asegurar que ningún usuario quede seleccionado por default al cargar la pestaña
   useEffect(() => {
@@ -77,9 +99,23 @@ export function UserAccountControlTab({
 
   // Unified selected user reference
   const selectedUser = students.find(s => s.id === assignUserId);
-  const isRootAdmin = selectedUser?.email === 'admin@diacero.com';
+  const isSuperAdminUser = selectedUser?.role === 'superadmin';
+  const isRootAdmin = selectedUser?.email === 'admin@diacero.com' || isSuperAdminUser;
   const isCurrentAdmin = selectedUser?.id === currentAdminId;
   const isProtectedFromDelete = isRootAdmin || isCurrentAdmin;
+
+  // Sincronizar datos del usuario seleccionado
+  useEffect(() => {
+    if (selectedUser) {
+      setSelectedName(selectedUser.name || "");
+      setSelectedHireDate(selectedUser.hire_date || "");
+      setSelectedRut(selectedUser.rut || "");
+    } else {
+      setSelectedName("");
+      setSelectedHireDate("");
+      setSelectedRut("");
+    }
+  }, [selectedUser?.id, selectedUser?.name, selectedUser?.hire_date, selectedUser?.rut]);
 
   const handleExecuteResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +126,22 @@ export function UserAccountControlTab({
     if (success) {
       setResetNewPass("");
     }
+  };
+
+  const handleExecuteUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignUserId) return;
+    setIsUpdatingProfile(true);
+    if (onChangeUserName && selectedName.trim() && selectedName.trim() !== selectedUser?.name) {
+      await onChangeUserName(assignUserId, selectedName.trim());
+    }
+    if (onChangeUserRut && selectedRut !== (selectedUser?.rut || "")) {
+      await onChangeUserRut(assignUserId, selectedRut || null);
+    }
+    if (onChangeUserHireDate && selectedHireDate !== (selectedUser?.hire_date || "")) {
+      await onChangeUserHireDate(assignUserId, selectedHireDate || null);
+    }
+    setIsUpdatingProfile(false);
   };
 
   const handleExecuteDeleteUser = async () => {
@@ -169,7 +221,7 @@ export function UserAccountControlTab({
             {isCreateUserOpen && (
               <div className="p-4 sm:p-6 pt-0 border-t border-emerald-100/80 animate-in fade-in slide-in-from-top-2 duration-200">
                 <form onSubmit={onCreateUser} className="space-y-4 pt-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-slate-700">Nombre Completo</Label>
                       <Input
@@ -190,6 +242,17 @@ export function UserAccountControlTab({
                         value={newUserEmail}
                         onChange={e => setNewUserEmail(e.target.value)}
                         required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-700">RUT (Opcional)</Label>
+                      <Input
+                        type="text"
+                        className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl focus:ring-2 focus:ring-emerald-500"
+                        placeholder="12.345.678-9"
+                        value={newUserRut || ""}
+                        onChange={e => setNewUserRut?.(e.target.value)}
                       />
                     </div>
 
@@ -218,6 +281,16 @@ export function UserAccountControlTab({
                         </select>
                       </div>
                     )}
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-700">Fecha de Contratación (Opcional)</Label>
+                      <Input
+                        type="date"
+                        className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                        value={newUserHireDate || ""}
+                        onChange={e => setNewUserHireDate?.(e.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-1">
@@ -282,9 +355,10 @@ export function UserAccountControlTab({
               <option value="">-- Ningún usuario seleccionado (Elige para administrar) --</option>
               {students.map(s => {
                 const isUserProtected = s.id === currentAdminId || s.email === 'admin@diacero.com';
+                const roleTag = s.role === 'superadmin' ? '[Superadmin]' : s.role === 'admin' ? '[Administrador]' : '[Alumno]';
                 return (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.email}) {s.role === 'admin' ? '[Administrador]' : '[Alumno]'} {isUserProtected ? '— (Tu sesión activa protegida)' : ''}
+                    {s.name} ({s.email}) {roleTag} {isUserProtected ? '— (Tu sesión activa protegida)' : ''}
                   </option>
                 );
               })}
@@ -294,95 +368,204 @@ export function UserAccountControlTab({
           {selectedUser ? (
             <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-200">
               
-              {/* 3 & 4. CONTROL DE ROLES Y CONTRASEÑA */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* 3, 4 & 5. CONTROL DE USUARIO: FICHA LABORAL + ROLES Y SEGURIDAD */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
                 
-                {/* 3. CONTROL DE ROLES */}
-                <div className="p-4 sm:p-5 bg-amber-50/30 border border-amber-200/70 rounded-2xl space-y-3.5 sm:space-y-4">
-                  <div className="flex items-center justify-between gap-2 border-b border-amber-100 pb-2.5">
-                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
-                      <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />
-                      <span className="truncate">Control de Roles</span>
-                    </h4>
-                    <span className={`shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-black ${
-                      selectedUser.role === 'admin'
-                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                        : 'bg-sky-100 text-sky-900 border border-sky-300'
-                    }`}>
-                      {selectedUser.role === 'admin' ? '🛡️ Administrador' : '🎓 Alumno'}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-slate-500 break-words leading-relaxed">
-                    Cambia los permisos operativos de <strong className="text-slate-700">{selectedUser.name}</strong> para otorgar o remover acceso al panel de administración.
-                  </p>
-
-                  <div className="pt-1">
-                    {onChangeUserRole && !isRootAdmin ? (
-                      <Button
-                        type="button"
-                        size="sm"
-                        disabled={isUpdatingRole}
-                        onClick={async () => {
-                          const newRole = selectedUser.role === 'admin' ? 'estudiante' : 'admin';
-                          const roleName = newRole === 'admin' ? 'Administrador' : 'Alumno';
-                          if (window.confirm(`¿Confirmas cambiar el rol de "${selectedUser.name}" a ${roleName}?`)) {
-                            setIsUpdatingRole(true);
-                            await onChangeUserRole(selectedUser.id, newRole);
-                            setIsUpdatingRole(false);
-                          }
-                        }}
-                        className={`w-full min-h-10 h-auto py-2.5 px-3 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 text-center whitespace-normal ${
-                          selectedUser.role === 'admin'
-                            ? 'bg-sky-600 hover:bg-sky-700 text-white'
-                            : 'bg-amber-600 hover:bg-amber-700 text-white'
-                        }`}
-                      >
-                        {isUpdatingRole ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <ShieldCheck className="h-4 w-4 shrink-0" />}
-                        <span>Cambiar a Rol {selectedUser.role === 'admin' ? 'Alumno' : 'Administrador'}</span>
-                      </Button>
-                    ) : (
-                      <div className="p-2.5 bg-slate-100 rounded-xl text-[11px] text-slate-500 italic text-center break-words">
-                        * La cuenta principal de Administrador no puede ser modificada.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 4. CONTRASEÑA */}
-                <div className="p-4 sm:p-5 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3.5 sm:space-y-4">
-                  <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
-                    <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
-                      <KeyRound className="h-4 w-4 text-slate-600 shrink-0" />
-                      <span className="truncate">Restablecer Contraseña</span>
-                    </h4>
-                    <span className="text-[11px] text-slate-500 font-medium shrink-0 whitespace-nowrap">Mín. 6 carac.</span>
-                  </div>
-
-                  <form onSubmit={handleExecuteResetPassword} className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-700">Nueva Contraseña Provisoria</Label>
-                      <Input
-                        type="text"
-                        className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl"
-                        placeholder="Ingresa la nueva clave..."
-                        value={resetNewPass}
-                        onChange={e => setResetNewPass(e.target.value)}
-                        required
-                        minLength={6}
-                      />
+                {/* 1. IDENTIDAD Y DATOS LABORALES (COLUMNA PRINCIPAL - 7 COLS) */}
+                <div className="lg:col-span-7 p-5 sm:p-6 bg-emerald-50/30 border border-emerald-200/80 rounded-2xl flex flex-col justify-between gap-4 shadow-2xs">
+                  <div className="space-y-3.5">
+                    <div className="flex items-center justify-between gap-2 border-b border-emerald-100 pb-2.5">
+                      <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
+                        <User className="h-4.5 w-4.5 text-emerald-600 shrink-0" />
+                        <span className="truncate">Identidad & Datos Laborales</span>
+                      </h4>
+                      <span className={`shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-black ${
+                        selectedUser.hire_date 
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                      }`}>
+                        {selectedUser.hire_date ? `Contrato: ${selectedUser.hire_date}` : 'Sin fecha'}
+                      </span>
                     </div>
 
+                    <p className="text-xs text-slate-500 break-words leading-relaxed">
+                      Corrige el nombre oficial, RUT y fecha de contratación para <strong className="text-slate-700">{selectedUser.name}</strong>.
+                    </p>
+
+                    <form id="profile-form" onSubmit={handleExecuteUpdateProfile} className="space-y-3 pt-1">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-700">Nombre Completo</Label>
+                        <Input
+                          type="text"
+                          className="h-10 text-xs bg-white border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 font-medium"
+                          placeholder="Nombre y Apellidos"
+                          value={selectedName}
+                          onChange={e => setSelectedName(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-bold text-slate-700">RUT del Titular</Label>
+                          <Input
+                            type="text"
+                            className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl focus:ring-2 focus:ring-emerald-500"
+                            placeholder="12.345.678-9"
+                            value={selectedRut}
+                            onChange={e => setSelectedRut(e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-xs font-bold text-slate-700">Fecha Contratación</Label>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedHireDate(new Date().toISOString().split('T')[0])}
+                                className="text-[10px] text-emerald-700 hover:text-emerald-800 font-bold underline cursor-pointer"
+                              >
+                                Hoy
+                              </button>
+                              {selectedHireDate && (
+                                <>
+                                  <span className="text-slate-300">•</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedHireDate("")}
+                                    className="text-[10px] text-rose-600 hover:text-rose-700 font-bold underline cursor-pointer"
+                                  >
+                                    Limpiar
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <Input
+                            type="date"
+                            className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                            value={selectedHireDate}
+                            onChange={e => setSelectedHireDate(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="pt-1">
                     <Button
                       type="submit"
-                      disabled={isResettingPassword || resetNewPass.length < 6}
-                      className="w-full min-h-10 h-auto py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-center whitespace-normal"
+                      form="profile-form"
+                      disabled={isUpdatingProfile}
+                      className="w-full h-10 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
                     >
-                      {isResettingPassword ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <KeyRound className="h-4 w-4 shrink-0" />}
-                      <span>{isResettingPassword ? "Actualizando..." : "Actualizar Contraseña"}</span>
+                      {isUpdatingProfile ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <CalendarCheck className="h-4 w-4 shrink-0" />}
+                      <span>{isUpdatingProfile ? "Guardando Ficha..." : "Guardar Ficha del Titular"}</span>
                     </Button>
-                  </form>
+                  </div>
                 </div>
+
+                {/* 2. CONTROL DE ROLES & SEGURIDAD (COLUMNA SECUNDARIA - 5 COLS) */}
+                <div className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 justify-between">
+                  
+                  {/* CARD 2A: CONTROL DE ROLES */}
+                  <div className="p-4 sm:p-5 bg-amber-50/30 border border-amber-200/70 rounded-2xl space-y-3 flex flex-col justify-between flex-1 shadow-2xs">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2 border-b border-amber-100 pb-2">
+                        <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
+                          <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />
+                          <span className="truncate">Control de Roles</span>
+                        </h4>
+                        <span className={`shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-black ${
+                          selectedUser.role === 'superadmin'
+                            ? 'bg-purple-100 text-purple-900 border border-purple-300'
+                            : selectedUser.role === 'admin'
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : 'bg-sky-100 text-sky-900 border border-sky-300'
+                        }`}>
+                          {selectedUser.role === 'superadmin' ? '⚡ Superadmin' : selectedUser.role === 'admin' ? '🛡️ Administrador' : '🎓 Alumno'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-500 break-words leading-relaxed">
+                        Permisos operativos para otorgar o remover acceso al panel de administración.
+                      </p>
+                    </div>
+
+                    <div className="pt-1">
+                      {onChangeUserRole && !isRootAdmin ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={isUpdatingRole}
+                          onClick={async () => {
+                            const newRole = selectedUser.role === 'admin' ? 'estudiante' : 'admin';
+                            const roleName = newRole === 'admin' ? 'Administrador' : 'Alumno';
+                            if (window.confirm(`¿Confirmas cambiar el rol de "${selectedUser.name}" a ${roleName}?`)) {
+                              setIsUpdatingRole(true);
+                              await onChangeUserRole(selectedUser.id, newRole);
+                              setIsUpdatingRole(false);
+                            }
+                          }}
+                          className={`w-full h-10 py-2 px-3 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 text-center whitespace-normal ${
+                            selectedUser.role === 'admin'
+                              ? 'bg-sky-600 hover:bg-sky-700 text-white'
+                              : 'bg-amber-600 hover:bg-amber-700 text-white'
+                          }`}
+                        >
+                          {isUpdatingRole ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <ShieldCheck className="h-4 w-4 shrink-0" />}
+                          <span>Cambiar a Rol {selectedUser.role === 'admin' ? 'Alumno' : 'Administrador'}</span>
+                        </Button>
+                      ) : (
+                        <div className="p-2 bg-slate-100/80 rounded-xl text-[11px] text-slate-500 italic text-center break-words">
+                          * {selectedUser.role === 'superadmin' ? 'Cuenta de Superadmin con privilegios globales.' : 'Cuenta principal de Administrador protegida.'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* CARD 2B: RESTABLECER CONTRASEÑA */}
+                  <div className="p-4 sm:p-5 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3 flex flex-col justify-between flex-1 shadow-2xs">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2">
+                        <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 font-headline min-w-0">
+                          <KeyRound className="h-4 w-4 text-slate-600 shrink-0" />
+                          <span className="truncate">Restablecer Contraseña</span>
+                        </h4>
+                        <span className="text-[11px] text-slate-500 font-medium shrink-0 whitespace-nowrap">Mín. 6 carac.</span>
+                      </div>
+
+                      <p className="text-xs text-slate-500 break-words leading-relaxed">
+                        Genera una clave provisional de acceso inmediato para el usuario.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleExecuteResetPassword} className="pt-1">
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Input
+                          type="text"
+                          className="h-10 text-xs bg-white border-slate-200 font-mono rounded-xl focus:ring-2 focus:ring-slate-500 flex-1"
+                          placeholder="Nueva clave provisoria..."
+                          value={resetNewPass}
+                          onChange={e => setResetNewPass(e.target.value)}
+                          required
+                          minLength={6}
+                        />
+                        <Button
+                          type="submit"
+                          disabled={isResettingPassword || resetNewPass.length < 6}
+                          className="h-10 px-4 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition-all shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap"
+                        >
+                          {isResettingPassword ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <KeyRound className="h-4 w-4 shrink-0" />}
+                          <span>Actualizar</span>
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+
+                </div>
+
               </div>
 
               {/* 5. Y ABAJO: ASIGNACIÓN DE MÓDULOS */}
@@ -394,18 +577,18 @@ export function UserAccountControlTab({
                       <span>Asignación de Módulos Académicos</span>
                     </h4>
                     <p className="text-xs text-slate-500 mt-1 break-words">
-                      <strong className="text-slate-700">{selectedUser.name}</strong> ({selectedUser.email}) • {selectedUser.assigned_count || 0} de {dbModules.length} módulos habilitados
+                      <strong className="text-slate-700">{selectedUser.name}</strong> ({selectedUser.email}) • {(selectedUser.assigned_count ?? selectedUser.assignedCount ?? 0)} de {dbModules.length} módulos habilitados
                     </p>
                   </div>
                   <span className="text-xs font-bold text-indigo-800 bg-indigo-100/70 px-3 py-1 rounded-xl border border-indigo-200 self-start sm:self-auto shrink-0 whitespace-nowrap">
-                    {selectedUser.assigned_count === dbModules.length ? "Malla Completa" : `${selectedUser.assigned_count || 0} Cursos Activos`}
+                    {(selectedUser.assigned_count ?? selectedUser.assignedCount ?? 0) === dbModules.length ? "Malla Completa" : `${selectedUser.assigned_count ?? selectedUser.assignedCount ?? 0} Cursos Activos`}
                   </span>
                 </div>
 
                 {/* Grid de módulos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {dbModules.map(mod => {
-                    const breakdownItem = selectedUser.module_breakdown?.find((mb: any) => mb.module_id === mod.id);
+                    const breakdownItem = (selectedUser.module_breakdown || selectedUser.modules)?.find((mb: any) => mb.module_id === mod.id);
                     const isAssigned = breakdownItem?.is_assigned ?? false;
                     const progressPerc = breakdownItem?.progress_percentage ?? 0;
 
@@ -460,19 +643,51 @@ export function UserAccountControlTab({
                                 type="button"
                                 size="sm"
                                 variant="outline"
-                                onClick={() => onUnassignModuleDirectly?.(selectedUser.id, mod.id)}
-                                className="w-full sm:w-auto h-8 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl"
+                                disabled={actionModId === mod.id}
+                                onClick={async () => {
+                                  if (actionModId) return;
+                                  setActionModId(mod.id);
+                                  try {
+                                    await onUnassignModuleDirectly?.(selectedUser.id, mod.id);
+                                  } finally {
+                                    setActionModId(null);
+                                  }
+                                }}
+                                className="w-full sm:w-auto h-8 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 rounded-xl flex items-center gap-1.5"
                               >
-                                Desvincular Módulo
+                                {actionModId === mod.id ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
+                                    <span>Desvinculando...</span>
+                                  </>
+                                ) : (
+                                  <span>Desvincular Módulo</span>
+                                )}
                               </Button>
                             ) : (
                               <Button
                                 type="button"
                                 size="sm"
-                                onClick={() => onAssignModuleDirectly?.(selectedUser.id, mod.id)}
-                                className="w-full sm:w-auto h-8 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs"
+                                disabled={actionModId === mod.id}
+                                onClick={async () => {
+                                  if (actionModId) return;
+                                  setActionModId(mod.id);
+                                  try {
+                                    await onAssignModuleDirectly?.(selectedUser.id, mod.id);
+                                  } finally {
+                                    setActionModId(null);
+                                  }
+                                }}
+                                className="w-full sm:w-auto h-8 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs flex items-center gap-1.5"
                               >
-                                Asignar Módulo
+                                {actionModId === mod.id ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
+                                    <span>Asignando...</span>
+                                  </>
+                                ) : (
+                                  <span>Asignar Módulo</span>
+                                )}
                               </Button>
                             )}
                           </div>

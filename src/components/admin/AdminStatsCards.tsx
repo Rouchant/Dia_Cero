@@ -6,11 +6,12 @@ import { Users, TrendingUp, Award } from "lucide-react";
 
 interface AdminStatsCardsProps {
   totalStudents: number;
+  totalUsers?: number;
   averageProgress: number;
   completedStudents: number;
 }
 
-export function AdminStatsCards({ totalStudents, averageProgress, completedStudents }: AdminStatsCardsProps) {
+export function AdminStatsCards({ totalStudents, totalUsers, averageProgress, completedStudents }: AdminStatsCardsProps) {
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-6 md:mb-8">
       {/* Card 1: Total de Alumnos */}
@@ -29,7 +30,7 @@ export function AdminStatsCards({ totalStudents, averageProgress, completedStude
               {totalStudents}
             </h3>
             <p className="text-[9px] sm:text-xs text-slate-500 mt-1 leading-tight line-clamp-1 sm:line-clamp-none">
-              Registrados en la plataforma
+              {totalUsers && totalUsers > totalStudents ? `${totalStudents} alumnos de ${totalUsers} registrados` : "Registrados en la plataforma"}
             </p>
           </div>
         </CardContent>

@@ -149,6 +149,8 @@ CREATE TABLE IF NOT EXISTS public.user_progress (
     quiz_scores JSONB DEFAULT '{}'::jsonb,
     current_section_index INTEGER DEFAULT 0,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    last_ip_address TEXT,
+    last_active_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     CONSTRAINT user_progress_pkey PRIMARY KEY (id),
     CONSTRAINT user_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
     CONSTRAINT user_progress_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.modules(id) ON DELETE CASCADE,
@@ -159,7 +161,7 @@ ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Estudiantes pueden ver su propio progreso"
 ON public.user_progress FOR SELECT TO authenticated
-USING (user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+USING (user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'superadmin')));
 
 CREATE POLICY "Estudiantes pueden registrar su progreso"
 ON public.user_progress FOR INSERT TO authenticated
@@ -171,11 +173,160 @@ USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
 CREATE POLICY "Administradores gestionan todo el progreso"
 ON public.user_progress FOR ALL TO authenticated
-USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'superadmin')));
 
 -- ==============================================================================
--- 8. DATOS SEMILLA (Seed Data) — Módulo Piloto Ley 16.744
+-- 8. TABLA: public.companies (Empresas y Organizaciones)
 -- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.companies (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    code VARCHAR(6) NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    business_name TEXT NOT NULL,
+    rut TEXT NOT NULL,
+    legal_address TEXT NOT NULL,
+    business_line TEXT NOT NULL,
+    logo_url TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT companies_pkey PRIMARY KEY (id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_companies_code ON public.companies(code);
+ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lectura de empresas activas para autenticados"
+ON public.companies FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Lectura pública de empresa para validación de código"
+ON public.companies FOR SELECT TO anon USING (is_active = true);
+
+-- Modificaciones a perfiles para multi-tenancy y datos sensibles
+ALTER TABLE public.profiles
+    ADD COLUMN IF NOT EXISTS rut TEXT,
+    ADD COLUMN IF NOT EXISTS hire_date DATE,
+    ADD COLUMN IF NOT EXISTS company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
+    ADD COLUMN IF NOT EXISTS company_code VARCHAR(6);
+
+CREATE INDEX IF NOT EXISTS idx_profiles_company_id ON public.profiles(company_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_rut ON public.profiles(rut);
+
+-- ==============================================================================
+-- 9. TABLA: public.consent_audit_logs (Consentimientos Ley 21.719)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.consent_audit_logs (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    terms_version TEXT NOT NULL,
+    privacy_version TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    accepted_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT consent_audit_logs_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE public.consent_audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Modificaciones a user_progress para auditoría de IP y actividad
+ALTER TABLE public.user_progress
+    ADD COLUMN IF NOT EXISTS last_ip_address TEXT,
+    ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMP WITH TIME ZONE DEFAULT now();
+
+-- ==============================================================================
+-- 10. TABLA: public.suppression_requests (Derecho al Olvido / Supresión)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.suppression_requests (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    ticket_number TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
+    rut TEXT,
+    full_name TEXT,
+    company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
+    reason TEXT NOT NULL,
+    details TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',
+    ip_address TEXT,
+    user_agent TEXT,
+    processed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    processed_at TIMESTAMP WITH TIME ZONE,
+    resolution_notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT suppression_requests_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE public.suppression_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Creación pública de solicitudes de supresión"
+ON public.suppression_requests FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+-- ==============================================================================
+-- 11. TABLA: public.certificates (Certificados Inmutables Sellados)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.certificates (
+    id TEXT NOT NULL,
+    student_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    student_name TEXT NOT NULL,
+    student_rut TEXT NOT NULL,
+    student_hire_date DATE,
+    company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
+    company_name TEXT NOT NULL,
+    company_rut TEXT NOT NULL,
+    company_logo_url TEXT,
+    signer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    signer_name TEXT NOT NULL,
+    signer_role TEXT NOT NULL,
+    module_id TEXT REFERENCES public.modules(id) ON DELETE SET NULL,
+    module_title TEXT NOT NULL,
+    score INTEGER NOT NULL DEFAULT 100,
+    issued_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    status TEXT NOT NULL DEFAULT 'valid',
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT certificates_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Verificación pública de certificados"
+ON public.certificates FOR SELECT TO anon, authenticated USING (status = 'valid');
+
+-- ==============================================================================
+-- 12. TABLA: public.audit_logs (Trazabilidad Administrativa)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    actor_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    actor_email TEXT,
+    action TEXT NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id TEXT,
+    company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
+    ip_address TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    CONSTRAINT audit_logs_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- ==============================================================================
+-- 13. DATOS SEMILLA (Seed Data) — Módulo Piloto Ley 16.744 y Empresa Demo
+-- ==============================================================================
+INSERT INTO public.companies (
+    id, code, name, business_name, rut, legal_address, business_line, is_active
+)
+VALUES (
+    'c0000000-0000-0000-0000-000000000001',
+    'DC2026',
+    'Día Cero Prevención',
+    'Día Cero Prevención y Capacitación SpA',
+    '76.543.210-K',
+    'Av. Apoquindo 4501, Piso 8, Las Condes, Santiago',
+    'Servicios de Capacitación y Asesoría en Seguridad Laboral',
+    true
+)
+ON CONFLICT (code) DO NOTHING;
+
 INSERT INTO public.modules (id, title, description)
 VALUES (
     'mod-1',
@@ -235,3 +386,4 @@ VALUES
     2
 )
 ON CONFLICT (id) DO NOTHING;
+

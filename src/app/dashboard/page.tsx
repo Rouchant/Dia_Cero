@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRight, Award, LayoutDashboard } from "lucide-react";
+import { BookOpen, User, Star, Trophy, Clock, LogOut, Settings, Bell, ChevronRight, Award, LayoutDashboard, Globe, ShieldCheck } from "lucide-react";
 import Link from 'next/link';
 import { Logo } from "@/components/ui/logo";
 import { createClient } from '@/utils/supabase/client';
@@ -19,6 +19,8 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState("Usuario Alumno");
   const [currentUserId, setCurrentUserId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperadmin, setIsSuperadmin] = useState(false);
+  const [userRole, setUserRole] = useState<string>("estudiante");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -27,20 +29,61 @@ export default function Dashboard() {
 
     async function fetchModules() {
       const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || "";
+      const user = authData.user;
+      const uid = user?.id || "";
       setCurrentUserId(uid);
       
-      if (authData.user?.email) {
-        setUserEmail(authData.user.email);
-      }
-      if (authData.user?.user_metadata?.role === 'admin') {
-        setIsAdmin(true);
+      const email = user?.email || "";
+      if (email) {
+        setUserEmail(email);
       }
 
       if (!uid) {
         setLoading(false);
         return;
       }
+
+      // Sincronizar y obtener el perfil con roles garantizados (crea el registro en profiles si faltaba)
+      let currentRole = 'estudiante';
+      let isSuper = false;
+      let isAdm = false;
+
+      try {
+        const syncRes = await fetch('/api/auth/sync-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: uid, email })
+        });
+        if (syncRes.ok) {
+          const syncData = await syncRes.json();
+          if (syncData.profile?.role) {
+            currentRole = syncData.profile.role;
+          }
+          isSuper = !!syncData.isSuperadmin;
+          isAdm = !!syncData.isAdmin;
+        }
+      } catch (err) {
+        console.warn('Sync profile fallback:', err);
+      }
+
+      // Fallback a consulta directa si no se determinó admin por API
+      if (!isAdm) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, full_name')
+          .eq('id', uid)
+          .maybeSingle();
+
+        const role = profile?.role || user?.user_metadata?.role || user?.app_metadata?.role || currentRole;
+        currentRole = role;
+        const emailLower = email.toLowerCase();
+        isSuper = role === 'superadmin' || emailLower === 'admin@diacero.com' || emailLower.includes('superadmin');
+        isAdm = isSuper || role === 'admin' || emailLower.includes('admin');
+      }
+
+      setUserRole(currentRole);
+      setIsAdmin(isAdm || isSuper);
+      setIsSuperadmin(isSuper);
 
       const { data: upData } = await supabase
         .from('user_progress')
@@ -92,7 +135,7 @@ export default function Dashboard() {
             <Logo />
             <span className="font-headline font-black text-lg tracking-tight hidden sm:inline mt-2.5 leading-none border-l border-brand-blue/20 pl-3">Portal Piloto</span>
           </div>
-          <div className="hidden sm:flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="icon" 
@@ -107,6 +150,11 @@ export default function Dashboard() {
                 <User className="h-4 w-4" />
               </div>
               <span className="text-sm font-bold mr-1 hidden sm:inline">{userEmail}</span>
+              {isSuperadmin ? (
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-purple-700 text-white shadow-xs">Superadmin</span>
+              ) : isAdmin ? (
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-brand-yellow text-slate-900 shadow-xs">Admin</span>
+              ) : null}
             </div>
           </div>
         </div>
@@ -114,11 +162,11 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <main className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 pt-8 pb-32 sm:pb-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        
+
         {/* Welcome Section */}
         <section className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-left duration-700 ease-out">
           <h1 className="text-xl sm:text-4xl font-headline font-black text-brand-blue tracking-tight">
-            Hola, <span className="text-brand-green pr-1 inline-block transition-transform duration-300 hover:scale-110 cursor-default">Estudiante</span> 👋
+            Hola, <span className="text-brand-green pr-1 inline-block transition-transform duration-300 hover:scale-110 cursor-default">{isSuperadmin ? "Superadmin" : isAdmin ? "Administrador" : "Estudiante"}</span> 👋
           </h1>
           <p className="text-slate-500 mt-1 sm:mt-2 text-base sm:text-lg font-medium">Resumen de tus programas de aprendizaje.</p>
         </section>
@@ -208,10 +256,18 @@ export default function Dashboard() {
                   </Button>
                 </Link>
                 
-                {isAdmin && (
+                {(isAdmin || isSuperadmin) && (
                   <Link href="/admin/dashboard" className="block">
                     <Button variant="default" className="hover-lift w-full justify-start h-12 font-semibold text-sm bg-brand-yellow hover:bg-[#fde047] text-slate-900 transition-all rounded-xl shadow-sm active:scale-95 border border-yellow-400/50">
                       <LayoutDashboard className="h-5 w-5 mr-3 text-slate-900" /> Panel de Administrador <ChevronRight className="h-4 w-4 ml-auto opacity-70 text-slate-900"/>
+                    </Button>
+                  </Link>
+                )}
+
+                {isSuperadmin && (
+                  <Link href="/admin/superadmin" className="block">
+                    <Button variant="default" className="hover-lift w-full justify-start h-12 font-semibold text-sm bg-purple-700 hover:bg-purple-800 text-white transition-all rounded-xl shadow-sm active:scale-95 border border-purple-500/50">
+                      <Globe className="h-5 w-5 mr-3 text-white" /> Consola Superadmin <ChevronRight className="h-4 w-4 ml-auto opacity-70 text-white"/>
                     </Button>
                   </Link>
                 )}
@@ -238,10 +294,17 @@ export default function Dashboard() {
           <span className="text-[10px] font-semibold uppercase tracking-tight">Módulos</span>
         </Link>
         
-        {isAdmin && (
+        {(isAdmin || isSuperadmin) && (
           <Link href="/admin/dashboard" className="flex flex-col items-center gap-1 text-brand-gold transition-transform active:scale-90">
             <LayoutDashboard className="h-6 w-6" />
             <span className="text-[10px] font-semibold uppercase tracking-tight">Admin</span>
+          </Link>
+        )}
+
+        {isSuperadmin && (
+          <Link href="/admin/superadmin" className="flex flex-col items-center gap-1 text-purple-600 transition-transform active:scale-90">
+            <Globe className="h-6 w-6" />
+            <span className="text-[10px] font-semibold uppercase tracking-tight">Super</span>
           </Link>
         )}
         

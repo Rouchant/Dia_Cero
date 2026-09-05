@@ -121,7 +121,7 @@ export function Quiz({ questions = [], onComplete }: QuizProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <RadioGroup
-          value={selectedAnswer?.toString()}
+          value={selectedAnswer !== null ? selectedAnswer.toString() : ""}
           onValueChange={(v: string) => !showFeedback && setSelectedAnswer(parseInt(v))}
           className="space-y-3"
         >
